@@ -3,137 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh Tips AI | Személyi Bookmaker Asszisztens</title>
+    <title>Skyhigh AI | Személyi Bookmaker Szoftver</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030005; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #fff; }
         .font-robot { font-family: 'Orbitron', sans-serif; }
-        .purple-gradient { background: linear-gradient(135deg, #6d28d9 0%, #a855f7 100%); }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .text-glow { text-shadow: 0 0 15px rgba(168, 85, 247, 0.6); }
+        .green-glow { text-shadow: 0 0 15px rgba(34, 197, 94, 0.6); }
+        .purple-robot { color: #a855f7; filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.8)); }
+        .glass-dark { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.1); }
+        input[type="range"] { accent-color: #22c55e; }
     </style>
 </head>
-<body class="text-white selection:bg-purple-500 overflow-x-hidden">
+<body class="overflow-x-hidden">
 
-    <div class="fixed bottom-10 -left-6 text-[8px] text-purple-500/30 uppercase tracking-[0.5em] z-50 transform -rotate-90 font-bold">
+    <div class="fixed bottom-10 -left-6 text-[8px] text-green-500/30 uppercase tracking-[0.5em] z-50 transform -rotate-90 font-bold">
         Dev by faqu
     </div>
 
-    <nav class="sticky top-0 z-40 glass px-6 py-4 flex justify-between items-center">
+    <nav class="sticky top-0 z-40 glass-dark px-6 py-4 flex justify-between items-center border-b border-green-500/20">
         <div class="flex items-center gap-2">
-            <i class="fas fa-robot text-purple-500 text-xl text-glow"></i>
-            <span class="font-robot text-lg tracking-tighter uppercase">Skyhigh<span class="text-purple-500">.Ai</span></span>
+            <i class="fas fa-robot purple-robot text-2xl"></i>
+            <span class="font-robot text-lg tracking-tighter text-white">SKYHIGH<span class="text-green-500">.AI</span></span>
         </div>
-        <button class="bg-purple-600 text-[10px] font-black px-4 py-2 rounded-full tracking-widest uppercase shadow-lg">Belépés</button>
+        <button class="bg-green-600 text-[10px] font-black px-5 py-2 rounded-full tracking-widest uppercase text-black hover:bg-green-400 transition">Belépés</button>
     </nav>
 
-    <header class="relative pt-12 pb-20 px-6 text-center">
-        <div class="inline-block mb-6 px-4 py-1.5 glass rounded-full">
-            <span class="text-purple-400 text-[9px] font-bold tracking-[0.3em] uppercase">Személyi AI Bookmaker v2.0</span>
-        </div>
-        
-        <h1 class="font-robot text-4xl leading-[1.1] font-black mb-6 uppercase tracking-tighter">
-            Saját AI <br> <span class="text-purple-500 text-glow italic">Asszisztens.</span>
-        </h1>
-        
-        <p class="text-gray-400 text-sm leading-relaxed mb-10 px-4 italic">
-            "Nem csak egy szoftver. A Skyhigh.Ai a digitális bookmakered, aki érted dolgozik, nem ellened. Én megírtam a kódot, ő pedig kezeli a tőkéd." - <span class="text-white font-bold">faqubelord</span>
-        </p>
-
-        <div class="flex flex-col gap-4 px-4">
-            <a href="#arak" class="purple-gradient text-white font-extrabold py-5 rounded-2xl text-sm shadow-[0_10px_30px_rgba(168,85,247,0.4)] uppercase tracking-widest active:scale-95 transition">
-                Licenc igénylése
-            </a>
-            <div class="flex items-center justify-center gap-2 text-[10px] text-green-500 uppercase tracking-widest font-bold">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                Zárt béta teszt: Február 10.
+    <header class="pt-12 pb-10 px-6 text-center">
+        <div class="mb-6 relative inline-block">
+            <div class="w-32 h-32 bg-black border-4 border-purple-500 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(168, 85, 247, 0.4)]">
+                <i class="fas fa-robot text-6xl purple-robot"></i>
             </div>
+            <div class="absolute -bottom-2 -right-2 bg-green-500 text-black text-[8px] font-black px-2 py-1 rounded shadow-lg">ACTIVE</div>
         </div>
+
+        <h1 class="font-robot text-3xl font-black mb-4 uppercase tracking-tighter leading-none">
+            Személyi <span class="text-green-500 green-glow">Bookmaker</span> <br> Asszisztens
+        </h1>
+        <p class="text-gray-400 text-xs leading-relaxed max-w-xs mx-auto italic">
+            "A nevem Skyhigh AI. Egy matematikai alapú pénzgyárat építettünk neked. Én adom a számítást, te adod a fegyelmet."
+        </p>
     </header>
 
-    <section class="py-10 px-6">
-        <h2 class="font-robot text-center text-xl mb-10 uppercase tracking-tighter">Mit tesz érted az Asszisztens?</h2>
-        
-        <div class="space-y-4">
-            <div class="glass p-6 rounded-3xl flex items-start gap-5">
-                <div class="bg-purple-600/20 p-4 rounded-2xl text-purple-500">
-                    <i class="fas fa-user-tie text-2xl"></i>
-                </div>
+    <section class="px-6 py-10">
+        <div class="glass-dark p-8 rounded-[2rem] border-green-500/30">
+            <h3 class="font-robot text-xs text-green-500 mb-6 uppercase text-center tracking-[0.2em]">Számold ki a jövőd</h3>
+            
+            <div class="space-y-6">
                 <div>
-                    <h4 class="font-bold text-sm uppercase mb-1">Privát Tanácsadó</h4>
-                    <p class="text-xs text-gray-500 leading-relaxed">A robot naponta kiválasztja az internet legszűrtebb információját, és tálcán kínálja neked.</p>
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Kezdőtőke</label>
+                        <span id="tokeValue" class="text-green-500 text-lg font-black tracking-tighter">100.000 Ft</span>
+                    </div>
+                    <input type="range" min="50000" max="5000000" step="10000" value="100000" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer" id="tokeRange">
                 </div>
-            </div>
 
-            <div class="glass p-6 rounded-3xl flex items-start gap-5 border-r-2 border-purple-500">
-                <div class="bg-purple-600/20 p-4 rounded-2xl text-purple-500">
-                    <i class="fas fa-percentage text-2xl"></i>
-                </div>
                 <div>
-                    <h4 class="font-bold text-sm uppercase mb-1">Precíziós Tétkezelés</h4>
-                    <p class="text-xs text-gray-500 leading-relaxed">Megadod a tőkéd, az Asszisztens pedig hajszálpontosan megmondja, mennyit tegyél fel, hogy megvédd a pénzed.</p>
+                    <label class="text-[10px] uppercase text-gray-500 font-bold mb-3 block tracking-widest">Időtartam kiválasztása</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="setTerm(6)" id="term6" class="py-4 rounded-2xl border border-green-500/50 bg-green-500/10 text-[10px] font-black tracking-widest transition uppercase">6 Hónap</button>
+                        <button onclick="setTerm(12)" id="term12" class="py-4 rounded-2xl border border-zinc-800 bg-transparent text-[10px] font-black tracking-widest transition text-gray-500 uppercase">12 Hónap</button>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t border-white/5 text-center">
+                    <span class="text-[10px] text-gray-500 uppercase block mb-2 tracking-widest">Garantált tőke-iránycél:</span>
+                    <div id="eredmeny" class="text-5xl font-black text-green-500 tracking-tighter green-glow">450.000 Ft</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-16 bg-zinc-900/50 px-6">
-        <div class="glass p-8 rounded-[3rem] border-purple-500/20 text-center relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 opacity-5">
-                <i class="fas fa-robot text-[10rem]"></i>
+    <section class="py-12 px-6">
+        <div class="bg-gradient-to-br from-green-600 to-green-800 text-black p-10 rounded-[3rem] shadow-[0_20px_50px_rgba(34,197,94,0.3)] relative overflow-hidden">
+            <div class="absolute -right-5 -top-5 opacity-10">
+                <i class="fas fa-robot text-[8rem]"></i>
             </div>
-            <h3 class="text-xs text-purple-500 font-bold uppercase tracking-[0.3em] mb-6">Vagyonépítési Iránytű</h3>
             
-            <div class="space-y-8">
-                <div>
-                    <span class="text-[10px] text-gray-600 uppercase block mb-1 tracking-widest">Kezdőtőke</span>
-                    <div class="text-3xl font-black">100.000 Ft</div>
-                </div>
-                <i class="fas fa-chevron-down text-purple-500 animate-bounce"></i>
-                <div>
-                    <span class="text-[10px] text-purple-400 uppercase block mb-1 tracking-widest font-bold">12 hónapos AI cél</span>
-                    <div class="text-5xl font-black text-glow tracking-tighter">1.400.000 Ft+</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="arak" class="py-20 px-6 text-center">
-        <div class="glass p-10 rounded-[3rem] shadow-2xl">
-            <h3 class="font-robot text-2xl font-black mb-2 uppercase">Havi Licenc</h3>
-            <p class="text-[10px] font-bold text-gray-500 uppercase mb-8 tracking-widest italic">A technológia ára</p>
+            <h3 class="font-robot text-3xl font-black mb-1 uppercase tracking-tighter">HAVI LICENC</h3>
+            <p class="text-[10px] font-bold uppercase mb-8 opacity-80 tracking-widest italic font-black">Technológiai Hozzáférés</p>
             
-            <div class="text-5xl font-black tracking-tighter mb-10">20.000 Ft<span class="text-sm text-gray-600">/hó</span></div>
-
-            <div class="space-y-4 text-left mb-10">
-                <div class="flex items-center gap-3 text-xs font-bold text-gray-400">
-                    <i class="fas fa-check text-purple-500"></i> AI Dashboard Hozzáférés
-                </div>
-                <div class="flex items-center gap-3 text-xs font-bold text-gray-400">
-                    <i class="fas fa-check text-purple-500"></i> Napi 1 Személyi Master Tipp
-                </div>
-                <div class="flex items-center gap-3 text-xs font-bold text-gray-400">
-                    <i class="fas fa-check text-purple-500"></i> MLM Jutalék (2% Visszatérítés)
-                </div>
+            <div class="flex items-baseline gap-2 mb-10">
+                <span class="text-6xl font-black tracking-tighter">20.000 Ft</span>
+                <span class="text-sm font-bold opacity-60">/hó</span>
             </div>
 
-            <button class="w-full bg-purple-600 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg active:scale-95 transition">
-                Várólistára jelentkezem
+            <ul class="space-y-4 text-xs font-black mb-12 uppercase tracking-wide">
+                <li class="flex items-center gap-3"><i class="fas fa-check-circle opacity-50"></i> Személyi AI Asszisztens (24/7)</li>
+                <li class="flex items-center gap-3"><i class="fas fa-check-circle opacity-50"></i> Napi 1 Master AI Szelekció</li>
+                <li class="flex items-center gap-3"><i class="fas fa-check-circle opacity-50"></i> Dinamikus Tőkemenedzsment</li>
+                <li class="flex items-center gap-3"><i class="fas fa-check-circle opacity-50"></i> Automata Haladás Mentés</li>
+            </ul>
+
+            <button class="w-full bg-black text-white py-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition">
+                Licenc Aktiválása
             </button>
         </div>
     </section>
 
-    <footer class="py-12 text-center px-8 opacity-50 border-t border-white/5">
-        <p class="text-[9px] font-bold tracking-[0.5em] uppercase mb-2">© 2026 SKYHIGH TIPS AI</p>
-        <p class="text-[7px] uppercase leading-relaxed">
-            A rendszer statisztikai modelleket használ. A szoftver használata kockázattal jár.
-        </p>
+    <section class="py-10 px-10 text-center space-y-12">
+        <div>
+            <i class="fas fa-save text-purple-500 mb-4 text-2xl"></i>
+            <h4 class="font-robot text-[10px] mb-2 uppercase tracking-[0.2em] font-bold">Progress Save technológia</h4>
+            <p class="text-[10px] text-gray-500 leading-relaxed uppercase tracking-wider">Ha a licenc lejár, a Robot megáll és menti a tőkéd állapotát. Aktiválás után pontosan onnan folytatódik a növekedés.</p>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center opacity-30 border-t border-white/5">
+        <p class="text-[7px] tracking-[0.6em] font-bold uppercase text-green-500">Skyhigh AI System • Owner: faqu</p>
     </footer>
 
+    <script>
+        const range = document.getElementById('tokeRange');
+        const tokeDisplay = document.getElementById('tokeValue');
+        const eredmeny = document.getElementById('eredmeny');
+        let currentTerm = 6;
+
+        function updateCalc() {
+            const val = parseInt(range.value);
+            tokeDisplay.innerText = val.toLocaleString() + ' Ft';
+            const multiplier = currentTerm === 6 ? 4.5 : 14;
+            const final = Math.floor(val * multiplier);
+            eredmeny.innerText = final.toLocaleString() + ' Ft';
+        }
+
+        function setTerm(months) {
+            currentTerm = months;
+            document.getElementById('term6').className = months === 6 ? 'py-4 rounded-2xl border border-green-500/50 bg-green-500/10 text-[10px] font-black tracking-widest transition uppercase' : 'py-4 rounded-2xl border border-zinc-800 bg-transparent text-[10px] font-black tracking-widest transition text-gray-500 uppercase';
+            document.getElementById('term12').className = months === 12 ? 'py-4 rounded-2xl border border-green-500/50 bg-green-500/10 text-[10px] font-black tracking-widest transition uppercase' : 'py-4 rounded-2xl border border-zinc-800 bg-transparent text-[10px] font-black tracking-widest transition text-gray-500 uppercase';
+            updateCalc();
+        }
+
+        range.addEventListener('input', updateCalc);
+        updateCalc();
+    </script>
 </body>
 </html>
