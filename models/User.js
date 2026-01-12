@@ -6,11 +6,15 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     date: { type: Date, default: Date.now },
     
-    // LICENC ÉS PÉNZÜGYI ADATOK
-    hasLicense: { type: Boolean, default: false }, // Ezt bekapcsoljuk fizetéskor
-    licenseType: { type: String, default: 'none' }, // 'Havi', 'Féléves', 'Éves'
-    licenseExpires: { type: Date, default: null },  // A lejárat pontos dátuma
-    totalSpent: { type: Number, default: 0 },       // Mennyit fizetett összesen
+    // LICENC ADATOK
+    hasLicense: { type: Boolean, default: false },
+    licenseType: { type: String, default: 'none' },
+    licenseExpires: { type: Date, default: null },
+    totalSpent: { type: Number, default: 0 },
+    
+    // PÉNZÜGYI MENEDZSMENT (ROBOT KEZELI)
+    startingCapital: { type: Number, default: 0 }, // Kezdőtőke
+    currentCapital: { type: Number, default: 0 },  // Aktuális egyenleg
     
     myReferralCode: { type: String, default: '' }
 });
