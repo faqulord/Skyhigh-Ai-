@@ -7,63 +7,83 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Orbitron:wght@900&display=swap');
         body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
-        .bento { background: #080808; border: 1px solid #141414; border-radius: 32px; }
-        .purple-glow { filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6)); color: #a855f7; }
+        .font-robot { font-family: 'Orbitron', sans-serif; }
+        .bento { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; }
+        .purple-glow { color: #a855f7; text-shadow: 0 0 25px rgba(168, 85, 247, 0.5); }
+        .nav-link { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #666; transition: 0.3s; }
+        .nav-link:hover { color: #fff; }
+        .active-link { color: #a855f7; border-bottom: 2px solid #a855f7; padding-bottom: 5px; }
     </style>
 </head>
 <body class="pb-20">
 
-    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/5 px-6 py-4">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-xl border-b border-white/5 px-6 py-4">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-2">
-                <i class="fas fa-robot text-purple-500"></i>
-                <span style="font-family: 'Orbitron';" class="text-sm tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
+                <i class="fas fa-robot text-purple-500 text-xl"></i>
+                <span class="font-robot text-lg tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
             </div>
-            <a href="/login" class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-full uppercase">Belépés</a>
-        </div>
-        <div class="max-w-5xl mx-auto mt-4 flex gap-4 text-[10px] font-bold uppercase tracking-widest">
-            <a href="/" class="text-zinc-500 hover:text-white">Home</a>
-            <a href="/technologia" class="text-purple-500 border-b border-purple-500">Technológia</a>
-            <a href="/strategia" class="text-zinc-500 hover:text-white">Stratégia</a>
+            <div class="flex gap-8">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/technologia" class="nav-link active-link">Technológia</a>
+                <a href="/strategia" class="nav-link">Stratégia</a>
+            </div>
+            
+            <a href="/login" class="bg-white text-black text-[10px] font-black px-6 py-2 rounded-full uppercase tracking-widest hover:bg-gray-200 transition">Belépés</a>
         </div>
     </nav>
 
-    <header class="pt-40 pb-20 px-8 text-center">
-        <div class="inline-block px-4 py-2 rounded-full border border-purple-500/30 mb-8 bg-purple-500/5">
-            <span class="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">Quantum Tech Engine v2.0</span>
-        </div>
-        <h1 class="text-5xl font-black uppercase tracking-tighter italic mb-6">
-            Csúcs <br> <span class="purple-glow italic">Technológia.</span>
+    <header class="pt-40 pb-16 px-6 text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-8">
+            A Motor, ami <br> <span class="purple-glow italic text-5xl md:text-6xl">Sosem Fárad El.</span>
         </h1>
-        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest max-w-xl mx-auto leading-relaxed">
-            A Skyhigh AI nem érzelemből fogad. <br> Több millió adatpontot elemez miliszekundumok alatt.
+        <p class="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-12">
+            Hogyan csinálunk pénzt a káoszból? <br>
+            Bemutatjuk a Skyhigh AI technológiai hátterét.
         </p>
     </header>
 
-    <section class="px-6 max-w-5xl mx-auto space-y-6">
-        <div class="bento p-10 border-l-4 border-purple-600">
-            <h3 class="text-xl font-black uppercase mb-6 flex items-center gap-3">
-                <i class="fas fa-brain text-purple-500"></i> Az AI Memória
-            </h3>
-            <p class="text-xs text-zinc-400 uppercase leading-relaxed font-bold">
-                A szoftver 365 napos memóriával rendelkezik. Minden nap elemzi az eredményeket, és a legfrissebb éles piaci információk alapján módosítja a stratégiát.
-            </p>
+    <section class="px-6 max-w-5xl mx-auto mb-20 space-y-6">
+        
+        <div class="bento p-8 border-l-4 border-purple-500 flex flex-col md:flex-row items-center gap-6">
+            <div class="w-16 h-16 rounded-full bg-purple-900/20 flex items-center justify-center text-purple-500 text-2xl"><i class="fas fa-brain"></i></div>
+            <div class="text-center md:text-left">
+                <h3 class="text-lg font-black uppercase mb-2">1. 365 Napos Memória</h3>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed">
+                    A legtöbb ember elfelejti a múlt heti hibáit. A szoftver soha. Az AI egy éven keresztül tárolja és elemzi az összes piaci mozgást, így folyamatosan finomítja a stratégiát, hogy elkerülje a veszteséget.
+                </p>
+            </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="bento p-8">
-                <i class="fas fa-bolt text-yellow-500 text-2xl mb-4"></i>
-                <h4 class="text-sm font-black uppercase mb-3">1.0s Feldolgozás</h4>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold leading-tight">Míg mások híreket olvasnak, az AI miliszekundumok alatt szűri le a globális odds-változásokat.</p>
-            </div>
-            <div class="bento p-8">
-                <i class="fas fa-square-root-variable text-green-500 text-2xl mb-4"></i>
-                <h4 class="text-sm font-black uppercase mb-3">Tiszta Matematika</h4>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold leading-tight">Minden tipp mögött kőkemény valószínűségszámítás áll.</p>
+        <div class="bento p-8 border-l-4 border-yellow-500 flex flex-col md:flex-row items-center gap-6">
+            <div class="w-16 h-16 rounded-full bg-yellow-900/20 flex items-center justify-center text-yellow-500 text-2xl"><i class="fas fa-bolt"></i></div>
+            <div class="text-center md:text-left">
+                <h3 class="text-lg font-black uppercase mb-2">2. 1.0s Reakcióidő</h3>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed">
+                    Amikor befut egy hír (pl. egy kulcsjátékos lesérül), a piac másodpercek alatt reagál. A Skyhigh AI miliszekundumok alatt érzékeli a változást, és még azelőtt jelez, hogy az odds-ok bezuhannának.
+                </p>
             </div>
         </div>
+
+        <div class="bento p-8 border-l-4 border-blue-500 flex flex-col md:flex-row items-center gap-6">
+            <div class="w-16 h-16 rounded-full bg-blue-900/20 flex items-center justify-center text-blue-500 text-2xl"><i class="fas fa-globe"></i></div>
+            <div class="text-center md:text-left">
+                <h3 class="text-lg font-black uppercase mb-2">3. Global Data Scan</h3>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed">
+                    Nem csak egy ligát figyelünk. A rendszer egyszerre pásztázza az ázsiai, európai és amerikai piacokat. Összehasonlítja a fogadóirodák tévedéseit, és megtalálja a matematikai réseket.
+                </p>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="px-6 max-w-3xl mx-auto text-center pb-20">
+        <p class="text-[9px] text-zinc-600 font-black uppercase tracking-[0.4em] mb-6">Ez nem szerencse. Ez technológia.</p>
+        <a href="/regisztracio" class="inline-block bg-purple-600 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] hover:scale-105 transition">
+            Csatlakozom a Rendszerhez
+        </a>
     </section>
 
 </body>
