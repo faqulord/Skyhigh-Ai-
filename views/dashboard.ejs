@@ -3,268 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Vezérlőpult</title>
+    <title>Skyhigh AI | Executive Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
         
         body { 
             background-color: #000000; 
-            color: #e4e4e7; /* zinc-200 */
+            color: #ffffff; 
             font-family: 'Inter', sans-serif; 
-        }
-        
-        /* Modern Kártyák (Fintech stílus) */
-        .card { 
-            background: #09090b; /* zinc-950 */
-            border: 1px solid #27272a; /* zinc-800 */
-            border-radius: 20px; 
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-        .card:hover { border-color: #3f3f46; /* zinc-700 */ }
-        
-        /* Prémium aktív kártya */
-        .card-active { 
-            background: linear-gradient(145deg, #09090b 0%, #051a0d 100%);
-            border: 1px solid #15803d; /* green-700 */
+            overflow-x: hidden;
         }
 
-        /* Homályosított Üveg (Frosted Glass) - A titok */
-        .locked-content {
-            position: relative;
-            overflow: hidden;
-        }
-        .locked-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(9, 9, 11, 0.6);
-            backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
+        /* Üveg kártyák (Glassmorphism) */
+        .glass-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
         }
 
-        /* Modern Gombok */
-        .btn-primary { 
-            background: white; 
-            color: black; 
-            font-weight: 600; 
+        /* AI Chat Buborék Animáció (Pop-in) */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .ai-bubble {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 16px 20px;
+            border-radius: 20px 20px 20px 4px; /* Bal alsó sarok hegyes */
+            color: #e5e5e5;
             font-size: 13px;
-            padding: 12px 20px; 
-            border-radius: 12px; 
-            width: 100%; 
-            display: block; 
-            text-align: center;
-            transition: 0.2s;
-        }
-        .btn-primary:hover { background: #d4d4d8; transform: translateY(-1px); }
-
-        .btn-admin { 
-            background: #f59e0b; color: black; font-weight: 700; 
-            font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-            padding: 8px 16px; border-radius: 8px; margin-bottom: 24px; display: inline-block;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            max-width: 90%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0; /* Kezdetben láthatatlan */
         }
 
-        /* Chat Buborékok (iMessage stílus) */
-        .chat-container { background: #09090b; border: 1px solid #27272a; border-radius: 20px; height: 500px; display: flex; flex-direction: column; }
-        .bubble-ai { 
-            background: #27272a; color: white; 
-            padding: 10px 16px; border-radius: 18px 18px 18px 4px; 
-            font-size: 13px; margin-bottom: 12px; max-width: 85%; line-height: 1.5;
+        .user-bubble {
+            background: #ffffff;
+            color: black;
+            border-radius: 20px 20px 4px 20px;
+            margin-left: auto;
         }
-        .bubble-label { font-size: 10px; color: #a1a1aa; margin-bottom: 4px; display: block; font-weight: 600; }
+
+        /* Avatar */
+        .ai-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: white;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Prémium Blur (A titokhoz) */
+        .premium-blur {
+            filter: blur(8px);
+            opacity: 0.6;
+            user-select: none;
+            transition: 0.5s;
+        }
         
-        /* Státusz Lista */
-        .status-item { display: flex; items-center; justify-content: space-between; font-size: 12px; padding: 8px 0; border-bottom: 1px solid #27272a; color: #a1a1aa; }
-        .status-item:last-child { border-bottom: none; }
-        .check-icon { color: #22c55e; margin-left: 8px; }
+        /* Gombok */
+        .btn-action {
+            background: white; color: black;
+            font-weight: 600; font-size: 12px;
+            padding: 14px; border-radius: 14px;
+            text-align: center; display: block; width: 100%;
+            transition: transform 0.2s;
+        }
+        .btn-action:hover { transform: scale(1.02); }
 
+        .btn-admin {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #f59e0b; color: black; font-weight: 700;
+            padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+            z-index: 100; font-size: 12px; text-transform: uppercase;
+        }
     </style>
 </head>
-<body class="p-6 md:p-10 max-w-7xl mx-auto pb-32">
+<body class="min-h-screen p-6 md:p-12 flex flex-col">
 
     <% 
         const today = new Date();
         const dateStr = today.toLocaleDateString('hu-HU', { month: 'long', day: 'numeric' });
-        
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yestStr = yesterday.toLocaleDateString('hu-HU', { month: '2-digit', day: '2-digit' });
     %>
 
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-white tracking-tight">Szia, <%= user.fullname.split(' ')[0] %> 👋</h1>
-            <p class="text-sm text-zinc-500 font-medium">Itt a mai piaci áttekintésed.</p>
-        </div>
-        
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-2 px-4 py-2 bg-zinc-900 rounded-full border border-zinc-800">
-                <span class="w-2 h-2 rounded-full <%= user.hasLicense ? 'bg-green-500' : 'bg-orange-500' %>"></span>
-                <span class="text-xs font-semibold <%= user.hasLicense ? 'text-green-500' : 'text-zinc-400' %>">
-                    <%= user.hasLicense ? 'Prémium Előfizető' : 'Ingyenes Fiók' %>
-                </span>
+    <header class="flex justify-between items-center mb-10 max-w-6xl mx-auto w-full">
+        <div class="flex items-center gap-4">
+            <div class="h-10 w-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500">
+                <i class="fas fa-user"></i>
             </div>
-            <a href="/logout" class="text-sm font-medium text-zinc-500 hover:text-white transition">Kilépés</a>
+            <div>
+                <h1 class="text-lg font-semibold text-white"><%= user.fullname %></h1>
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full <%= user.hasLicense ? 'bg-green-500' : 'bg-zinc-600' %>"></span>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-medium">
+                        <%= user.hasLicense ? 'Prémium Tag' : 'Vendég Fiók' %>
+                    </p>
+                </div>
+            </div>
         </div>
+        <a href="/logout" class="text-xs text-zinc-500 hover:text-white transition">Kijelentkezés</a>
     </header>
 
-    <% if (isAdmin) { %> 
-        <a href="/admin" class="btn-admin"><i class="fas fa-crown mr-2"></i> Igazgatói Mód</a> 
-    <% } %>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto w-full">
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        <div class="space-y-6">
+        <div class="lg:col-span-8 flex flex-col gap-6">
             
+            <div class="glass-card flex-1 min-h-[500px] flex flex-col p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-purple-900/10 rounded-full blur-3xl -z-10"></div>
+
+                <div class="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+                    <div class="ai-avatar"><i class="fas fa-robot"></i></div>
+                    <div>
+                        <h3 class="text-sm font-medium text-white">Skyhigh AI</h3>
+                        <p class="text-[10px] text-purple-400 uppercase tracking-wider">Személyes Asszisztens</p>
+                    </div>
+                </div>
+
+                <div id="chatContainer" class="flex-1 overflow-y-auto pr-2">
+                    </div>
+
+                <div class="mt-4 relative">
+                    <input type="text" placeholder="Írj választ..." class="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-zinc-600 transition placeholder-zinc-600">
+                    <button class="absolute right-3 top-3 text-zinc-400 hover:text-white p-1">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-4 space-y-6">
+
             <% if (user.hasLicense) { %>
-                <div class="card card-active">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-xs font-semibold text-green-400 uppercase tracking-wider">Mai Teljesítmény</span>
-                        <i class="fas fa-chart-pie text-green-500"></i>
+                <div class="glass-card p-6 border-green-500/30">
+                    <p class="text-xs text-zinc-500 uppercase tracking-widest mb-1">Mai Teljesítmény</p>
+                    <h2 class="text-4xl font-light text-white mb-2">+4.8%</h2>
+                    <div class="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
+                        <div class="bg-green-500 h-full w-[40%]"></div>
                     </div>
-                    <div class="flex items-baseline gap-2">
-                        <h2 class="text-4xl font-bold text-white">+4.8%</h2>
-                        <span class="text-sm text-green-500 font-medium">Profit</span>
-                    </div>
-                    <p class="text-xs text-zinc-500 mt-2">A tőkéd a tervezett ütemben növekszik.</p>
+                    <p class="text-[10px] text-green-400 mt-2">Célkitűzés teljesítve</p>
                 </div>
 
-                <div class="card">
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="text-xs font-bold text-white bg-zinc-800 px-3 py-1 rounded-full"><%= dateStr %></span>
-                        <span class="text-xs text-purple-400 font-bold">PREMIER LEAGUE</span>
-                    </div>
-                    
+                <div class="glass-card p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <div class="text-center w-full">
-                            <p class="text-lg font-bold text-white">MAN. CITY</p>
-                            <p class="text-[10px] text-zinc-500">vs</p>
-                            <p class="text-lg font-bold text-white">LIVERPOOL</p>
+                        <span class="text-[10px] font-bold bg-white text-black px-2 py-1 rounded"><%= dateStr %></span>
+                        <span class="text-[10px] text-zinc-400">PREMIER LEAGUE</span>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-lg font-medium">Man. City vs Liverpool</p>
+                        <div class="mt-4 bg-zinc-800/50 p-3 rounded-xl border border-zinc-700/50">
+                            <span class="text-xs text-zinc-400 block mb-1">AI Választás:</span>
+                            <span class="text-sm font-bold text-white">HAZAI (1.85)</span>
                         </div>
-                    </div>
-                    
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex justify-between items-center">
-                        <span class="text-xs text-zinc-400">A Robot választása:</span>
-                        <span class="text-sm font-bold text-white">HAZAI (1.85)</span>
-                    </div>
-                </div>
-
-                <div class="bg-zinc-900 rounded-xl p-4 border border-zinc-800">
-                    <div class="flex justify-between text-xs mb-2">
-                        <span class="text-zinc-400">Havi Ciklus</span>
-                        <span class="text-white font-bold">1 / 30 Nap</span>
-                    </div>
-                    <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-                        <div class="bg-white h-full w-[3%]"></div>
                     </div>
                 </div>
 
             <% } else { %>
-                
-                <div class="card">
-                    <h3 class="text-sm font-semibold text-white mb-4">Rendszer Elemzés (<%= dateStr %>)</h3>
-                    <div class="space-y-1">
-                        <div class="status-item">
-                            <span>Globális piacok szűrése</span>
-                            <i class="fas fa-check-circle check-icon"></i>
-                        </div>
-                        <div class="status-item">
-                            <span>Sérülések ellenőrzése</span>
-                            <i class="fas fa-check-circle check-icon"></i>
-                        </div>
-                        <div class="status-item">
-                            <span>Kockázat elemzés</span>
-                            <i class="fas fa-check-circle check-icon"></i>
-                        </div>
-                        <div class="status-item">
-                            <span class="text-white font-bold">Nyereséges lehetőség találva</span>
-                            <span class="text-green-500 font-bold">IGEN</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card locked-content p-0">
-                    <div class="p-6 filter blur-[4px]">
+                <div class="glass-card p-0 relative overflow-hidden group">
+                    <div class="p-6">
                         <div class="flex justify-between items-center mb-6">
-                            <span class="text-xs font-bold text-zinc-600 bg-zinc-900 px-3 py-1 rounded-full"><%= dateStr %></span>
-                            <span class="text-xs text-zinc-600 font-bold">PREMIER LEAGUE</span>
+                            <span class="text-[10px] font-bold bg-zinc-800 text-zinc-400 px-2 py-1 rounded"><%= dateStr %></span>
+                            <span class="text-[10px] text-green-500 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Élő
+                            </span>
                         </div>
-                        <div class="text-center w-full mb-4">
-                            <p class="text-lg font-bold text-zinc-600">MAN. CITY</p>
-                            <p class="text-[10px] text-zinc-700">vs</p>
-                            <p class="text-lg font-bold text-zinc-600">LIVERPOOL</p>
+                        
+                        <div class="premium-blur opacity-40">
+                            <h3 class="text-center text-xl font-bold mb-2">TITKOS MÉRKŐZÉS</h3>
+                            <div class="flex justify-between mt-4">
+                                <span>Hazai</span>
+                                <span>Vendég</span>
+                            </div>
                         </div>
-                        <div class="bg-zinc-900 rounded-xl p-4 flex justify-between">
-                            <span class="text-xs text-zinc-700">Tipp:</span>
-                            <span class="text-sm font-bold text-zinc-700">HAZAI</span>
+
+                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/10 backdrop-blur-[2px]">
+                            <div class="bg-zinc-900/90 border border-zinc-700 p-4 rounded-2xl text-center shadow-2xl transform transition group-hover:scale-105 duration-300">
+                                <i class="fas fa-lock text-white mb-2"></i>
+                                <p class="text-xs font-medium text-white mb-1">Prémium Elemzés</p>
+                                <p class="text-[10px] text-zinc-400">94%-os valószínűség</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="locked-overlay p-6 text-center">
-                        <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center mb-3 border border-zinc-700">
-                            <i class="fas fa-lock text-white text-sm"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-sm mb-1">Prémium Lehetőség</h3>
-                        <p class="text-xs text-zinc-400 mb-6 max-w-[200px]">
-                            A Skyhigh AI 94%-os valószínűséget mért erre az eseményre.
-                        </p>
-                        <a href="/fizetes" class="btn-primary">
-                            Tipp Feloldása
+                    
+                    <div class="p-4 border-t border-white/5 bg-zinc-900/30">
+                        <a href="/fizetes" class="btn-action">
+                            Elemzés Feloldása
                         </a>
-                        <p class="text-[10px] text-orange-400 mt-3 font-medium">
-                            <i class="fas fa-clock mr-1"></i> Magas értékű tipp
-                        </p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800/50">
-                    <div class="w-8 h-8 rounded-full bg-green-900/30 flex items-center justify-center text-green-500 border border-green-900/50">
-                        <i class="fas fa-history text-xs"></i>
+                <div class="glass-card p-5 flex items-center gap-4">
+                    <div class="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+                        <i class="fas fa-check"></i>
                     </div>
                     <div>
-                        <p class="text-xs text-zinc-400">Tegnapi eredmény (<%= yestStr %>)</p>
-                        <p class="text-sm font-bold text-white">Sikeres Tipp ✅</p>
+                        <p class="text-xs text-zinc-400">Tegnapi Eredmény</p>
+                        <p class="text-sm font-medium text-white">Sikeres Zárás ✅</p>
                     </div>
                 </div>
-
             <% } %>
 
         </div>
-
-        <div class="lg:col-span-2">
-            <div class="chat-container">
-                <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                            <i class="fas fa-robot text-black text-sm"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-white">Skyhigh Assistant</h3>
-                            <p class="text-[10px] text-zinc-500">Mindig aktív</p>
-                        </div>
-                    </div>
-                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                </div>
-
-                <div id="chatBox" class="flex-1 overflow-y-auto p-6"></div>
-
-                <div class="p-4 border-t border-zinc-800">
-                    <input type="text" placeholder="Írj az asszisztensnek..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white transition placeholder-zinc-600">
-                </div>
-            </div>
-        </div>
-
     </div>
+
+    <% if (isAdmin) { %> 
+        <a href="/admin" class="btn-admin">
+            <i class="fas fa-shield-alt mr-2"></i> Admin
+        </a> 
+    <% } %>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const chatBox = document.getElementById('chatBox');
+            const container = document.getElementById('chatContainer');
             const hasLicense = <%= user.hasLicense %>;
-            const userName = "<%= user.fullname %>"; // Csak a keresztnév kellene, de így is jó
-            
-            let messages = [];
+            const fullName = "<%= user.fullname %>";
+            const firstName = fullName.split(' ')[0]; // Csak a keresztnevet használjuk, közvetlenebb
+
+            // Üzenet hozzáadása animációval
+            function addAiMessage(text, delay) {
+                setTimeout(() => {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'ai-bubble';
+                    bubble.innerHTML = text; // HTML engedélyezve a formázáshoz
+                    container.appendChild(bubble);
+                    
+                    // Görgetés az aljára
+                    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                }, delay);
+            }
+
+            // A FORGATÓKÖNYV
+            // 1. Üdvözlés
+            addAiMessage(`Üdvözöllek, <strong>${firstName}</strong>.`, 600);
+
+            // 2. Bemutatkozás (Mindenkinek)
+            addAiMessage(`A Skyhigh AI asszisztense vagyok. Az én feladatom, hogy felügyeljem a befektetéseidet és biztosítsam a matematikai alapú profitot.`, 2000);
+
+            if (hasLicense) {
+                // PRÉMIUM ÜGYFÉLNEK
+                addAiMessage(`A rendszered státusza: <span class="text-green-400 font-bold">AKTÍV</span>.`, 3500);
+                addAiMessage(`A mai piaci elemzés elkészült. A kockázat minimalizálva, a várható hozam pozitív. A konkrét instrukciókat a jobb oldali panelen találod.`, 5000);
+            } else {
+                // ÚJ (INGYENES) ÜGYFÉLNEK
+                addAiMessage(`Jelenleg <strong>Vendég</strong> módban vagy.`, 3500);
+                addAiMessage(`Lefuttattam a globális keresést a mai napra. Találtam egy kiemelkedően magas valószínűségű lehetőséget a Premier League-ben.`, 5000);
+                addAiMessage(`Mivel a fiókod még nincs aktiválva, a részleteket biztonsági okokból elhomályosítottam. Ha készen állsz a kezdésre, a jobb oldalon tudod feloldani a hozzáférést.`, 7500);
+            }
+        });
+    </script>
+
+</body>
+</html>
