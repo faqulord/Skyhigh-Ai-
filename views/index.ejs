@@ -3,129 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh AI | Regisztrálj és Teszteld a Jövőt</title>
+    <title>Skyhigh AI | Élj a hobbidból. Építs birodalmat.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
         .bento-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 28px; }
         .btn-active { background: #22c55e !important; color: #000 !important; border-color: #22c55e !important; }
         .btn-inactive { background: transparent; border: 1px solid #222; color: #666; }
         .term-active { border: 2px solid #a855f7 !important; background: rgba(168, 85, 247, 0.1); color: #fff !important; }
         .green-glow { color: #22c55e; text-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
-        .purple-glow { color: #a855f7; filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.8)); }
-        .register-button { background: #fff; color: #000; font-weight: 900; }
+        .purple-glow { color: #a855f7; filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.8)); }
         .buy-button { background: linear-gradient(90deg, #22c55e, #16a34a); color: #000; font-weight: 900; }
+        .legal-box { background: #050505; border: 1px solid #111; font-size: 9px; height: 100px; overflow-y: scroll; padding: 10px; color: #444; }
     </style>
 </head>
-<body class="px-4 pb-10">
+<body class="pb-10">
 
-    <nav class="py-6 flex justify-between items-center border-b border-white/5 mb-8">
+    <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-2">
-            <i class="fas fa-robot purple-glow text-xl"></i>
-            <span class="font-black tracking-tighter text-lg uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
+            <i class="fas fa-robot purple-glow"></i>
+            <span class="font-black tracking-tighter text-sm uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
         </div>
-        <div class="flex gap-3">
-            <button class="text-[9px] font-bold text-zinc-400 uppercase">Bejelentkezés</button>
-            <button class="bg-white text-black text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Regisztráció</button>
+        <div class="hidden md:flex gap-6 text-[10px] font-bold text-zinc-500 uppercase">
+            <a href="#tech" class="hover:text-white">Technológia</a>
+            <a href="#mlm" class="hover:text-white">Referral</a>
+            <a href="#about" class="hover:text-white">Rólunk</a>
         </div>
+        <button class="bg-white text-black text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Login</button>
     </nav>
 
-    <header class="text-center mb-10">
-        <h1 class="text-3xl font-black uppercase tracking-tighter leading-[0.9] mb-4">
-            Nézz be a <br> <span class="green-glow text-5xl italic">Kulisszák mögé.</span>
+    <header class="text-center pt-16 pb-12 px-6">
+        <h1 class="text-4xl font-black uppercase tracking-tighter leading-[0.9] mb-4">
+            Kezdj el a <br> <span class="green-glow text-5xl italic">Hobbidból megélni.</span>
         </h1>
-        <p class="text-zinc-400 text-[10px] leading-relaxed px-6 uppercase tracking-widest font-bold mb-8">
-            Regisztrálj ingyen és nézd meg, milyen egyszerű kezelni a <span class="text-white">Személyi AI Asszisztensedet!</span>
+        <p class="text-zinc-400 text-[11px] leading-relaxed px-10 uppercase tracking-widest font-bold mb-8">
+            A Skyhigh AI az út a <span class="text-white">szakmai szabadsághoz</span>. <br> 
+            Több mint sportfogadás: Matematikai vagyongyarapítás.
         </p>
-        <button class="register-button w-full py-5 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition mb-4">
-            Ingyenes Regisztráció & Teszt
-        </button>
-        <p class="text-[8px] text-zinc-600 uppercase tracking-widest italic">Nincs szükség bankkártyára a betekintéshez</p>
     </header>
 
-    <section class="mb-10 space-y-4 px-2">
-        <div class="bento-card p-6">
-            <h4 class="text-[11px] font-black text-green-500 uppercase tracking-widest mb-4 italic">Tudtad?</h4>
-            <p class="text-[10px] text-zinc-400 leading-relaxed">
-                A mai világban rengetegen élnek meg sportfogadásból, de ehhez <span class="text-white font-bold">hosszú évek kemény munkája és szakmai tapasztalata</span> kell. Ez egy szakma.
-            </p>
-            <div class="h-[1px] bg-zinc-800 my-4"></div>
-            <p class="text-[10px] text-zinc-400 leading-relaxed">
-                Mondunk egy jobbat: A Skyhigh AI Licenccel kapsz egy <span class="text-purple-400 font-bold">csúcstechnológiás robotot</span>, aki neked dolgozik. Neked csak meg kell raknod a tippet, a robot pedig szállítja a matekot.
-            </p>
-        </div>
-    </section>
-
-    <section class="mb-10 space-y-3">
-        <h3 class="text-[10px] font-black text-center text-zinc-600 uppercase tracking-[0.3em] mb-6">Próbáld ki a felületet:</h3>
-        
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bento-card p-5 text-center">
-                <i class="fas fa-comments text-blue-500 text-xl mb-3"></i>
-                <h5 class="text-[9px] font-black uppercase mb-1">Ingyenes Chat</h5>
-                <p class="text-[7px] text-zinc-600 uppercase tracking-tight leading-tight italic">Beszélgess az AI asszisztenssel regisztráció után</p>
+    <section id="mlm" class="px-6 mb-12">
+        <div class="bento-card p-8 border-l-4 border-green-500 bg-gradient-to-br from-green-900/10 to-transparent">
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fas fa-users text-green-500 text-xl"></i>
+                <h3 class="text-sm font-black uppercase tracking-widest">MLM Csapat Rendszer</h3>
             </div>
-            <div class="bento-card p-5 text-center border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-                <i class="fas fa-lock text-purple-500 text-xl mb-3"></i>
-                <h5 class="text-[9px] font-black uppercase mb-1">Master Tippek</h5>
-                <p class="text-[7px] text-zinc-600 uppercase tracking-tight leading-tight italic">A napi 1 tippet és az elemzést a licenc aktiválás oldja fel</p>
+            <p class="text-[10px] text-zinc-400 leading-relaxed mb-6">
+                Építsd a saját hálózatod! Hívd meg barátaidat a saját egyedi kódoddal, és kapsz <span class="text-white font-black text-lg">3%</span> jutalékot minden befizetésükből. 
+            </p>
+            <div class="p-4 bg-black/40 rounded-2xl border border-white/5 text-[9px] text-zinc-500 italic mb-6">
+                <i class="fas fa-info-circle mr-2 text-green-500"></i> Ha a jutalékaid összege eléri a 20.000 Ft-ot, ingyen válthatod ki a következő havi Licenc csomagodat!
             </div>
         </div>
     </section>
 
-    <section class="bento-card p-6 mb-10 shadow-2xl">
-        <h3 class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-8 text-center italic tracking-[0.3em]">Üzleti Profit Kalkulátor</h3>
-        <div class="space-y-8">
-            <div>
-                <label class="text-[9px] text-zinc-500 uppercase font-bold block mb-3 text-center tracking-widest">Kezdőtőke:</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button onclick="setCap(50000)" id="cap50000" class="btn-inactive py-3 rounded-xl text-[10px] font-black">50.000</button>
-                    <button onclick="setCap(100000)" id="cap100000" class="btn-active py-3 rounded-xl text-[10px] font-black">100.000</button>
-                    <button onclick="setCap(250000)" id="cap250000" class="btn-inactive py-3 rounded-xl text-[10px] font-black">250.000</button>
+    <section class="px-6 mb-12">
+        <div class="bento-card p-8">
+            <h3 class="text-[11px] font-black uppercase tracking-widest mb-6 text-center italic">Regisztráció & Licenc Jogosultság</h3>
+            
+            <form class="space-y-4">
+                <input type="email" placeholder="E-mail címed" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl text-xs focus:border-purple-500 outline-none">
+                <input type="password" placeholder="Jelszó" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl text-xs focus:border-purple-500 outline-none">
+                
+                <div class="mt-6">
+                    <p class="text-[9px] text-zinc-500 uppercase font-bold mb-2">Felhasználási Feltételek (T&C):</p>
+                    <div class="legal-box rounded-xl">
+                        A Skyhigh AI egy matematikai statisztikai modellező szoftver. A szoftver használatával a Felhasználó kijelenti, hogy tudomásul veszi: a szoftver által generált adatok nem minősülnek pénzügyi vagy befektetési tanácsadásnak. Az üzemeltető (Igazgató) semmilyen felelősséget nem vállal a szoftver használatából eredő esetleges anyagi veszteségekért. A sportfogadás kockázatos tevékenység. A szoftver statisztikai valószínűségeket mutat be a múltbeli adatok és az AI algoritmus alapján. A havi díj a technológiai licenc használatára jogosít, nem garantált nyereményre. A regisztrációval Ön elfogadja, hogy a szoftvert saját felelősségére használja.
+                    </div>
+                    <div class="flex items-center gap-3 mt-4">
+                        <input type="checkbox" id="accept" class="w-4 h-4 accent-green-500">
+                        <label for="accept" class="text-[9px] text-zinc-400 uppercase font-bold">Elfogadom a feltételeket és mentesítem az üzemeltetőt a felelősség alól.</label>
+                    </div>
+                </div>
+
+                <button type="button" class="buy-button w-full py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-lg active:scale-95 mt-4">
+                    Fiók Létrehozása & Belépés
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <section id="about" class="px-6 py-12 bg-zinc-900/20 border-y border-white/5">
+        <h2 class="text-[10px] font-black text-center text-zinc-600 uppercase tracking-[0.4em] mb-10">Micsoda a Skyhigh AI?</h2>
+        <div class="space-y-8 max-w-lg mx-auto">
+            <p class="text-[11px] text-zinc-500 leading-relaxed text-center">
+                A <span class="text-white font-bold">Skyhigh AI</span> egy professzionális, mesterséges intelligenciára épülő algoritmus, amelyet azért fejlesztettünk ki, hogy a káoszból rendet, a szerencsejátékból pedig <span class="text-green-500 font-bold italic">kiszámítható stratégiát</span> alkosson. 
+            </p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center p-4 bento-card">
+                    <i class="fas fa-microchip text-purple-500 mb-2"></i>
+                    <h5 class="text-[9px] font-bold uppercase">AI Asszisztens</h5>
+                    <p class="text-[7px] text-zinc-600 uppercase italic">A robot mindenre emlékszik.</p>
+                </div>
+                <div class="text-center p-4 bento-card">
+                    <i class="fas fa-chart-line text-green-500 mb-2"></i>
+                    <h5 class="text-[9px] font-bold uppercase">Havi Profit</h5>
+                    <p class="text-[7px] text-zinc-600 uppercase italic">Fixált matematikai célok.</p>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="setTerm(6)" id="term6" class="term-active py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">6 Hónap</button>
-                <button onclick="setTerm(12)" id="term12" class="btn-inactive py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">12 Hónap</button>
-            </div>
-            <div class="pt-6 border-t border-white/5">
-                <div class="bg-zinc-900 py-6 rounded-3xl border border-white/5 text-center">
-                    <span id="eredmeny" class="text-5xl font-black tracking-tighter italic">450.000 <span class="text-green-500 text-lg">Ft</span></span>
-                    <p class="text-[8px] text-zinc-600 mt-2 uppercase tracking-widest">Havi Licenc: 20.000 Ft</p>
-                </div>
-            </div>
+            <p class="text-[10px] text-zinc-600 italic text-center px-4 leading-relaxed">
+                "Nem egy szoftvert adunk a kezedbe, hanem egy új életformát. Ahol a hobbid válik a pénzgyárad alapjává." - Skyhigh System
+            </p>
         </div>
     </section>
 
-    <footer class="text-center pt-10 border-t border-white/5 opacity-40">
-        <p class="text-[8px] font-black tracking-[0.6em] uppercase mb-2 text-green-500">SKYHIGH AI SYSTEM</p>
-        <p class="text-[7px] text-zinc-700 uppercase italic">© 2026 Minden jog fenntartva.</p>
+    <footer class="text-center py-12 opacity-40">
+        <p class="text-[8px] font-black tracking-[0.6em] uppercase mb-2 text-green-500">SKYHIGH AI SYSTEM • 2026</p>
+        <p class="text-[7px] text-zinc-700 uppercase mb-4 px-10 leading-relaxed italic">Minden jog fenntartva. Faqubelord Engineering. A szoftver matematikai modellezést használ.</p>
     </footer>
 
     <script>
+        // Egyszerűsített kalkulátor JS (megmaradt a korábbi logikából)
         let currentCap = 100000;
         let currentTerm = 6;
-        function setCap(amount) {
-            currentCap = amount;
-            [50000, 100000, 250000].forEach(c => {
-                document.getElementById('cap' + c).className = c === amount ? 'btn-active py-3 rounded-xl text-[10px] font-black' : 'btn-inactive py-3 rounded-xl text-[10px] font-black';
-            });
-            updateCalc();
-        }
-        function setTerm(months) {
-            currentTerm = months;
-            document.getElementById('term6').className = months === 6 ? 'term-active py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all' : 'btn-inactive py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all';
-            document.getElementById('term12').className = months === 12 ? 'term-active py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all' : 'btn-inactive py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all';
-            updateCalc();
-        }
+        function setCap(amount) { currentCap = amount; updateCalc(); }
+        function setTerm(months) { currentTerm = months; updateCalc(); }
         function updateCalc() {
-            const veg = document.getElementById('eredmeny');
-            const multiplier = currentTerm === 6 ? 4.5 : 14;
-            veg.innerHTML = Math.floor(currentCap * multiplier).toLocaleString() + ' <span class="text-green-500 text-lg font-black">Ft</span>';
+            // Itt a korábbi kalkulátor logika maradhat, ha szükséges a UI-hoz
         }
-        updateCalc();
     </script>
 </body>
 </html>
