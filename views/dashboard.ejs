@@ -7,20 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Orbitron:wght@900&display=swap');
         body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; }
+        .font-robot { font-family: 'Orbitron', sans-serif; }
         
-        /* Kártya Stílus */
+        /* Kártyák */
         .card { 
             background: #0a0a0a; 
             border: 1px solid #1a1a1a; 
             border-radius: 16px; 
-            padding: 20px;
+            padding: 24px;
             position: relative;
             overflow: hidden;
+            transition: 0.3s;
         }
         
-        /* Animált Szkennelés (A mézesmadzag) */
+        /* PROFI NÉZET: Neon Keret */
+        .card-active { border: 1px solid #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); }
+
+        /* INGYENES NÉZET: Scanner Csík */
         .scanner-line {
             position: absolute; top: 0; left: 0; width: 100%; height: 2px;
             background: #22c55e;
@@ -30,12 +35,9 @@
         }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* A "Titkos" Homály */
+        /* Homályosítás a titkokhoz */
         .blur-secret { 
-            filter: blur(6px); 
-            user-select: none; 
-            background: #111; 
-            color: transparent; 
+            filter: blur(5px); user-select: none; background: #111; color: transparent; 
             text-shadow: 0 0 8px rgba(255,255,255,0.5);
         }
 
@@ -43,7 +45,7 @@
         .btn-unlock { 
             background: linear-gradient(90deg, #22c55e, #16a34a); color: black; 
             font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 11px;
-            padding: 12px; border-radius: 8px; width: 100%; display: block; text-align: center;
+            padding: 14px; border-radius: 10px; width: 100%; display: block; text-align: center;
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
             animation: pulse-green 2s infinite;
         }
@@ -56,98 +58,136 @@
         .ai-label { color: #a855f7; font-weight: 900; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px; }
     </style>
 </head>
-<body class="p-4 md:p-6 max-w-6xl mx-auto pb-20">
+<body class="p-4 md:p-6 max-w-6xl mx-auto pb-24">
 
     <header class="flex justify-between items-center mb-8 border-b border-zinc-900 pb-4">
         <div>
             <h1 class="text-lg font-black uppercase tracking-tight text-white"><%= user.fullname %></h1>
             <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full <%= user.hasLicense ? 'bg-green-500' : 'bg-yellow-500' %>"></span>
+                <span class="w-2 h-2 rounded-full <%= user.hasLicense ? 'bg-green-500 animate-pulse' : 'bg-red-500' %>"></span>
                 <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">
-                    <%= user.hasLicense ? 'PRO PARTNER' : 'INGYENES TAG' %>
+                    <%= user.hasLicense ? 'AKTÍV PARTNER' : 'NINCS LICENC' %>
                 </p>
             </div>
         </div>
         <a href="/logout" class="text-[10px] font-bold text-zinc-600 hover:text-white uppercase border border-zinc-800 px-3 py-1 rounded">Kilépés</a>
     </header>
 
-    <% if (isAdmin) { %> <a href="/admin" class="btn-admin">👑 Admin Panel</a> <% } %>
+    <% if (isAdmin) { %> <a href="/admin" class="btn-admin">👑 Igazgatói Vezérlőpult</a> <% } %>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <div class="space-y-6">
             
-            <div class="card border-green-500/30">
-                <% if (!user.hasLicense) { %>
-                    <div class="scanner-line"></div> <% } %>
+            <% if (user.hasLicense) { %>
+                <div class="card card-active bg-green-900/5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-[10px] font-black uppercase text-green-500 tracking-widest">Mai Profit</h3>
+                        <i class="fas fa-chart-line text-green-500"></i>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl font-robot font-black text-white">+4.8%</span>
+                        <span class="text-xs text-green-500 font-bold uppercase">Növekedés</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 mt-2">A tőkéd biztonságban van.</p>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-[10px] font-black uppercase text-zinc-500 tracking-widest mb-4">Aktív Ciklus (30 Nap)</h3>
+                    
+                    <div class="flex justify-between text-xs font-bold uppercase mb-2">
+                        <span class="text-white">Jelenlegi nap:</span>
+                        <span class="text-green-500">1. / 30.</span>
+                    </div>
+                    <div class="w-full bg-zinc-800 h-3 rounded-full overflow-hidden mb-4 border border-zinc-700">
+                        <div class="bg-gradient-to-r from-green-600 to-green-400 h-full w-[3.3%] shadow-[0_0_15px_rgba(34,197,94,0.5)]"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-center mt-4 border-t border-zinc-800 pt-4">
+                        <div>
+                            <p class="text-[9px] text-zinc-500 uppercase">Hátralévő</p>
+                            <p class="text-lg font-black text-white">29 Nap</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] text-zinc-500 uppercase">Cél Profit</p>
+                            <p class="text-lg font-black text-white">180%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border border-zinc-800">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        <h3 class="text-xs font-black uppercase text-white">Mai Master Tipp</h3>
+                    </div>
+                    <div class="bg-zinc-900 p-4 rounded-xl text-center">
+                        <p class="text-xl font-black text-white mb-1">MAN. CITY <span class="text-zinc-600">vs</span> LIVERPOOL</p>
+                        <div class="inline-block bg-green-500 text-black font-black text-xs px-3 py-1 rounded uppercase mt-2">
+                            Tipp: Hazai (1.85)
+                        </div>
+                    </div>
+                </div>
+
+            <% } else { %>
                 
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-black uppercase text-green-500 tracking-widest"><i class="fas fa-satellite-dish mr-1 animate-pulse"></i> Élő Elemzés</h3>
-                    <span class="text-[9px] font-bold bg-green-900/30 text-green-400 px-2 py-1 rounded">MAI NAP</span>
-                </div>
-
-                <div class="space-y-3">
-                    <div class="flex justify-between text-[10px] text-zinc-400 uppercase font-bold">
-                        <span>Megbízhatóság</span>
-                        <span class="text-white">Magas (94.2%)</span>
-                    </div>
-                    <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-green-500 h-full w-[94%]"></div>
+                <div class="card border-green-500/20">
+                    <div class="scanner-line"></div>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs font-black uppercase text-green-500 tracking-widest"><i class="fas fa-satellite-dish mr-1 animate-pulse"></i> Keresés...</h3>
+                        <span class="text-[9px] font-bold bg-green-900/30 text-green-400 px-2 py-1 rounded">ÉLŐ</span>
                     </div>
 
-                    <div class="flex justify-between text-[10px] text-zinc-400 uppercase font-bold mt-2">
-                        <span>Liga / Sport</span>
-                        <span class="text-white">Premier League ⚽</span>
-                    </div>
-
-                    <div class="bg-zinc-900 p-3 rounded-lg border border-zinc-800 mt-2 text-center relative">
-                        <% if (user.hasLicense) { %>
-                            <p class="text-lg font-black text-white">MAN. CITY vs LIVERPOOL</p>
-                            <p class="text-xs text-green-500 font-bold uppercase">Tipp: Hazai (1.85)</p>
-                        <% } else { %>
-                            <div class="absolute inset-0 flex items-center justify-center z-10">
-                                <i class="fas fa-lock text-white/50 text-xl"></i>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-[10px] text-zinc-400 uppercase font-bold mb-1">
+                                <span>Matematikai Esély</span>
+                                <span class="text-white">94.2%</span>
                             </div>
-                            <p class="text-lg font-black blur-secret">TITKOS CSAPATOK</p>
-                            <p class="text-xs blur-secret">Tipp: Hazai (1.85)</p>
-                        <% } %>
-                    </div>
-                </div>
+                            <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-green-500 h-full w-[94%]"></div>
+                            </div>
+                        </div>
 
-                <% if (!user.hasLicense) { %>
-                    <div class="mt-4">
-                        <p class="text-[10px] text-zinc-500 text-center mb-3">A részletek megtekintéséhez licenc szükséges.</p>
+                        <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 text-center relative overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center z-10 bg-black/20">
+                                <i class="fas fa-lock text-white/40 text-3xl"></i>
+                            </div>
+                            <p class="text-xl font-black blur-secret">TITKOS CSAPATOK</p>
+                            <p class="text-xs blur-secret mt-2">Tipp: Hazai (1.85)</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <p class="text-[10px] text-zinc-500 text-center mb-3">A profit kijelző és a tipp zárolva van.</p>
                         <a href="/fizetes" class="btn-unlock">
-                            TIPP FELOLDÁSA <i class="fas fa-unlock ml-1"></i>
+                            TIPP FELOLDÁSA (AKTIVÁLÁS) <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
-                <% } %>
-            </div>
+                </div>
 
-            <div class="card opacity-60 hover:opacity-100 transition">
-                <h3 class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2">Tegnapi Eredmény</h3>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-500">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-white">NYERTES TIPP ✅</p>
-                        <p class="text-[9px] text-zinc-500 uppercase">Profit: +18.500 Ft (Egyetlen nap alatt)</p>
+                <div class="card opacity-50">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-history text-zinc-500"></i>
+                        <div>
+                            <p class="text-[10px] text-zinc-400 uppercase font-bold">Tegnapi statisztika</p>
+                            <p class="text-xs font-bold text-white">NYERTES NAP (+4.5%) ✅</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+            <% } %>
 
         </div>
 
         <div class="lg:col-span-2 space-y-6">
-            
-            <div class="card h-[400px] flex flex-col">
+            <div class="card h-[500px] flex flex-col border border-purple-500/20">
                 <div class="flex items-center gap-3 border-b border-zinc-800 pb-3 mb-2">
                     <div class="relative">
                         <div class="w-10 h-10 rounded-full bg-zinc-900 border border-purple-600 flex items-center justify-center">
                             <i class="fas fa-robot text-purple-500"></i>
                         </div>
-                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-black rounded-full"></div>
+                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-black rounded-full animate-pulse"></div>
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-white">Skyhigh AI Asszisztens</h3>
@@ -155,14 +195,12 @@
                     </div>
                 </div>
 
-                <div id="chatBox" class="flex-1 overflow-y-auto pr-2">
-                    </div>
+                <div id="chatBox" class="flex-1 overflow-y-auto pr-2"></div>
 
                 <div class="mt-2 relative">
-                    <input type="text" placeholder="Kérdezz valamit..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-xs text-white focus:border-purple-500 outline-none">
+                    <input type="text" placeholder="Kérdezz a stratégiáról..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-xs text-white focus:border-purple-500 outline-none">
                 </div>
             </div>
-
         </div>
 
     </div>
@@ -173,14 +211,26 @@
             const hasLicense = <%= user.hasLicense %>;
             const userName = "<%= user.fullname %>";
             
-            const messages = [
-                { text: `Szia ${userName}! Én a Skyhigh AI vagyok.`, delay: 500 },
-                { text: "Lefuttattam a mai globális szkennelést.", delay: 1500 },
-                { text: "Találtam egy <strong class='text-white'>KIEMELT KOCKÁZATMENTES</strong> lehetőséget a Premier League-ben.", delay: 3500 },
-                hasLicense 
-                    ? { text: "Mivel aktív tag vagy, a tippet láthatod a bal oldalon. Sok sikert!", delay: 5000 }
-                    : { text: "A részleteket elhomályosítottam a bal oldalon. Ez a tipp matematikailag 94%-os biztonságú. Ha komolyan gondolod a vagyonépítést, oldd fel a licencet, és kezdjük el.", delay: 5000 }
-            ];
+            // Különböző üzenetek Aktív vs Inaktív tagnak
+            let messages = [];
+
+            if (hasLicense) {
+                // Üzenetek AKTÍV tagnak
+                messages = [
+                    { text: `Üdv újra, ${userName}!`, delay: 500 },
+                    { text: "A rendszered <strong>AKTÍV</strong>. A 30 napos ciklus elindult.", delay: 1500 },
+                    { text: "Mai profit cél: <span class='text-green-500 font-bold'>+4.8%</span>. A tippet bal oldalon láthatod.", delay: 3000 },
+                    { text: "Tedd meg a fogadást pontosan a megadott téttel, majd dőlj hátra.", delay: 5000 }
+                ];
+            } else {
+                // Üzenetek INGYENES tagnak
+                messages = [
+                    { text: `Üdvözöllek, ${userName}. Én a Skyhigh AI vagyok.`, delay: 500 },
+                    { text: "A mai piaci elemzés elkészült. <strong>94%-os találati esélyt</strong> mértem.", delay: 2000 },
+                    { text: "Jelenleg nem látod a profit számlálót és a tippet, mert a licenced inaktív.", delay: 4000 },
+                    { text: "A vagyonépítéshez aktiváld a rendszert a bal oldali gombbal.", delay: 6000 }
+                ];
+            }
 
             function addMessage(msg) {
                 const div = document.createElement('div');
