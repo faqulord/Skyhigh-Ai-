@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <title>Siker!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta http-equiv="refresh" content="5;url=/dashboard" /> </head>
+<body class="bg-black text-white flex items-center justify-center h-screen text-center p-4">
+    <div>
+        <i class="fas fa-check-circle text-green-500 text-6xl mb-4 animate-bounce"></i>
+        <h1 class="text-3xl font-black uppercase mb-2">Fizetés Sikeres!</h1>
+        <p class="text-zinc-400 mb-6">A rendszer automatikusan aktiválta a licencet.</p>
+        
+        <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 inline-block text-left">
+            <p>Csomag: <strong class="text-purple-400"><%= plan %></strong></p>
+            <p>Lejárat: <strong class="text-white"><%= date %></strong></p>
+        </div>
+        
+        <p class="text-xs text-zinc-500 mt-8">Visszairányítás a Dashboardra 5 másodpercen belül...</p>
+        <a href="/dashboard" class="block mt-4 bg-white text-black font-bold py-2 rounded">Azonnali belépés</a>
+    </div>
+</body>
+</html>
