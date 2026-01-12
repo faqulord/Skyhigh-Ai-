@@ -11,43 +11,36 @@ const Tip = require('./models/Tip');
 
 const app = express();
 
-// ======================================================
-// 🔑 KULCSOK (Railway Environment Variables)
-// ======================================================
+// --- KULCSOK ---
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY; 
 const SPORT_API_KEY = process.env.SPORT_API_KEY; 
 
-if (!OPENAI_API_KEY || !SPORT_API_KEY) {
-    console.error("⚠️ FIGYELEM: A kulcsok nincsenek beállítva a Railway-en!");
-}
+if (!OPENAI_API_KEY || !SPORT_API_KEY) console.error("⚠️ KULCSOK HIÁNYOZNAK!");
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-// ======================================================
-
+// --- DB ---
 const dbURI = process.env.MONGO_URL || process.env.MONGO_URI || 'mongodb://localhost:27017/skyhigh';
-mongoose.connect(dbURI)
-    .then(() => console.log('✅ MongoDB SIKERESEN CSATLAKOZTATVA'))
-    .catch(err => console.log('❌ FATÁLIS DB HIBA:', err));
+mongoose.connect(dbURI).then(() => console.log('✅ DB OK')).catch(err => console.log('❌ DB ERR:', err));
 
+app.use(express.json()); // FONTOS A CHAT MIATT!
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'director_secret_key',
+    secret: process.env.SESSION_SECRET || 'director_secret',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: dbURI }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- JOGOSULTSÁGOK ---
+// --- JOGOK ---
 const requireLogin = (req, res, next) => {
-    if (!req.session.userId) return res.send('<h1>Nem vagy bejelentkezve! <a href="/login">Belépés</a></h1>');
+    if (!req.session.userId) return res.send('<h1>Nem vagy bejelentkezve!</h1>');
     next();
 };
-
 const requireAdmin = (req, res, next) => {
     if (!req.session.isAdmin) return res.redirect('/dashboard');
     next();
@@ -88,121 +81,153 @@ app.get('/dashboard', requireLogin, async (req, res) => {
     res.render('dashboard', { user, isAdmin: req.session.isAdmin, dailyTip: todayTip });
 });
 
+// --- FIZETÉS ---
 app.get('/fizetes', requireLogin, (req, res) => res.render('pay'));
-
 app.post('/pay/create-checkout-session', requireLogin, async (req, res) => {
     const { plan } = req.body;
     const user = await User.findById(req.session.userId);
-    let days = 0; let price = 0; let type = '';
-    if (plan === 'monthly') { days = 30; price = 20000; type = 'Havi Licenc'; }
-    else if (plan === 'biannual') { days = 180; price = 100000; type = 'Féléves Profi Licenc'; }
-    else if (plan === 'annual') { days = 365; price = 180000; type = 'Éves Befektetői Licenc'; }
+    let days = plan === 'monthly' ? 30 : (plan === 'biannual' ? 180 : 365);
+    let type = plan === 'monthly' ? 'Havi Licenc' : (plan === 'biannual' ? 'Féléves Profi' : 'Éves Befektető');
     
     const expiry = new Date(); expiry.setDate(expiry.getDate() + days);
-    user.hasLicense = true; user.licenseExpires = expiry; user.licenseType = type; user.totalSpent = (user.totalSpent || 0) + price;
+    user.hasLicense = true; user.licenseExpires = expiry; user.licenseType = type;
     await user.save();
     res.render('pay_success', { plan: type, date: expiry.toLocaleDateString() });
 });
 
 // ======================================================
-// 🤖 AI KOMBI-SZELVÉNY GENERÁTOR (PROFI VERZIÓ)
+// 🧠 ÉLŐ CHAT RENDSZER (A ROBOT AGYA)
 // ======================================================
+app.post('/api/chat', requireLogin, async (req, res) => {
+    try {
+        const { message } = req.body;
+        const user = await User.findById(req.session.userId);
 
+        // 1. TŐKE MENTÉSE (Ha számot ír és még nincs tőkéje)
+        if (user.hasLicense && user.startingCapital === 0 && !isNaN(message) && Number(message) > 1000) {
+            user.startingCapital = Number(message);
+            user.currentCapital = Number(message);
+            await user.save();
+            return res.json({ reply: `Rögzítettem. ${user.startingCapital} Ft tőkével indítjuk a 30 napos ciklust. A havi hozamcélunk +30% kockázatmentesen. Figyeld a jobb oldali panelt a mai szelvényért.` });
+        }
+
+        // 2. A SZEMÉLYISÉG KIVÁLASZTÁSA
+        let systemPrompt = "";
+
+        if (user.hasLicense) {
+            // --- FIZETŐS USER (PROFI TANÁCSADÓ) ---
+            if (user.startingCapital === 0) {
+                // Ha még nem adta meg a tőkét
+                systemPrompt = `A Skyhigh AI vagy. Egy licencelt, profi sportfogadási szoftver.
+                A felhasználó most vette meg a licencet.
+                CÉLOD: Kérdezd meg tőle azonnal: "Mekkora tőkével indulunk?"
+                Ne beszélj másról, csak a tőkét akard megtudni, hogy beállíthasd a 30 napos tervet.`;
+            } else {
+                // Ha már van tőke -> Stratégia
+                systemPrompt = `A Skyhigh AI vagy. Profi pénzügyi algoritmus.
+                A felhasználó tőkéje: ${user.startingCapital} Ft.
+                Stílusod: Rövid, tömör, profi, érzelemmentes.
+                CÉLOD: Tartsd őt a stratégiánál. "Napi 1 szelvény, max 2 meccs."
+                Biztasd, hogy a hónap végén fix profit lesz.
+                Ha tippet kér, mondd neki, hogy a "Jobb oldali panelen" találja a napi generált szelvényt. Te chaten NEM írsz be meccseket, csak stratégiát.`;
+            }
+        } else {
+            // --- INGYENES USER (SALES / WOLF OF WALL STREET) ---
+            systemPrompt = `A Skyhigh AI vagy. Egy 20.000 Ft/hó díjú prémium szoftver.
+            A felhasználónak NINCS licence, de beszélget veled.
+            CÉLOD: ELADNI A LICENCET. Mindenáron.
+            Stílusod: Domináns, meggyőző, technológiai felsőbbrendűség.
+            TILTOTT: SOHA ne adj tippet ingyen!
+            ÉRVELÉS: 
+            - "Ez nem szerencsejáték, ez matematika."
+            - "A 20 ezer Ft aprópénz ahhoz képest, amit hozok."
+            - "Garantált hozam a 30 napos ciklusban."
+            - "Kezdd el a befizetést most, ne pazarold az időmet."`;
+        }
+
+        // 3. VÁLASZ GENERÁLÁS
+        const completion = await openai.chat.completions.create({
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: message }
+            ],
+            model: "gpt-3.5-turbo",
+        });
+
+        res.json({ reply: completion.choices[0].message.content });
+
+    } catch (error) {
+        res.status(500).json({ reply: "Hiba a rendszerben." });
+    }
+});
+
+// ======================================================
+// ⚡ NAPI TIPPEK (MAX 2 MECCS)
+// ======================================================
 app.get('/admin/generate-tip', requireLogin, requireAdmin, async (req, res) => {
     try {
-        console.log("📡 1. Lépés: Nagy mennyiségű adat lekérése...");
-        
-        // Lekérjük a Premier League meccseket
+        console.log("📡 Adatok lekérése...");
+        // Premier League + La Liga adatok
         const options = {
             method: 'GET',
             url: 'https://v3.football.api-sports.io/fixtures',
-            params: {
-                date: new Date().toISOString().split('T')[0],
-                league: '39', // Premier League
-                season: '2023'
-            },
+            params: { date: new Date().toISOString().split('T')[0], league: '39', season: '2023' },
             headers: { 'x-apisports-key': SPORT_API_KEY }
         };
-
-        let response = await axios.request(options);
-        let matches = response.data.response;
-
-        // Ha nincs elég angol meccs, hozzácsapjuk a Spanyolt is (hogy legyen miből válogatni)
-        if (!matches || matches.length < 3) {
-            console.log("⚠️ Kevés az angol meccs, hozzáadom a La Ligát...");
-            options.params.league = '140'; // La Liga
+        let matches = (await axios.request(options)).data.response;
+        
+        if (!matches || matches.length < 2) {
+            options.params.league = '140'; // La Liga backup
             let resp2 = await axios.request(options);
             matches = matches.concat(resp2.data.response);
         }
 
-        if (matches.length === 0) {
-            return res.send("<h1>Ma nincs elég meccs egy kombi szelvényhez.</h1>");
-        }
+        if (matches.length === 0) return res.send("Nincs elég meccs.");
 
-        // Kiválasztjuk az első 6 meccset elemzésre (hogy ne terheljük túl a tokent)
-        const matchCandidates = matches.slice(0, 6).map(m => {
-            return `${m.teams.home.name} vs ${m.teams.away.name}`;
-        }).join(", ");
-
-        console.log(`🤖 2. Lépés: AI Matematikus indítása. Vizsgált meccsek: ${matchCandidates}`);
-
-        // --- A PROFI UTASÍTÁS (PROMPT) ---
+        // AI DÖNTÉS
         const prompt = `
-            Te egy profi sportfogadási AI asszisztens vagy, matematikai alapokon.
+            Skyhigh AI vagy. 
+            Válassz ki EBBŐL a listából PONTOSAN 1 vagy 2 legbiztosabb meccset a mai napra.
+            NEM TÖBBET! A cél a 30 napos profit biztonsága.
             
-            FELADAT: Állíts össze EGYETLEN kombinált szelvényt (accumulator) a mai napra.
-            A cél: Hosszú távú, stabil profit (6-12 hónapos ciklus).
+            Keresd az alacsony kockázatot (pl. 1.5 gól felett, 1X).
             
-            MECCSEK LISTÁJA:
-            ${matchCandidates}
-            
-            UTASÍTÁS:
-            1. Válassz ki ebből a listából PONTOSAN 3 vagy 4 legbiztosabb mérkőzést.
-            2. Mindegyikhez adj egy biztonsági tippet (pl. 1.5 gól felett, vagy dupla esély).
-            3. Számold ki a szelvény várható eredő oddsát.
-            4. Indoklásban említsd meg a matematikai valószínűséget és a hosszú távú profitot.
-            
-            VÁLASZ FORMÁTUM (Csak JSON lehet!):
+            Válasz JSON formátumban:
             {
-                "matches": "1. Meccs: Tipp | 2. Meccs: Tipp | 3. Meccs: Tipp",
-                "odds": "Eredő odds (pl. 3.45)",
-                "reasoning": "Írj egy motiváló elemzést arról, hogy ez a szelvény hogyan illeszkedik a havi profit tervbe."
+                "matches": "Csapat A vs Csapat B (Tipp: ...)",
+                "odds": "Eredő odds (pl. 1.85)",
+                "reasoning": "Írd le, hogy ez a 2 meccs matematikailag a legbiztosabb a mai kínálatból a havi tervhez."
             }
         `;
 
+        // Itt most egyszerűsítve küldjük be (csak a neveket), hogy spóroljunk a tokennel
+        const simpleList = matches.slice(0, 10).map(m => `${m.teams.home.name} vs ${m.teams.away.name}`).join("\n");
+
         const completion = await openai.chat.completions.create({
-            messages: [{ role: "system", content: prompt }],
-            model: "gpt-3.5-turbo", // Vagy gpt-4, ha van kereted
+            messages: [{ role: "system", content: prompt + "\n" + simpleList }],
+            model: "gpt-3.5-turbo",
         });
 
-        // Válasz feldolgozása
-        let content = completion.choices[0].message.content;
-        content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+        let content = completion.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim();
         const aiResponse = JSON.parse(content);
 
-        // Mentés az adatbázisba
-        // A "match" mezőbe most bekerül a teljes szelvény tartalma
         const newTip = new Tip({
             date: new Date().toLocaleDateString('hu-HU'),
-            match: "⚡ NAPI PROFIT SZELVÉNY (MIX)", // Ez jelenik meg nagy betűvel
-            prediction: aiResponse.matches, // Itt vannak a meccsek felsorolva
+            match: "🎯 NAPI FIX (MAX 2 MECCS)",
+            prediction: aiResponse.matches,
             odds: aiResponse.odds,
             reasoning: aiResponse.reasoning,
-            league: "AI Prémium Válogatás"
+            league: "AI Prémium"
         });
 
         await newTip.save();
-        console.log("✅ KOMBI SZELVÉNY GENERÁLVA!");
-
         res.redirect('/dashboard');
 
     } catch (error) {
-        console.error("GENERÁLÁSI HIBA:", error);
-        res.send(`<h1>Hiba történt</h1><p>${error.message}</p>`);
+        res.send("Hiba: " + error.message);
     }
 });
 
-// ADMIN PANEL
 app.get('/admin', requireLogin, requireAdmin, async (req, res) => {
     const users = await User.find().sort({ date: -1 });
     res.render('admin', { users });
