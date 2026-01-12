@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyhigh AI | Bejelentkezés</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #000; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .box { background: #0a0a0a; border: 1px solid #222; padding: 40px; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 0 50px rgba(34, 197, 94, 0.1); }
+        input { width: 100%; background: #111; border: 1px solid #333; padding: 16px; margin-bottom: 16px; border-radius: 12px; color: white; outline: none; transition: 0.3s; }
+        input:focus { border-color: #22c55e; }
+        .btn { width: 100%; background: white; color: black; padding: 16px; font-weight: 900; border-radius: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .btn:hover { background: #ccc; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="text-center mb-10">
+            <i class="fas fa-robot text-purple-500 text-3xl mb-4"></i>
+            <h2 class="text-2xl font-black uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></h2>
+        </div>
+
+        <form action="/auth/login" method="POST">
+            <input type="email" name="email" placeholder="E-mail cím" required>
+            <input type="password" name="password" placeholder="Jelszó" required>
+            
+            <button type="submit" class="btn">Belépés</button>
+        </form>
+
+        <div class="text-center mt-8 space-y-4">
+            <a href="/regisztracio" class="block text-xs text-zinc-500 hover:text-green-500 uppercase font-bold">Még nincs fiókod? Regisztráció</a>
+            <a href="/" class="block text-xs text-zinc-600 hover:text-white">Vissza a főoldalra</a>
+        </div>
+    </div>
+</body>
+</html>
