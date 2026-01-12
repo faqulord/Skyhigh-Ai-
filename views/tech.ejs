@@ -3,70 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Quantum Technológia</title>
+    <title>Skyhigh AI | Csúcstechnológia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Orbitron:wght@900&display=swap');
         body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
-        .bento { background: #080808; border: 1px solid #141414; border-radius: 32px; }
-        .purple-glow { filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6)); color: #a855f7; }
-        .tech-card { background: linear-gradient(135deg, #0a0a0a 0%, #050505 100%); border: 1px solid #1a1a1a; }
+        .font-robot { font-family: 'Orbitron', sans-serif; }
+        .bento-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 28px; }
+        .purple-glow { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+        .nav-pill { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #555; transition: 0.3s; }
+        .active-pill { color: #a855f7; border-bottom: 2px solid #a855f7; padding-bottom: 4px; }
     </style>
 </head>
 <body class="pb-20">
 
-    <nav class="p-6">
-        <a href="/" class="text-[10px] font-black uppercase tracking-widest text-zinc-500"><i class="fas fa-arrow-left mr-2"></i> Vissza a főoldalra</a>
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/5 px-6 py-4">
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="flex justify-between items-center mb-5">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-robot text-purple-500 text-xl"></i>
+                    <span class="font-robot text-lg tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
+                </div>
+                <a href="/regisztracio" class="bg-white text-black text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest shadow-lg">Belépés</a>
+            </div>
+            <div class="flex justify-center gap-8 border-t border-white/5 pt-4">
+                <a href="/" class="nav-pill">Home</a>
+                <a href="/technologia" class="nav-pill active-pill">Technológia</a>
+                <a href="/halozat" class="nav-pill">Hálózat</a>
+                <a href="/strategia" class="nav-pill">Stratégia</a>
+            </div>
+        </div>
     </nav>
 
-    <header class="pt-10 pb-20 px-8 text-center">
-        <div class="inline-block px-4 py-2 rounded-full border border-purple-500/30 mb-8 bg-purple-500/5">
-            <span class="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">Quantum Tech Engine v2.0</span>
-        </div>
-        <h1 class="text-5xl font-black uppercase tracking-tighter italic mb-6">
-            Csúcs <br> <span class="purple-glow italic">Technológia.</span>
+    <header class="pt-48 pb-16 px-8 text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-8">
+            Kvantum Sebesség. <br> <span class="purple-glow italic text-5xl md:text-6xl">Matematikai Siker.</span>
         </h1>
-        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest max-w-xl mx-auto leading-relaxed">
-            A Skyhigh AI nem érzelemből fogad. <br> Több millió adatpontot elemez miliszekundumok alatt.
+        <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.3em] mb-12">
+            A Skyhigh AI a világ egyik leggyorsabb <br> sport-analitikai motorja.
         </p>
     </header>
 
-    <section class="px-6 max-w-5xl mx-auto space-y-6">
-        <div class="bento p-10 border-l-4 border-purple-600">
-            <h3 class="text-xl font-black uppercase mb-6 flex items-center gap-3">
-                <i class="fas fa-brain text-purple-500"></i> Az AI Memória
-            </h3>
-            <p class="text-xs text-zinc-400 uppercase leading-relaxed font-bold">
-                A szoftver 365 napos memóriával rendelkezik. Minden nap elemzi az eredményeket, és a legfrissebb éles piaci információk alapján módosítja a stratégiát. Ez egy öntanuló rendszer, ami azért lett fejlesztve, hogy a matematikai esélyeket 100%-ra optimalizálja.
+    <section class="px-6 space-y-6 max-w-5xl mx-auto">
+        <div class="bento-card p-10 border-l-4 border-purple-500">
+            <h3 class="text-xl font-black uppercase italic mb-4">Éles Matematikai Analízis</h3>
+            <p class="text-[11px] text-zinc-400 leading-relaxed uppercase font-bold">
+                A robotunk <span class="text-white">miliszekundumok alatt</span> futtatja le a világ összes odds-változását. Nem tippel, hanem kiszámolja a legfrissebb információk alapján a győzelmi esélyeket. Ez a csúcstechnológia tesz Téged profi sportfogadóvá.
             </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="bento p-8">
-                <i class="fas fa-bolt text-yellow-500 text-2xl mb-4"></i>
-                <h4 class="text-sm font-black uppercase mb-3">1.0s Feldolgozás</h4>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold leading-tight">Míg mások híreket olvasnak, az AI miliszekundumok alatt szűri le a globális odds-változásokat a kezdés előtt.</p>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bento-card p-6 text-center">
+                <i class="fas fa-bolt text-yellow-500 text-xl mb-3"></i>
+                <h5 class="text-[10px] font-black uppercase">Gyorsaság</h5>
+                <p class="text-[8px] text-zinc-600 uppercase font-bold tracking-tighter">Adatfeldolgozás < 1.0s</p>
             </div>
-            <div class="bento p-8">
-                <i class="fas fa-square-root-variable text-green-500 text-2xl mb-4"></i>
-                <h4 class="text-sm font-black uppercase mb-3">Tiszta Matematika</h4>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold leading-tight">Minden tipp mögött kőkemény valószínűségszámítás áll. A szoftver csak akkor ad tippet, ha a matematikai előny igazolt.</p>
+            <div class="bento-card p-6 text-center">
+                <i class="fas fa-brain text-purple-500 text-xl mb-3"></i>
+                <h5 class="text-[10px] font-black uppercase">AI Memória</h5>
+                <p class="text-[8px] text-zinc-600 uppercase font-bold tracking-tighter">365 napos tőkekövetés</p>
             </div>
-        </div>
-
-        <div class="bento p-10 text-center bg-gradient-to-b from-[#0a0a0a] to-black border-purple-500/20">
-            <h3 class="text-xl font-black uppercase mb-4 italic">A Licenc Ereje</h3>
-            <p class="text-xs text-zinc-400 uppercase font-bold mb-10 leading-relaxed px-6">
-                A havi 20.000 Ft-os díjjal nem csak egy tippet veszel. <br> Megvásárolod a világ egyik legfejlettebb sportfogadó technológiájához való hozzáférést, a saját Admin paneledet és a Robot napi 24 órás munkáját.
-            </p>
-            <a href="/regisztracio" class="bg-purple-600 text-white px-10 py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-purple-500/20">Aktiváld a Technológiát</a>
+            <div class="bento-card p-6 text-center">
+                <i class="fas fa-shield-alt text-green-500 text-xl mb-3"></i>
+                <h5 class="text-[10px] font-black uppercase">Biztonság</h5>
+                <p class="text-[8px] text-zinc-600 uppercase font-bold tracking-tighter">Matematikai tőkevédelem</p>
+            </div>
         </div>
     </section>
-
-    <footer class="text-center py-20 opacity-20">
-        <p class="text-[8px] font-black tracking-[0.6em] uppercase text-purple-500 italic">Skyhigh AI • Engineering by faqubelord</p>
-    </footer>
 
 </body>
 </html>
