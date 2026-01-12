@@ -3,70 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Dashboard</title>
+    <title>Skyhigh AI | Vezérlőpult</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #000; color: white; font-family: sans-serif; }
-        .bento { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Orbitron:wght@900&display=swap');
+        
+        body { background-color: #000; color: white; font-family: 'Inter', sans-serif; }
+        .font-robot { font-family: 'Orbitron', sans-serif; }
+        
+        /* Üveg hatású kártyák (Bento Grid) */
+        .bento { 
+            background: rgba(10, 10, 10, 0.95); 
+            border: 1px solid #1a1a1a; 
+            border-radius: 24px; 
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Neon effektek */
+        .green-glow { text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+        .purple-glow { text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+        
+        /* Progress Bar Animáció */
+        .progress-bar { transition: width 1.5s ease-in-out; }
+
+        /* Admin Gomb */
         .admin-btn { 
             background: linear-gradient(45deg, #fbbf24, #d97706); 
-            color: black; 
-            font-weight: 900; 
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+            color: black; font-weight: 900; 
             animation: pulse 2s infinite;
         }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
+
+        /* Chat Animáció */
+        .typing-effect::after { content: '|'; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
-<body class="p-6 pb-20">
+<body class="p-4 pb-24 md:p-8 min-h-screen bg-[url('https://images.unsplash.com/photo-1614064641938-3bcee5297404?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-fixed">
+    
+    <div class="fixed inset-0 bg-black/90 z-[-1]"></div>
 
-    <div class="flex justify-between items-center mb-8 max-w-4xl mx-auto">
-        <div>
-            <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Üdvözöllek,</p>
-            <h2 class="text-xl font-black uppercase text-white"><%= user.fullname %></h2>
+    <div class="max-w-6xl mx-auto flex justify-between items-center mb-8">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
+                <i class="fas fa-user text-zinc-400"></i>
+            </div>
+            <div>
+                <p class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Ügynök</p>
+                <h2 class="text-sm md:text-lg font-black uppercase text-white"><%= user.fullname %></h2>
+            </div>
         </div>
-        <a href="/logout" class="text-[10px] text-red-500 font-bold uppercase border border-red-900/30 px-3 py-1 rounded-full hover:bg-red-900/20">Kilépés</a>
+        <a href="/logout" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 px-4 py-2 rounded-full text-[9px] font-black uppercase transition">
+            <i class="fas fa-power-off mr-1"></i> Kilépés
+        </a>
     </div>
 
     <% if (isAdmin) { %>
-        <div class="max-w-4xl mx-auto mb-8">
-            <a href="/admin" class="admin-btn block w-full text-center py-4 rounded-xl text-xs uppercase tracking-[0.3em]">
-                <i class="fas fa-crown mr-2"></i> ADMIN DASHBOARD (Belépés)
+        <div class="max-w-6xl mx-auto mb-8">
+            <a href="/admin" class="admin-btn block w-full text-center py-4 rounded-2xl text-xs uppercase tracking-[0.3em] border border-yellow-500">
+                <i class="fas fa-crown mr-2"></i> Rendszergazda Mód
             </a>
         </div>
     <% } %>
 
-    <div class="max-w-4xl mx-auto space-y-4">
-        
-        <div class="bento p-6 border-l-4 <%= user.hasLicense ? 'border-green-500' : 'border-zinc-700' %>">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="text-sm font-black uppercase text-zinc-400">Licenc Státusz</h3>
-                    <p class="text-lg font-black uppercase <%= user.hasLicense ? 'text-green-500' : 'text-white' %>">
-                        <%= user.hasLicense ? 'AKTÍV' : 'INAKTÍV' %>
-                    </p>
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <div class="space-y-6">
+            
+            <div class="bento p-6 border-l-4 <%= user.hasLicense ? 'border-green-500' : 'border-red-500' %>">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-[10px] font-black uppercase text-zinc-500 tracking-widest mb-1">Előfizetés Állapota</h3>
+                        <p class="text-2xl font-black uppercase italic <%= user.hasLicense ? 'text-green-500 green-glow' : 'text-red-500' %>">
+                            <%= user.hasLicense ? 'AKTÍV' : 'INAKTÍV' %>
+                        </p>
+                    </div>
+                    <i class="fas <%= user.hasLicense ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500' %> text-2xl"></i>
                 </div>
+                
                 <% if (!user.hasLicense) { %>
-                    <button class="bg-green-600 text-black px-4 py-2 rounded-lg text-[10px] font-black uppercase">Vásárlás</button>
+                    <p class="text-[10px] text-zinc-400 mb-4 leading-relaxed">A robot jelenleg alvó módban van. A profit termeléshez aktiválnod kell a rendszert.</p>
+                    <button class="w-full py-3 bg-green-600 hover:bg-green-500 text-black font-black text-xs uppercase rounded-xl transition shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                        Licenc Aktiválása (20k Ft)
+                    </button>
+                <% } else { %>
+                    <p class="text-[10px] text-zinc-400">Lejárat: <span class="text-white">2026.02.12.</span></p>
                 <% } %>
             </div>
-        </div>
 
-        <div class="bento p-6">
-            <h3 class="text-sm font-black uppercase text-zinc-400 mb-2">Partner Kódod</h3>
-            <div class="bg-black/50 p-4 rounded-xl text-center border border-white/5">
-                <span class="text-xl font-mono text-purple-400 tracking-widest"><%= user.myReferralCode %></span>
+            <div class="bento p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i class="fas fa-chart-line text-6xl text-white"></i>
+                </div>
+                
+                <h3 class="text-[10px] font-black uppercase text-zinc-500 tracking-widest mb-4">Üzleti Ciklusok</h3>
+
+                <div class="mb-6">
+                    <div class="flex justify-between text-[9px] font-bold uppercase mb-2">
+                        <span class="text-white">Havi Ciklus (30 Nap)</span>
+                        <span class="text-green-500">Nap 1 / 30</span>
+                    </div>
+                    <div class="w-full bg-zinc-800 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full progress-bar shadow-[0_0_10px_rgba(34,197,94,0.5)]" style="width: 3%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-[9px] font-bold uppercase mb-2">
+                        <span class="text-white">Vagyonépítés (6 Hónap)</span>
+                        <span class="text-purple-500">Hónap 1 / 6</span>
+                    </div>
+                    <div class="w-full bg-zinc-800 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full progress-bar shadow-[0_0_10px_rgba(168,85,247,0.5)]" style="width: 16%"></div>
+                    </div>
+                    <p class="text-[8px] text-zinc-500 mt-2 italic text-right">A kamatos kamat már dolgozik.</p>
+                </div>
             </div>
-            <p class="text-[9px] text-zinc-600 text-center mt-2 uppercase">Ezzel hívhatsz meg másokat</p>
+
         </div>
 
-        <div class="bento p-10 text-center opacity-50">
-            <i class="fas fa-lock text-3xl mb-4"></i>
-            <p class="text-xs uppercase font-bold">A napi tipp megtekintéséhez<br>aktív licenc szükséges.</p>
+        <div class="lg:col-span-2 h-full">
+            <div class="bento h-[500px] flex flex-col border border-purple-500/30 shadow-[0_0_30px_rgba(168,85,247,0.1)]">
+                
+                <div class="p-4 border-b border-white/5 flex items-center justify-between bg-purple-900/10 rounded-t-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-10 h-10 rounded-full bg-black border border-purple-500 flex items-center justify-center relative z-10">
+                                <i class="fas fa-robot text-purple-400 text-lg"></i>
+                            </div>
+                            <div class="absolute inset-0 bg-purple-500 blur-lg opacity-50 animate-pulse"></div>
+                        </div>
+                        <div>
+                            <h3 class="font-robot text-sm font-bold text-white tracking-wider">SKYHIGH <span class="text-purple-400">AI</span></h3>
+                            <p class="text-[9px] text-green-400 font-bold uppercase flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-black/50 px-3 py-1 rounded-full border border-white/10">
+                        <span class="text-[9px] text-zinc-400 uppercase font-bold">Live Data Feed</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 p-6 overflow-y-auto space-y-4" id="chatBox">
+                    </div>
+
+                <div class="p-4 border-t border-white/5 bg-black/40 rounded-b-2xl">
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Írj az asszisztensnek..." class="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:border-purple-500 outline-none transition placeholder-zinc-600">
+                        <button class="bg-purple-600 text-white px-4 rounded-xl hover:bg-purple-500 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatBox = document.getElementById('chatBox');
+            const userName = "<%= user.fullname %>"; // Megkapja a felhasználó nevét
+            
+            // Az üzenet, amit kértél
+            const messages = [
+                { text: `Üdvözöllek a rendszerben, ${userName}.`, delay: 500 },
+                { text: "Én vagyok a Skyhigh AI, a személyes profi sportfogadó asszisztensed.", delay: 2000 },
+                { text: "A küldetésem egyszerű: matematikai alapon vagyont építeni neked.", delay: 4000 },
+                { text: "Ez nem szerencsejáték. Ez üzlet. Ha szigorúan követed az utasításaimat és tartod a fegyelmet, el fogjuk érni az anyagi függetlenséget.", delay: 6500 },
+                { text: "Készen állsz az első ciklus elindítására?", delay: 9000 }
+            ];
+
+            let messageIndex = 0;
+
+            function typeWriter(text, element) {
+                let i = 0;
+                element.innerHTML = '<span class="text-purple-400 font-black mr-2">AI:</span>'; // Prefix
+                const interval = setInterval(() => {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    if (i > text.length - 1) {
+                        clearInterval(interval);
+                        chatBox.scrollTop = chatBox.scrollHeight; // Auto scroll
+                    }
+                }, 30); // Gépelési sebesség
+            }
+
+            function addMessage(text) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'bg-zinc-900/80 border border-zinc-800 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl max-w-[90%] text-xs text-zinc-300 leading-relaxed shadow-lg backdrop-blur-sm';
+                chatBox.appendChild(msgDiv);
+                typeWriter(text, msgDiv);
+            }
+
+            // Üzenetek időzített lejátszása
+            messages.forEach((msg, index) => {
+                setTimeout(() => {
+                    addMessage(msg.text);
+                }, msg.delay);
+            });
+        });
+    </script>
 </body>
 </html>
