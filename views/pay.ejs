@@ -2,78 +2,120 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Skyhigh AI | Csomagok</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Skyhigh AI | Csomagok</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #050505; color: white; font-family: sans-serif; }
+        
+        /* MOBIL FIRST KÁRTYÁK */
         .tier-card { 
-            background: #0f0f11; border: 1px solid #27272a; border-radius: 20px; padding: 30px; 
-            transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column;
+            background: #0f0f11; 
+            border: 1px solid #27272a; 
+            border-radius: 24px; 
+            padding: 24px; 
+            display: flex; 
+            flex-direction: column;
+            position: relative;
+            margin-bottom: 20px; /* Hely a kártyák között mobilon */
         }
-        .tier-card:hover { transform: translateY(-5px); border-color: #555; }
-        .popular { border: 2px solid #a855f7; box-shadow: 0 0 40px rgba(168, 85, 247, 0.15); transform: scale(1.05); z-index: 10; }
-        .btn-pay { background: white; color: black; font-weight: 800; text-transform: uppercase; padding: 15px; border-radius: 10px; width: 100%; margin-top: auto; transition: 0.2s; }
-        .btn-pay:hover { background: #d4d4d8; }
-        .btn-purple { background: #a855f7; color: white; border: none; }
-        .btn-purple:hover { background: #9333ea; }
-        .price-tag { font-size: 28px; font-weight: 900; color: white; }
+
+        /* Aktiváláskor (Hover vagy érintés) */
+        .tier-card:active, .tier-card:hover { border-color: #555; transform: scale(1.01); }
+
+        /* A PROFI CSOMAG KIEMELÉSE */
+        .popular { 
+            border: 2px solid #a855f7; 
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); 
+            background: #131315;
+            order: -1; /* Mobilon ez legyen legfelül! */
+        }
+        @media (min-width: 768px) { .popular { order: 0; transform: scale(1.05); } }
+
+        /* ÓRIÁS GOMBOK MOBILRA */
+        .btn-pay {
+            background: white; color: black; font-weight: 900; text-transform: uppercase; 
+            padding: 18px; border-radius: 14px; width: 100%; text-align: center; margin-top: 20px;
+            font-size: 14px; letter-spacing: 1px; transition: 0.2s;
+        }
+        .btn-pay:active { background: #ccc; }
+        
+        .btn-purple { 
+            background: #a855f7; color: white; border: none; 
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .price-tag { font-size: 32px; font-weight: 900; color: white; line-height: 1; }
     </style>
 </head>
-<body class="p-6 max-w-7xl mx-auto flex flex-col justify-center min-h-screen">
+<body class="p-4 md:p-8 min-h-screen flex flex-col justify-center">
 
-    <div class="text-center mb-12">
-        <a href="/dashboard" class="text-zinc-500 hover:text-white uppercase font-bold text-xs mb-6 block"><i class="fas fa-arrow-left"></i> Vissza</a>
-        <h1 class="text-3xl font-black uppercase italic mb-4">Válassz <span class="text-purple-500">Stratégiát</span></h1>
-        <p class="text-zinc-400">Automatikus aktiválás azonnal a fizetés után.</p>
+    <div class="text-center mb-8 mt-4">
+        <a href="/dashboard" class="inline-block bg-zinc-900 text-zinc-400 px-4 py-2 rounded-full text-xs font-bold uppercase mb-6"><i class="fas fa-arrow-left mr-2"></i> Mégse</a>
+        <h1 class="text-3xl font-black uppercase italic mb-2">Válassz <span class="text-purple-500">Licencet</span></h1>
+        <p class="text-zinc-400 text-sm px-4">A rendszer automatikusan aktiválódik fizetés után.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+    <div class="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pb-20">
         
-        <div class="tier-card opacity-80 hover:opacity-100">
-            <h3 class="text-lg font-bold text-zinc-300 mb-2">Havi</h3>
-            <div class="price-tag">20.000 Ft <span class="text-xs font-normal text-zinc-500">/ hó</span></div>
-            <p class="text-xs text-zinc-500 mb-6">Próbáld ki kockázat nélkül.</p>
-            <ul class="space-y-4 text-sm text-zinc-400 mb-8">
-                <li><i class="fas fa-check text-zinc-500 mr-2"></i> 30 napos licenc</li>
-                <li><i class="fas fa-check text-zinc-500 mr-2"></i> Napi Master Tipp</li>
+        <div class="tier-card opacity-90">
+            <h3 class="text-lg font-bold text-zinc-300 mb-1">Kezdő Csomag</h3>
+            <div class="price-tag">20.000 Ft <span class="text-sm font-normal text-zinc-500">/ hó</span></div>
+            
+            <div class="my-6 border-t border-zinc-800"></div>
+            
+            <ul class="space-y-3 text-sm text-zinc-400">
+                <li><i class="fas fa-check text-zinc-600 mr-3"></i> 30 Napos Aktiválás</li>
+                <li><i class="fas fa-check text-zinc-600 mr-3"></i> Napi 1 Master Tipp</li>
             </ul>
-            <form action="/pay/create-checkout-session" method="POST">
+
+            <form action="/pay/create-checkout-session" method="POST" class="mt-auto">
                 <input type="hidden" name="plan" value="monthly">
                 <button type="submit" class="btn-pay">Kiválasztás</button>
             </form>
         </div>
 
-        <div class="tier-card popular bg-[#121214]">
-            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase">Ajánlott</div>
+        <div class="tier-card popular">
+            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase tracking-widest">Legnépszerűbb</div>
+            
             <h3 class="text-xl font-black text-purple-400 mb-1 uppercase">Profi Stratégia</h3>
-            <div class="price-tag">100.000 Ft <span class="text-xs font-normal text-zinc-400">/ 6 hó</span></div>
-            <p class="text-xs text-green-500 font-bold mb-6">Spórolj 20.000 Ft-ot!</p>
-            <ul class="space-y-4 text-sm text-white mb-8">
-                <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> <strong>180 napos</strong> profit</li>
-                <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> <strong>Stratégiai Mentorálás</strong></li>
-                <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> Kiemelt Support</li>
+            <div class="price-tag">100.000 Ft <span class="text-sm font-normal text-zinc-400">/ 6 hó</span></div>
+            <p class="text-xs text-green-500 font-bold mt-1 uppercase"><i class="fas fa-coins mr-1"></i> Megtakarítás: 20.000 Ft</p>
+            
+            <div class="my-6 border-t border-zinc-700"></div>
+            
+            <ul class="space-y-4 text-sm text-white font-medium">
+                <li class="flex items-center"><i class="fas fa-calendar-check text-purple-500 mr-3 text-lg"></i> 180 Napos Licenc</li>
+                <li class="flex items-center"><i class="fas fa-chart-line text-purple-500 mr-3 text-lg"></i> Stratégiai Tőkekezelés</li>
+                <li class="flex items-center"><i class="fas fa-crown text-purple-500 mr-3 text-lg"></i> Kiemelt Támogatás</li>
             </ul>
-            <form action="/pay/create-checkout-session" method="POST">
+
+            <form action="/pay/create-checkout-session" method="POST" class="mt-auto">
                 <input type="hidden" name="plan" value="biannual">
-                <button type="submit" class="btn-pay btn-purple shadow-[0_0_20px_rgba(168,85,247,0.4)]">Profi Leszek</button>
+                <button type="submit" class="btn-pay btn-purple">
+                    Aktiválás (100k) <i class="fas fa-bolt ml-2"></i>
+                </button>
             </form>
         </div>
 
-        <div class="tier-card opacity-80 hover:opacity-100">
-            <h3 class="text-lg font-bold text-zinc-300 mb-2">Befektető</h3>
-            <div class="price-tag">180.000 Ft <span class="text-xs font-normal text-zinc-500">/ év</span></div>
-            <p class="text-xs text-zinc-500 mb-6">A legnagyobb megtakarítás.</p>
-            <ul class="space-y-4 text-sm text-zinc-400 mb-8">
-                <li><i class="fas fa-check text-zinc-500 mr-2"></i> 365 napos licenc</li>
-                <li><i class="fas fa-check text-zinc-500 mr-2"></i> VIP bánásmód</li>
+        <div class="tier-card opacity-90">
+            <h3 class="text-lg font-bold text-zinc-300 mb-1">Befektetői</h3>
+            <div class="price-tag">180.000 Ft <span class="text-sm font-normal text-zinc-500">/ év</span></div>
+            
+            <div class="my-6 border-t border-zinc-800"></div>
+            
+            <ul class="space-y-3 text-sm text-zinc-400">
+                <li><i class="fas fa-check text-zinc-600 mr-3"></i> 365 Napos Aktiválás</li>
+                <li><i class="fas fa-check text-zinc-600 mr-3"></i> VIP Bánásmód</li>
             </ul>
-            <form action="/pay/create-checkout-session" method="POST">
+
+            <form action="/pay/create-checkout-session" method="POST" class="mt-auto">
                 <input type="hidden" name="plan" value="annual">
                 <button type="submit" class="btn-pay">Kiválasztás</button>
             </form>
         </div>
 
     </div>
+
 </body>
 </html>
