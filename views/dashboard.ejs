@@ -5,47 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skyhigh AI | Vezérlőpult</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #000; color: white; font-family: sans-serif; }
-        .bento { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-        .admin-btn { background: gold; color: black; font-weight: 900; padding: 15px; border-radius: 10px; display: block; text-align: center; text-transform: uppercase; margin-bottom: 20px; }
+        body { background-color: #000; color: white; font-family: sans-serif; padding: 20px; }
+        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
+        .admin-btn { display: block; width: 100%; background: gold; color: black; font-weight: bold; text-align: center; padding: 15px; border-radius: 10px; text-transform: uppercase; margin-bottom: 20px; }
     </style>
 </head>
-<body class="p-6 pb-20">
+<body>
 
-    <div class="flex justify-between items-center mb-8 max-w-4xl mx-auto pt-4">
-        <div>
-            <p class="text-[10px] text-zinc-500 uppercase font-bold">Bejelentkezve:</p>
-            <h2 class="text-xl font-black uppercase text-white"><%= user.fullname %></h2>
-        </div>
-        <a href="/logout" class="text-xs text-red-500 font-bold border border-red-900 px-3 py-1 rounded">KILÉPÉS</a>
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-xl font-bold uppercase text-green-500">Vezérlőpult</h2>
+        <a href="/logout" class="text-xs text-red-500 border border-red-500 px-3 py-1 rounded">KILÉPÉS</a>
     </div>
 
     <% if (isAdmin) { %>
-        <a href="/admin" class="admin-btn">👑 Admin Vezérlőpult</a>
+        <a href="/admin" class="admin-btn">👑 BELÉPÉS AZ ADMIN FELÜLETRE</a>
     <% } %>
 
-    <div class="max-w-4xl mx-auto">
+    <div class="card">
+        <h3 class="text-lg font-bold mb-2">Szia, <%= user.fullname %>!</h3>
+        <p class="text-sm text-gray-400">Üdvözöllek a Skyhigh AI belső felületén.</p>
+        <hr class="border-gray-800 my-4">
         
-        <div class="bento border-l-4 border-purple-500">
-            <h3 class="text-lg font-black uppercase text-purple-400 mb-2"><i class="fas fa-robot mr-2"></i> Skyhigh AI Chat</h3>
-            <p class="text-xs text-zinc-300 font-bold mb-4">Üdvözöllek, <%= user.fullname %>! Én vagyok a személyes asszisztensed. A rendszer készen áll.</p>
-            <div class="bg-zinc-900 p-3 rounded text-[10px] text-zinc-500 italic">
-                A vagyonépítés a fegyelemmel kezdődik.
-            </div>
-        </div>
-
-        <div class="bento">
-            <h3 class="text-sm font-black uppercase text-zinc-500 mb-2">Licenc Státusz</h3>
-            <p class="text-xl font-black uppercase <%= user.hasLicense ? 'text-green-500' : 'text-red-500' %>">
-                <%= user.hasLicense ? 'AKTÍV' : 'INAKTÍV' %>
-            </p>
-            <% if (!user.hasLicense) { %>
-                <button class="mt-3 bg-green-600 text-black px-4 py-2 rounded text-xs font-black uppercase w-full">Licenc Vásárlása</button>
-            <% } %>
-        </div>
-
+        <p class="text-xs text-gray-500 uppercase font-bold">Státuszod:</p>
+        <p class="text-xl font-bold <%= user.hasLicense ? 'text-green-500' : 'text-red-500' %>">
+            <%= user.hasLicense ? 'AKTÍV LICENC' : 'NINCS LICENC' %>
+        </p>
     </div>
 
 </body>
