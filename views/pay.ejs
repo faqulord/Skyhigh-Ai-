@@ -12,76 +12,62 @@
             transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column;
         }
         .tier-card:hover { transform: translateY(-5px); border-color: #555; }
-        .popular { border: 1px solid #a855f7; box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); }
-        
-        .btn-pay {
-            background: white; color: black; font-weight: 800; text-transform: uppercase; 
-            padding: 15px; border-radius: 10px; width: 100%; text-align: center; margin-top: auto;
-            transition: 0.2s;
-        }
-        .btn-pay:hover { bg-gray-200; transform: scale(1.02); }
-        .btn-purple { background: #a855f7; color: white; }
+        .popular { border: 2px solid #a855f7; box-shadow: 0 0 40px rgba(168, 85, 247, 0.15); transform: scale(1.05); z-index: 10; }
+        .btn-pay { background: white; color: black; font-weight: 800; text-transform: uppercase; padding: 15px; border-radius: 10px; width: 100%; margin-top: auto; transition: 0.2s; }
+        .btn-pay:hover { background: #d4d4d8; }
+        .btn-purple { background: #a855f7; color: white; border: none; }
         .btn-purple:hover { background: #9333ea; }
-
-        .price-tag { font-size: 32px; font-weight: 900; }
-        .period { font-size: 12px; color: #71717a; font-weight: normal; }
+        .price-tag { font-size: 28px; font-weight: 900; color: white; }
     </style>
 </head>
-<body class="p-6 max-w-7xl mx-auto">
+<body class="p-6 max-w-7xl mx-auto flex flex-col justify-center min-h-screen">
 
-    <div class="text-center mb-12 mt-8">
-        <h1 class="text-3xl font-black uppercase italic mb-4">Válassz <span class="text-purple-500">Időtávot</span></h1>
-        <p class="text-zinc-400">Automatikus aktiválás a sikeres fizetés után.</p>
+    <div class="text-center mb-12">
+        <a href="/dashboard" class="text-zinc-500 hover:text-white uppercase font-bold text-xs mb-6 block"><i class="fas fa-arrow-left"></i> Vissza</a>
+        <h1 class="text-3xl font-black uppercase italic mb-4">Válassz <span class="text-purple-500">Stratégiát</span></h1>
+        <p class="text-zinc-400">Automatikus aktiválás azonnal a fizetés után.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
         
-        <div class="tier-card">
-            <h3 class="text-xl font-bold text-white mb-2">Kezdő</h3>
-            <div class="price-tag">20.000 Ft <span class="period">/ hó</span></div>
-            <p class="text-xs text-zinc-500 mb-6">Teszteld a rendszert kockázat nélkül.</p>
-            
+        <div class="tier-card opacity-80 hover:opacity-100">
+            <h3 class="text-lg font-bold text-zinc-300 mb-2">Havi</h3>
+            <div class="price-tag">20.000 Ft <span class="text-xs font-normal text-zinc-500">/ hó</span></div>
+            <p class="text-xs text-zinc-500 mb-6">Próbáld ki kockázat nélkül.</p>
             <ul class="space-y-4 text-sm text-zinc-400 mb-8">
-                <li><i class="fas fa-check text-green-500 mr-2"></i> 30 napos hozzáférés</li>
-                <li><i class="fas fa-check text-green-500 mr-2"></i> Napi Master Tipp</li>
-                <li><i class="fas fa-check text-green-500 mr-2"></i> AI Chat Asszisztens</li>
+                <li><i class="fas fa-check text-zinc-500 mr-2"></i> 30 napos licenc</li>
+                <li><i class="fas fa-check text-zinc-500 mr-2"></i> Napi Master Tipp</li>
             </ul>
-
             <form action="/pay/create-checkout-session" method="POST">
                 <input type="hidden" name="plan" value="monthly">
                 <button type="submit" class="btn-pay">Kiválasztás</button>
             </form>
         </div>
 
-        <div class="tier-card popular">
-            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase">Legnépszerűbb</div>
-            <h3 class="text-xl font-bold text-purple-400 mb-2">Vagyonépítő</h3>
-            <div class="price-tag">100.000 Ft <span class="period">/ 6 hó</span></div>
-            <p class="text-xs text-zinc-500 mb-6">Spórolj 20.000 Ft-ot a havihoz képest.</p>
-            
-            <ul class="space-y-4 text-sm text-zinc-300 mb-8">
-                <li><i class="fas fa-check text-purple-500 mr-2"></i> <strong>180 napos hozzáférés</strong></li>
-                <li><i class="fas fa-check text-purple-500 mr-2"></i> Minden funkció elérhető</li>
-                <li><i class="fas fa-check text-purple-500 mr-2"></i> <strong>Stratégiai Mentorálás</strong></li>
+        <div class="tier-card popular bg-[#121214]">
+            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase">Ajánlott</div>
+            <h3 class="text-xl font-black text-purple-400 mb-1 uppercase">Profi Stratégia</h3>
+            <div class="price-tag">100.000 Ft <span class="text-xs font-normal text-zinc-400">/ 6 hó</span></div>
+            <p class="text-xs text-green-500 font-bold mb-6">Spórolj 20.000 Ft-ot!</p>
+            <ul class="space-y-4 text-sm text-white mb-8">
+                <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> <strong>180 napos</strong> profit</li>
+                <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> <strong>Stratégiai Mentorálás</strong></li>
+                <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> Kiemelt Support</li>
             </ul>
-
             <form action="/pay/create-checkout-session" method="POST">
                 <input type="hidden" name="plan" value="biannual">
-                <button type="submit" class="btn-pay btn-purple">Kiválasztás</button>
+                <button type="submit" class="btn-pay btn-purple shadow-[0_0_20px_rgba(168,85,247,0.4)]">Profi Leszek</button>
             </form>
         </div>
 
-        <div class="tier-card">
-            <h3 class="text-xl font-bold text-white mb-2">Profi Befektető</h3>
-            <div class="price-tag">180.000 Ft <span class="period">/ év</span></div>
-            <p class="text-xs text-zinc-500 mb-6">A legjobb ár-érték arány. 3 hónap ingyen.</p>
-            
+        <div class="tier-card opacity-80 hover:opacity-100">
+            <h3 class="text-lg font-bold text-zinc-300 mb-2">Befektető</h3>
+            <div class="price-tag">180.000 Ft <span class="text-xs font-normal text-zinc-500">/ év</span></div>
+            <p class="text-xs text-zinc-500 mb-6">A legnagyobb megtakarítás.</p>
             <ul class="space-y-4 text-sm text-zinc-400 mb-8">
-                <li><i class="fas fa-check text-green-500 mr-2"></i> <strong>365 napos hozzáférés</strong></li>
-                <li><i class="fas fa-check text-green-500 mr-2"></i> VIP Support</li>
-                <li><i class="fas fa-check text-green-500 mr-2"></i> Hozzáférés az új fejlesztésekhez</li>
+                <li><i class="fas fa-check text-zinc-500 mr-2"></i> 365 napos licenc</li>
+                <li><i class="fas fa-check text-zinc-500 mr-2"></i> VIP bánásmód</li>
             </ul>
-
             <form action="/pay/create-checkout-session" method="POST">
                 <input type="hidden" name="plan" value="annual">
                 <button type="submit" class="btn-pay">Kiválasztás</button>
@@ -89,11 +75,5 @@
         </div>
 
     </div>
-    
-    <div class="text-center mt-12 opacity-50">
-        <i class="fab fa-stripe text-4xl text-zinc-600"></i>
-        <p class="text-[10px] text-zinc-600 mt-2 uppercase">Biztonságos fizetés Stripe rendszeren keresztül</p>
-    </div>
-
 </body>
 </html>
