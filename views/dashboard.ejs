@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyhigh AI | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #000; color: white; font-family: sans-serif; }
+        .bento { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; }
+        .admin-btn { 
+            background: linear-gradient(45deg, #fbbf24, #d97706); 
+            color: black; 
+            font-weight: 900; 
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
+    </style>
+</head>
+<body class="p-6 pb-20">
+
+    <div class="flex justify-between items-center mb-8 max-w-4xl mx-auto">
+        <div>
+            <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Üdvözöllek,</p>
+            <h2 class="text-xl font-black uppercase text-white"><%= user.fullname %></h2>
+        </div>
+        <a href="/logout" class="text-[10px] text-red-500 font-bold uppercase border border-red-900/30 px-3 py-1 rounded-full hover:bg-red-900/20">Kilépés</a>
+    </div>
+
+    <% if (isAdmin) { %>
+        <div class="max-w-4xl mx-auto mb-8">
+            <a href="/admin" class="admin-btn block w-full text-center py-4 rounded-xl text-xs uppercase tracking-[0.3em]">
+                <i class="fas fa-crown mr-2"></i> ADMIN DASHBOARD (Belépés)
+            </a>
+        </div>
+    <% } %>
+
+    <div class="max-w-4xl mx-auto space-y-4">
+        
+        <div class="bento p-6 border-l-4 <%= user.hasLicense ? 'border-green-500' : 'border-zinc-700' %>">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-black uppercase text-zinc-400">Licenc Státusz</h3>
+                    <p class="text-lg font-black uppercase <%= user.hasLicense ? 'text-green-500' : 'text-white' %>">
+                        <%= user.hasLicense ? 'AKTÍV' : 'INAKTÍV' %>
+                    </p>
+                </div>
+                <% if (!user.hasLicense) { %>
+                    <button class="bg-green-600 text-black px-4 py-2 rounded-lg text-[10px] font-black uppercase">Vásárlás</button>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="bento p-6">
+            <h3 class="text-sm font-black uppercase text-zinc-400 mb-2">Partner Kódod</h3>
+            <div class="bg-black/50 p-4 rounded-xl text-center border border-white/5">
+                <span class="text-xl font-mono text-purple-400 tracking-widest"><%= user.myReferralCode %></span>
+            </div>
+            <p class="text-[9px] text-zinc-600 text-center mt-2 uppercase">Ezzel hívhatsz meg másokat</p>
+        </div>
+
+        <div class="bento p-10 text-center opacity-50">
+            <i class="fas fa-lock text-3xl mb-4"></i>
+            <p class="text-xs uppercase font-bold">A napi tipp megtekintéséhez<br>aktív licenc szükséges.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
