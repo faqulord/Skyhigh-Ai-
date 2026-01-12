@@ -3,140 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | A Stratégia</title>
+    <title>Skyhigh AI | A Szolgáltatás</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Orbitron:wght@900&display=swap');
         body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
         .font-robot { font-family: 'Orbitron', sans-serif; }
-        .bento-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 28px; }
-        .purple-glow { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
-        .green-glow { color: #22c55e; text-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
-        
-        .nav-pill { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #555; transition: 0.3s; }
-        .active-pill { color: #22c55e; border-bottom: 2px solid #22c55e; padding-bottom: 4px; }
-        
-        .buy-btn { background: linear-gradient(90deg, #22c55e, #16a34a); color: #000; font-weight: 900; box-shadow: 0 0 20px rgba(34,197,94,0.2); }
+        .bento { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; }
+        .green-glow { color: #22c55e; text-shadow: 0 0 25px rgba(34, 197, 94, 0.5); }
+        .nav-link { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #666; transition: 0.3s; }
+        .nav-link:hover { color: #fff; }
+        .active-link { color: #22c55e; border-bottom: 2px solid #22c55e; padding-bottom: 5px; }
+        .btn-buy { background: linear-gradient(90deg, #22c55e, #16a34a); color: #000; font-weight: 900; }
     </style>
 </head>
 <body class="pb-20">
 
-    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/5 px-6 py-4">
-        <div class="max-w-5xl mx-auto text-center">
-            <div class="flex justify-between items-center mb-5">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-robot text-purple-500 text-xl"></i>
-                    <span class="font-robot text-lg tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
-                </div>
-                <a href="/regisztracio" class="bg-white text-black text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest shadow-lg">Belépés</a>
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-xl border-b border-white/5 px-6 py-4">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-robot text-purple-500 text-xl"></i>
+                <span class="font-robot text-lg tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
             </div>
-            <div class="flex justify-center gap-8 border-t border-white/5 pt-4">
-                <a href="/" class="nav-pill">Home</a>
-                <a href="/technologia" class="nav-pill">Technológia</a>
-                <a href="/halozat" class="nav-pill">Hálózat</a>
-                <a href="/strategia" class="nav-pill active-pill">Stratégia</a>
+            <div class="flex gap-8">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/technologia" class="nav-link">Technológia</a>
+                <a href="/strategia" class="nav-link active-link">Stratégia</a>
             </div>
+            <a href="/regisztracio" class="bg-white text-black text-[10px] font-black px-6 py-2 rounded-full uppercase tracking-widest hover:bg-gray-200 transition">Belépés</a>
         </div>
     </nav>
 
-    <header class="pt-48 pb-12 px-8 text-center max-w-4xl mx-auto">
-        <h1 class="text-4xl font-black uppercase tracking-tighter leading-none mb-6">
-            Egyszerűbb, mint <br> <span class="green-glow italic text-5xl">Gondolnád.</span>
+    <header class="pt-40 pb-16 px-6 text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-8">
+            A Csomag, ami <br> <span class="green-glow italic text-5xl md:text-6xl">Pénzt Gyárt.</span>
         </h1>
         <p class="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-12">
-            Nincs szükséged szakértelemre. <br> A Skyhigh AI átveszi az irányítást.
+            Mit kapsz, ha felveszed a Skyhigh AI-t alkalmazottnak? <br>
+            Bemutatjuk a teljes szolgáltatást.
         </p>
     </header>
 
-    <section class="px-6 space-y-6 max-w-5xl mx-auto mb-20">
-        <div class="grid md:grid-cols-3 gap-4">
-            <div class="bento-card p-8 text-center border-t-4 border-purple-500">
-                <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-400 font-black">1</div>
-                <h4 class="text-sm font-black uppercase mb-2">Várd meg az értesítést</h4>
-                <p class="text-[10px] text-zinc-500 font-bold uppercase leading-relaxed">
-                    Nem kell egész nap a telefont nyomkodnod. A robot naponta egyszer jelez, amikor kész a Master Tipp.
-                </p>
-            </div>
-            <div class="bento-card p-8 text-center border-t-4 border-green-500">
-                <div class="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-green-400 font-black">2</div>
-                <h4 class="text-sm font-black uppercase mb-2">Másold le a Tippet</h4>
-                <p class="text-[10px] text-zinc-500 font-bold uppercase leading-relaxed">
-                    A szoftver megmondja, mire fogadj és mennyivel. Neked csak 2 kattintás megtenni a szelvényt.
-                </p>
-            </div>
-            <div class="bento-card p-8 text-center border-t-4 border-white">
-                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-black">3</div>
-                <h4 class="text-sm font-black uppercase mb-2">Nézd a növekedést</h4>
-                <p class="text-[10px] text-zinc-500 font-bold uppercase leading-relaxed">
-                    Nyisd meg a Skyhigh Admin panelt, és élvezd, ahogy a grafikonok zöldbe fordulnak.
+    <section class="px-6 max-w-5xl mx-auto mb-20 space-y-6">
+        
+        <div class="bento p-8 border-l-4 border-green-500 flex flex-col md:flex-row items-center gap-6">
+            <div class="w-16 h-16 rounded-full bg-green-900/20 flex items-center justify-center text-green-500 text-2xl"><i class="fas fa-check-circle"></i></div>
+            <div class="text-center md:text-left">
+                <h3 class="text-lg font-black uppercase mb-2">1. Napi 1 Master Tipp</h3>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed">
+                    Nem öntjük rád a tippeket. A szoftver naponta 100.000 eseményből választja ki azt az <span class="text-white">EGYETLEN EGYET</span>, ami matematikailag a legbiztosabb. Neked csak ezt az egyet kell megtenned.
                 </p>
             </div>
         </div>
+
+        <div class="bento p-8 border-l-4 border-purple-500 flex flex-col md:flex-row items-center gap-6">
+            <div class="w-16 h-16 rounded-full bg-purple-900/20 flex items-center justify-center text-purple-500 text-2xl"><i class="fas fa-desktop"></i></div>
+            <div class="text-center md:text-left">
+                <h3 class="text-lg font-black uppercase mb-2">2. Saját Admin Panel</h3>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed">
+                    Felejtsd el a füzetet vagy az Excelt. Regisztráció után saját fiókot kapsz, ahol az AI vezeti helyetted a statisztikát. Látod a napi profitot, a havi egyenleget és a tőkéd növekedését grafikonokon.
+                </p>
+            </div>
+        </div>
+
+        <div class="bento p-8 border-l-4 border-blue-500 flex flex-col md:flex-row items-center gap-6">
+            <div class="w-16 h-16 rounded-full bg-blue-900/20 flex items-center justify-center text-blue-500 text-2xl"><i class="fas fa-comments"></i></div>
+            <div class="text-center md:text-left">
+                <h3 class="text-lg font-black uppercase mb-2">3. AI Asszisztens Chat</h3>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed">
+                    Nem vagy egyedül. A belső felületen bármikor írhatsz a robotnak. Kérdezz a stratégiáról, a bankroll menedzsmentről, ő azonnal válaszol.
+                </p>
+            </div>
+        </div>
+
     </section>
 
     <section class="px-6 max-w-3xl mx-auto">
-        <div class="bento-card p-1 bg-gradient-to-b from-green-600 via-green-900 to-black rounded-[32px] shadow-2xl">
-            <div class="bg-[#050505] rounded-[30px] p-8 md:p-12 text-center relative overflow-hidden">
+        <div class="bento p-1 bg-gradient-to-b from-green-600 to-black shadow-2xl">
+            <div class="bg-[#050505] rounded-[22px] p-10 text-center relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 opacity-10 text-[10rem]"><i class="fas fa-robot"></i></div>
                 
-                <div class="absolute top-0 right-0 opacity-5 pointer-events-none">
-                    <i class="fas fa-robot text-[15rem]"></i>
+                <h2 class="text-2xl font-black uppercase italic mb-2">Skyhigh Partner Licenc</h2>
+                <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-[0.3em] mb-8">Teljes Hozzáférés a Rendszerhez</p>
+
+                <div class="flex justify-center items-baseline gap-2 mb-8">
+                    <span class="text-5xl font-black text-white tracking-tighter">20.000</span>
+                    <span class="text-lg font-bold text-green-500">Ft / Hó</span>
                 </div>
 
-                <div class="inline-block px-4 py-2 bg-green-500/10 rounded-full border border-green-500/20 mb-6">
-                    <span class="text-[9px] font-black text-green-500 uppercase tracking-widest">Minden egyben csomag</span>
-                </div>
-
-                <h2 class="text-3xl font-black uppercase italic mb-2 tracking-tighter">Skyhigh <span class="text-green-500">Partner</span> Licenc</h2>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-[0.3em] mb-10">
-                    A te személyes profi alkalmazottad
-                </p>
-
-                <div class="flex justify-center items-baseline gap-2 mb-10">
-                    <span class="text-6xl font-black tracking-tighter text-white">20.000</span>
-                    <div class="text-left">
-                        <div class="text-lg font-bold text-green-500">Ft</div>
-                        <div class="text-[9px] text-zinc-600 uppercase font-bold">/ Hónap</div>
-                    </div>
-                </div>
-
-                <div class="space-y-4 text-left max-w-sm mx-auto mb-10">
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
-                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-500"><i class="fas fa-check"></i></div>
-                        <div>
-                            <h5 class="text-[10px] font-black uppercase text-white">Napi 1 Master Tipp</h5>
-                            <p class="text-[8px] text-zinc-500 font-bold uppercase">A nap legbiztosabb matematikai eseménye.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
-                        <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500"><i class="fas fa-brain"></i></div>
-                        <div>
-                            <h5 class="text-[10px] font-black uppercase text-white">AI Asszisztens & Chat</h5>
-                            <p class="text-[8px] text-zinc-500 font-bold uppercase">Bármikor kérdezhetsz tőle, ő figyel és válaszol.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
-                        <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500"><i class="fas fa-chart-line"></i></div>
-                        <div>
-                            <h5 class="text-[10px] font-black uppercase text-white">Saját Admin Felület</h5>
-                            <p class="text-[8px] text-zinc-500 font-bold uppercase">Látod a profitod növekedését Ft-ban és %-ban.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <a href="/regisztracio" class="buy-btn block w-full py-5 rounded-2xl text-xs uppercase tracking-[0.2em] active:scale-95 transition hover:brightness-110">
-                    Felveszem a robotot
+                <a href="/regisztracio" class="btn-buy block w-full py-5 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-lg active:scale-95 transition hover:brightness-110">
+                    Kezdjük a közös munkát
                 </a>
-                <p class="text-[8px] text-zinc-600 mt-4 uppercase font-bold italic">
-                    Nincs hűségidő. Bármikor lemondható.
-                </p>
+                <p class="text-[8px] text-zinc-600 mt-4 font-bold uppercase italic">Lemondás bármikor • Biztonságos fizetés</p>
             </div>
         </div>
     </section>
-
-    <footer class="text-center py-20 opacity-20">
-        <p class="text-[8px] font-black tracking-[0.6em] uppercase text-green-500 italic">Skyhigh AI • Strategy</p>
-    </footer>
 
 </body>
 </html>
