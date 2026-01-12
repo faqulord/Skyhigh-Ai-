@@ -7,23 +7,48 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Orbitron:wght@900&display=swap');
-        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
-        .font-robot { font-family: 'Orbitron', sans-serif; }
-        .bento { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; }
-        .purple-glow { color: #a855f7; text-shadow: 0 0 25px rgba(168, 85, 247, 0.5); }
-        .nav-link { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #666; transition: 0.3s; }
-        .nav-link:hover { color: #fff; }
-        .active-link { color: #a855f7; border-bottom: 2px solid #a855f7; padding-bottom: 5px; }
+        body { font-family: sans-serif; background: #000; color: #fff; }
+        .bento { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; padding: 20px; }
+        .purple-glow { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
     </style>
 </head>
 <body class="pb-20">
 
-    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-xl border-b border-white/5 px-6 py-4">
-        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <nav class="fixed top-0 w-full z-50 bg-black/90 border-b border-white/10 px-6 py-4">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <i class="fas fa-robot text-purple-500 text-xl"></i>
-                <span class="font-robot text-lg tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
+                <i class="fas fa-robot text-purple-500"></i>
+                <span class="font-bold uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
             </div>
-            <div class="flex gap-8">
-                <a
+            <div class="flex gap-4 text-[10px] font-bold uppercase">
+                <a href="/" class="text-zinc-500 hover:text-white">Home</a>
+                <a href="/technologia" class="text-purple-500">Technológia</a>
+                <a href="/strategia" class="text-zinc-500 hover:text-white">Stratégia</a>
+            </div>
+            <a href="/login" class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-full uppercase">Belépés</a>
+        </div>
+    </nav>
+
+    <header class="pt-40 pb-10 text-center px-6">
+        <h1 class="text-4xl font-black uppercase mb-6">
+            Csúcs <br> <span class="purple-glow italic">Technológia.</span>
+        </h1>
+        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest">
+            1.0s Reakcióidő • AI Memória • Global Scan
+        </p>
+    </header>
+
+    <section class="px-6 max-w-4xl mx-auto space-y-6">
+        <div class="bento border-l-4 border-purple-600">
+            <h3 class="text-xl font-black uppercase mb-2"><i class="fas fa-brain text-purple-500 mr-2"></i> AI Memória</h3>
+            <p class="text-xs text-zinc-400 uppercase font-bold">A szoftver 365 napos memóriával rendelkezik. Tanul a hibákból és optimalizálja a profitot.</p>
+        </div>
+        <div class="bento text-center">
+             <i class="fas fa-bolt text-yellow-500 text-2xl mb-4"></i>
+             <h4 class="text-sm font-black uppercase">Miliszekundumos Döntések</h4>
+             <p class="text-[10px] text-zinc-500 uppercase font-bold">Gyorsabb, mint bármelyik emberi fogadó.</p>
+        </div>
+    </section>
+
+</body>
+</html>
