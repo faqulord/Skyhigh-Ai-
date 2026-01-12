@@ -29,99 +29,66 @@ app.use(session({
 // --- 3. JOGOSULTSÁGOK ---
 const requireLogin = (req, res, next) => {
     if (!req.session.userId) {
-        return res.send('<h1 style="color:red">HIBA: Nem vagy bejelentkezve! <a href="/login">Kattints ide a belépéshez</a></h1>');
+        return res.send('<h1 style="color:red">HIBA: Nem vagy bejelentkezve! <a href="/login">Belépés</a></h1>');
     }
     next();
 };
 
 const requireAdmin = (req, res, next) => {
-    if (!req.session.isAdmin) {
-        return res.redirect('/dashboard');
-    }
+    if (!req.session.isAdmin) return res.redirect('/dashboard');
     next();
 };
 
-// --- 4. ÚTVONALAK ---
-
-// Alap oldalak
-app.get('/', (req, res) => res.render('index'));
+// --- 4. ALAP ÚTVONALAK ---
+app.get('/', (req, res) => res.render('index')); // Ha van index.ejs, ha nincs, irányítsd /login-ra
 app.get('/technologia', (req, res) => res.render('tech'));
 app.get('/strategia', (req, res) => res.render('profit'));
 app.get('/mlm', (req, res) => res.render('mlm'));
 app.get('/regisztracio', (req, res) => res.render('register'));
 app.get('/login', (req, res) => res.render('login'));
+app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
 
-// DEBUG (A te régi kódodból, meghagytam)
-app.get('/debug', async (req, res) => {
-    try {
-        const users = await User.find();
-        res.send(`
-            <h1>ADATBÁZIS DIAGNOSZTIKA</h1>
-            <p>Regisztrált felhasználók: ${users.length}</p>
-            <ul>${users.map(u => `<li>${u.email} | Licenc: ${u.hasLicense ? 'AKTÍV' : 'Nincs'}</li>`).join('')}</ul>
-            <a href="/login">Vissza</a>
-        `);
-    } catch (err) { res.send('DB HIBA: ' + err.message); }
-});
-
-// AUTH: Login
-app.post('/auth/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user) return res.send('Nincs ilyen felhasználó! <a href="/login">Újra</a>');
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.send('Hibás jelszó! <a href="/login">Újra</a>');
-
-        req.session.userId = user._id;
-        // ADMIN JOG BEÁLLÍTÁSA:
-        req.session.isAdmin = (email === 'stylefaqu@gmail.com'); 
-        
-        res.redirect('/dashboard');
-    } catch (err) { res.send('Hiba: ' + err.message); }
-});
-
-// AUTH: Regisztráció
+// AUTH
 app.post('/auth/register', async (req, res) => {
     const { fullname, email, password } = req.body;
     try {
         const existing = await User.findOne({ email });
         if (existing) return res.send('Ez az email már foglalt.');
-        
-        const salt = await bcrypt.genSalt(10);
-        const hashed = await bcrypt.hash(password, salt);
-        const code = 'SKY-' + Math.floor(1000 + Math.random() * 9000);
-        
-        await new User({ fullname, email, password: hashed, myReferralCode: code }).save();
+        const hashed = await bcrypt.hash(password, 10);
+        await new User({ fullname, email, password: hashed }).save();
         res.redirect('/login');
     } catch (err) { res.send('Hiba: ' + err.message); }
 });
 
-// DASHBOARD
+app.post('/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user || !await bcrypt.compare(password, user.password)) return res.send('Hibás adatok!');
+        req.session.userId = user._id;
+        req.session.isAdmin = (email === 'stylefaqu@gmail.com');
+        res.redirect('/dashboard');
+    } catch (err) { res.send('Hiba: ' + err.message); }
+});
+
+// DASHBOARD (Lejárat ellenőrzéssel)
 app.get('/dashboard', requireLogin, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
         if (!user) { req.session.destroy(); return res.redirect('/login'); }
-        
-        // Ellenőrizzük, lejárt-e a licenc
+
+        // Ha lejárt a licenc, elvesszük a jogot
         if (user.licenseExpires && new Date() > user.licenseExpires) {
-            user.hasLicense = false; // Lejárt
+            user.hasLicense = false;
             await user.save();
         }
 
         res.render('dashboard', { user, isAdmin: req.session.isAdmin });
-    } catch (err) { res.send('Dashboard Hiba: ' + err.message); }
-});
-
-// LOGOUT
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
+    } catch (err) { res.send('Dashboard Hiba'); }
 });
 
 // ======================================================
-// 💰 FIZETÉSI RENDSZER (ÚJ)
+// 💰 FIZETÉS (20k / 100k / 180k LOGIKA)
 // ======================================================
 
 app.get('/fizetes', requireLogin, (req, res) => res.render('pay'));
@@ -134,18 +101,18 @@ app.post('/pay/create-checkout-session', requireLogin, async (req, res) => {
     let price = 0;
     let type = '';
 
-    // --- AZ ÁRAZÁSI LOGIKA (Amit kértél) ---
+    // --- AZ ÁRAZÁS ---
     if (plan === 'monthly') {
         durationDays = 30;
         price = 20000;      // 20.000 Ft
         type = 'Havi Licenc';
     } else if (plan === 'biannual') {
         durationDays = 180; // 6 Hónap
-        price = 100000;     // 100.000 Ft (Kedvezményes)
+        price = 100000;     // 100.000 Ft (120e helyett)
         type = 'Féléves Profi Licenc';
     } else if (plan === 'annual') {
         durationDays = 365; // 1 Év
-        price = 180000;     // 180.000 Ft (VIP)
+        price = 180000;     // 180.000 Ft (240e helyett)
         type = 'Éves Befektetői Licenc';
     }
 
@@ -153,47 +120,37 @@ app.post('/pay/create-checkout-session', requireLogin, async (req, res) => {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + durationDays);
 
-    user.hasLicense = true;           // Bekapcsoljuk
-    user.licenseExpires = expiryDate; // Beállítjuk a lejáratot
+    user.hasLicense = true;
+    user.licenseExpires = expiryDate;
     user.licenseType = type;
-    user.totalSpent = (user.totalSpent || 0) + price; // Hozzáadjuk a bevételhez
+    user.totalSpent = (user.totalSpent || 0) + price;
     
     await user.save();
 
-    console.log(`💰 FIZETÉS SIKERES: ${user.email} | Összeg: ${price} Ft`);
-
-    // Siker oldalra küldjük
+    console.log(`💰 BEVÉTEL: ${user.email} fizetett ${price} Ft-ot.`);
     res.render('pay_success', { plan: type, date: expiryDate.toLocaleDateString() });
 });
 
 // ======================================================
-// 👑 ADMIN PANEL (ÚJ)
+// 👑 ADMIN PANEL
 // ======================================================
 
 app.get('/admin', requireLogin, requireAdmin, async (req, res) => {
-    const users = await User.find().sort({ date: -1 }); // Legújabb elöl
+    const users = await User.find().sort({ date: -1 });
     res.render('admin', { users });
 });
 
 app.get('/admin/activate/:id', requireLogin, requireAdmin, async (req, res) => {
-    // Kézi aktiválás (alapból 30 napot ad)
     const expiry = new Date();
-    expiry.setDate(expiry.getDate() + 30);
-    await User.findByIdAndUpdate(req.params.id, { 
-        hasLicense: true, 
-        licenseExpires: expiry,
-        licenseType: 'Admin Ajándék'
-    });
+    expiry.setDate(expiry.getDate() + 30); // Admin aktiválás = 30 nap ajándék
+    await User.findByIdAndUpdate(req.params.id, { hasLicense: true, licenseExpires: expiry, licenseType: 'Admin Gift' });
     res.redirect('/admin');
 });
 
 app.get('/admin/deactivate/:id', requireLogin, requireAdmin, async (req, res) => {
-    await User.findByIdAndUpdate(req.params.id, { 
-        hasLicense: false,
-        licenseExpires: null 
-    });
+    await User.findByIdAndUpdate(req.params.id, { hasLicense: false });
     res.redirect('/admin');
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => console.log(`Server fut: ${PORT}`));
