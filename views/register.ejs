@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyhigh AI | Fiók Létrehozása</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Orbitron:wght@900&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
+        .font-robot { font-family: 'Orbitron', sans-serif; }
+        .bento { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; }
+        
+        /* Jogi doboz stílusa */
+        .legal-box { 
+            height: 150px; 
+            overflow-y: scroll; 
+            background: #050505; 
+            border: 1px solid #222; 
+            padding: 15px; 
+            font-size: 10px; 
+            color: #666; 
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .legal-box::-webkit-scrollbar { width: 4px; }
+        .legal-box::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        .input-field {
+            width: 100%;
+            background: #0f0f0f;
+            border: 1px solid #222;
+            padding: 16px;
+            border-radius: 16px;
+            color: white;
+            font-size: 12px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-field:focus { border-color: #22c55e; }
+        
+        /* Gomb tiltása alapból */
+        .btn-disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .btn-active { opacity: 1; cursor: pointer; filter: grayscale(0); }
+        .reg-btn { background: linear-gradient(90deg, #22c55e, #16a34a); color: #000; font-weight: 900; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 bg-[url('https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=2832&auto=format&fit=crop')] bg-cover bg-center">
+    
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-sm"></div>
+
+    <div class="relative w-full max-w-md">
+        
+        <a href="/" class="inline-block mb-8 text-[10px] font-bold text-zinc-500 hover:text-white uppercase tracking-widest transition">
+            <i class="fas fa-arrow-left mr-2"></i> Vissza a főoldalra
+        </a>
+
+        <div class="bento p-8 md:p-10 shadow-2xl shadow-green-900/20 border-t-4 border-green-500">
+            
+            <div class="text-center mb-8">
+                <i class="fas fa-robot text-3xl text-purple-500 mb-3"></i>
+                <h2 class="font-robot text-2xl uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></h2>
+                <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-[0.3em] mt-2">Member Access</p>
+            </div>
+
+            <form action="/auth/register" method="POST" class="space-y-4">
+                
+                <div>
+                    <label class="block text-[9px] text-zinc-500 uppercase font-bold mb-2 ml-2">Teljes Név</label>
+                    <input type="text" name="fullname" placeholder="Írd be a neved" class="input-field" required>
+                </div>
+
+                <div>
+                    <label class="block text-[9px] text-zinc-500 uppercase font-bold mb-2 ml-2">E-mail Cím</label>
+                    <input type="email" name="email" placeholder="pelda@email.com" class="input-field" required>
+                </div>
+
+                <div>
+                    <label class="block text-[9px] text-zinc-500 uppercase font-bold mb-2 ml-2">Jelszó</label>
+                    <input type="password" name="password" placeholder="••••••••" class="input-field" required>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-[9px] text-red-500 uppercase font-black mb-2 ml-2">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Kötelező elfogadni:
+                    </label>
+                    <div class="legal-box">
+                        <strong class="text-white block mb-2">FELHASZNÁLÁSI FELTÉTELEK ÉS KOCKÁZATI NYILATKOZAT</strong>
+                        <p class="mb-2">1. A Skyhigh AI szoftver (továbbiakban: Szolgáltatás) kizárólag matematikai és statisztikai elemzéseket nyújt sporteseményekkel kapcsolatban. A Szolgáltatás nem minősül pénzügyi tanácsadásnak, befektetési ajánlásnak vagy szerencsejáték-szervezésnek.</p>
+                        <p class="mb-2">2. A Felhasználó kijelenti, hogy tudatában van a sportfogadás kockázatainak. A múltbeli eredmények nem jelentenek garanciát a jövőbeli profitra.</p>
+                        <p class="mb-2">3. A Szolgáltató (Igazgató) és a Fejlesztő (Faqubelord Engineering) kizár minden felelősséget a Felhasználót ért esetleges anyagi veszteségekért. A szoftver használata saját felelősségre történik.</p>
+                        <p class="mb-2">4. A 20.000 Ft-os havi díj a technológiai licenc használati díja, nem pedig garantált nyeremény után fizetett jutalék.</p>
+                        <p>5. A fiók létrehozásával Ön elfogadja ezeket a feltételeket.</p>
+                    </div>
+                    
+                    <div class="flex items-start gap-3 p-3 bg-zinc-900/50 rounded-xl border border-zinc-800 cursor-pointer hover:border-zinc-600 transition" onclick="toggleCheckbox()">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" id="legalCheck" class="w-5 h-5 accent-green-500 cursor-pointer" onchange="checkLegal()">
+                        </div>
+                        <label for="legalCheck" class="text-[9px] text-zinc-400 font-bold uppercase leading-tight cursor-pointer select-none">
+                            Elolvastam és elfogadom a felelősségkizáró nyilatkozatot. Tudomásul veszem a kockázatot.
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="reg-btn w-full py-5 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-lg mt-6 transition btn-disabled" disabled>
+                    Fiók Létrehozása
+                </button>
+
+            </form>
+
+            <div class="mt-8 text-center border-t border-zinc-800 pt-6">
+                <p class="text-[10px] text-zinc-500">Már van fiókod?</p>
+                <a href="/login" class="text-[10px] font-black text-white uppercase tracking-widest hover:text-green-500 transition">Jelentkezz be itt</a>
+            </div>
+
+        </div>
+        
+        <p class="text-center text-[8px] text-zinc-600 mt-6 uppercase tracking-[0.5em] opacity-50">Secured by Skyhigh AI</p>
+    </div>
+
+    <script>
+        function checkLegal() {
+            const checkbox = document.getElementById('legalCheck');
+            const btn = document.getElementById('submitBtn');
+            
+            if (checkbox.checked) {
+                btn.disabled = false;
+                btn.classList.remove('btn-disabled');
+                btn.classList.add('btn-active');
+                btn.classList.add('hover:scale-105');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('btn-disabled');
+                btn.classList.remove('btn-active');
+                btn.classList.remove('hover:scale-105');
+            }
+        }
+    </script>
+</body>
+</html>
