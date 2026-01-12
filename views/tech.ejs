@@ -7,46 +7,62 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; }
-        .bento { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; padding: 20px; }
-        .purple-glow { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@900&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
+        .bento { background: #080808; border: 1px solid #141414; border-radius: 32px; }
+        .purple-glow { filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6)); color: #a855f7; }
     </style>
 </head>
 <body class="pb-20">
 
-    <nav class="fixed top-0 w-full z-50 bg-black/90 border-b border-white/10 px-6 py-4">
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/5 px-6 py-4">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i class="fas fa-robot text-purple-500"></i>
-                <span class="font-bold uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
-            </div>
-            <div class="flex gap-4 text-[10px] font-bold uppercase">
-                <a href="/" class="text-zinc-500 hover:text-white">Home</a>
-                <a href="/technologia" class="text-purple-500">Technológia</a>
-                <a href="/strategia" class="text-zinc-500 hover:text-white">Stratégia</a>
+                <span style="font-family: 'Orbitron';" class="text-sm tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
             </div>
             <a href="/login" class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-full uppercase">Belépés</a>
         </div>
+        <div class="max-w-5xl mx-auto mt-4 flex gap-4 text-[10px] font-bold uppercase tracking-widest">
+            <a href="/" class="text-zinc-500 hover:text-white">Home</a>
+            <a href="/technologia" class="text-purple-500 border-b border-purple-500">Technológia</a>
+            <a href="/strategia" class="text-zinc-500 hover:text-white">Stratégia</a>
+        </div>
     </nav>
 
-    <header class="pt-40 pb-10 text-center px-6">
-        <h1 class="text-4xl font-black uppercase mb-6">
+    <header class="pt-40 pb-20 px-8 text-center">
+        <div class="inline-block px-4 py-2 rounded-full border border-purple-500/30 mb-8 bg-purple-500/5">
+            <span class="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">Quantum Tech Engine v2.0</span>
+        </div>
+        <h1 class="text-5xl font-black uppercase tracking-tighter italic mb-6">
             Csúcs <br> <span class="purple-glow italic">Technológia.</span>
         </h1>
-        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest">
-            1.0s Reakcióidő • AI Memória • Global Scan
+        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest max-w-xl mx-auto leading-relaxed">
+            A Skyhigh AI nem érzelemből fogad. <br> Több millió adatpontot elemez miliszekundumok alatt.
         </p>
     </header>
 
-    <section class="px-6 max-w-4xl mx-auto space-y-6">
-        <div class="bento border-l-4 border-purple-600">
-            <h3 class="text-xl font-black uppercase mb-2"><i class="fas fa-brain text-purple-500 mr-2"></i> AI Memória</h3>
-            <p class="text-xs text-zinc-400 uppercase font-bold">A szoftver 365 napos memóriával rendelkezik. Tanul a hibákból és optimalizálja a profitot.</p>
+    <section class="px-6 max-w-5xl mx-auto space-y-6">
+        <div class="bento p-10 border-l-4 border-purple-600">
+            <h3 class="text-xl font-black uppercase mb-6 flex items-center gap-3">
+                <i class="fas fa-brain text-purple-500"></i> Az AI Memória
+            </h3>
+            <p class="text-xs text-zinc-400 uppercase leading-relaxed font-bold">
+                A szoftver 365 napos memóriával rendelkezik. Minden nap elemzi az eredményeket, és a legfrissebb éles piaci információk alapján módosítja a stratégiát.
+            </p>
         </div>
-        <div class="bento text-center">
-             <i class="fas fa-bolt text-yellow-500 text-2xl mb-4"></i>
-             <h4 class="text-sm font-black uppercase">Miliszekundumos Döntések</h4>
-             <p class="text-[10px] text-zinc-500 uppercase font-bold">Gyorsabb, mint bármelyik emberi fogadó.</p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bento p-8">
+                <i class="fas fa-bolt text-yellow-500 text-2xl mb-4"></i>
+                <h4 class="text-sm font-black uppercase mb-3">1.0s Feldolgozás</h4>
+                <p class="text-[10px] text-zinc-500 uppercase font-bold leading-tight">Míg mások híreket olvasnak, az AI miliszekundumok alatt szűri le a globális odds-változásokat.</p>
+            </div>
+            <div class="bento p-8">
+                <i class="fas fa-square-root-variable text-green-500 text-2xl mb-4"></i>
+                <h4 class="text-sm font-black uppercase mb-3">Tiszta Matematika</h4>
+                <p class="text-[10px] text-zinc-500 uppercase font-bold leading-tight">Minden tipp mögött kőkemény valószínűségszámítás áll.</p>
+            </div>
         </div>
     </section>
 
