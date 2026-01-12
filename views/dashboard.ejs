@@ -22,10 +22,10 @@
             transition: 0.3s;
         }
         
-        /* PROFI NÉZET: Neon Keret */
+        /* PROFI NÉZET KERET */
         .card-active { border: 1px solid #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); }
 
-        /* INGYENES NÉZET: Scanner Csík */
+        /* SCANNER ANIMÁCIÓ */
         .scanner-line {
             position: absolute; top: 0; left: 0; width: 100%; height: 2px;
             background: #22c55e;
@@ -35,13 +35,13 @@
         }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* Homályosítás a titkokhoz */
+        /* BLUR EFFECT */
         .blur-secret { 
             filter: blur(5px); user-select: none; background: #111; color: transparent; 
             text-shadow: 0 0 8px rgba(255,255,255,0.5);
         }
 
-        /* Gombok */
+        /* GOMBOK */
         .btn-unlock { 
             background: linear-gradient(90deg, #22c55e, #16a34a); color: black; 
             font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 11px;
@@ -53,12 +53,22 @@
 
         .btn-admin { background: gold; color: black; font-weight: 900; padding: 10px; border-radius: 8px; text-align: center; display: block; margin-bottom: 20px; text-transform: uppercase; font-size: 10px; }
 
-        /* Chat */
+        /* CHAT */
         .chat-bubble { background: #111; border: 1px solid #222; padding: 12px; border-radius: 12px; font-size: 12px; color: #ccc; margin-bottom: 8px; }
         .ai-label { color: #a855f7; font-weight: 900; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+        /* TERMINÁL EFFEKT */
+        .terminal-text { font-family: monospace; font-size: 9px; color: #666; }
+        .terminal-cursor::after { content: '_'; animation: blink 1s infinite; }
     </style>
 </head>
 <body class="p-4 md:p-6 max-w-6xl mx-auto pb-24">
+
+    <% 
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const dateStr = yesterday.toLocaleDateString('hu-HU', { month: '2-digit', day: '2-digit' });
+    %>
 
     <header class="flex justify-between items-center mb-8 border-b border-zinc-900 pb-4">
         <div>
@@ -89,29 +99,16 @@
                         <span class="text-4xl font-robot font-black text-white">+4.8%</span>
                         <span class="text-xs text-green-500 font-bold uppercase">Növekedés</span>
                     </div>
-                    <p class="text-[10px] text-zinc-500 mt-2">A tőkéd biztonságban van.</p>
                 </div>
 
                 <div class="card">
                     <h3 class="text-[10px] font-black uppercase text-zinc-500 tracking-widest mb-4">Aktív Ciklus (30 Nap)</h3>
-                    
                     <div class="flex justify-between text-xs font-bold uppercase mb-2">
                         <span class="text-white">Jelenlegi nap:</span>
                         <span class="text-green-500">1. / 30.</span>
                     </div>
                     <div class="w-full bg-zinc-800 h-3 rounded-full overflow-hidden mb-4 border border-zinc-700">
                         <div class="bg-gradient-to-r from-green-600 to-green-400 h-full w-[3.3%] shadow-[0_0_15px_rgba(34,197,94,0.5)]"></div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4 text-center mt-4 border-t border-zinc-800 pt-4">
-                        <div>
-                            <p class="text-[9px] text-zinc-500 uppercase">Hátralévő</p>
-                            <p class="text-lg font-black text-white">29 Nap</p>
-                        </div>
-                        <div>
-                            <p class="text-[9px] text-zinc-500 uppercase">Cél Profit</p>
-                            <p class="text-lg font-black text-white">180%</p>
-                        </div>
                     </div>
                 </div>
 
@@ -138,17 +135,13 @@
                         <span class="text-[9px] font-bold bg-green-900/30 text-green-400 px-2 py-1 rounded">ÉLŐ</span>
                     </div>
 
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-[10px] text-zinc-400 uppercase font-bold mb-1">
-                                <span>Matematikai Esély</span>
-                                <span class="text-white">94.2%</span>
-                            </div>
-                            <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-green-500 h-full w-[94%]"></div>
-                            </div>
-                        </div>
+                    <div class="bg-black p-3 rounded mb-4 border border-zinc-800 opacity-70">
+                        <p class="terminal-text">> Csatlakozás a globális piachoz...</p>
+                        <p class="terminal-text">> Odds elemzés folyamatban...</p>
+                        <p class="terminal-text text-green-500">> Találat megerősítve! <span class="terminal-cursor"></span></p>
+                    </div>
 
+                    <div class="space-y-4">
                         <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 text-center relative overflow-hidden">
                             <div class="absolute inset-0 flex items-center justify-center z-10 bg-black/20">
                                 <i class="fas fa-lock text-white/40 text-3xl"></i>
@@ -156,22 +149,32 @@
                             <p class="text-xl font-black blur-secret">TITKOS CSAPATOK</p>
                             <p class="text-xs blur-secret mt-2">Tipp: Hazai (1.85)</p>
                         </div>
+                        
+                        <div class="flex items-center justify-center gap-2 text-red-500 animate-pulse">
+                            <i class="fas fa-exclamation-triangle text-xs"></i>
+                            <p class="text-[9px] font-black uppercase">Az odds csökkenő tendenciát mutat!</p>
+                        </div>
                     </div>
 
                     <div class="mt-6">
-                        <p class="text-[10px] text-zinc-500 text-center mb-3">A profit kijelző és a tipp zárolva van.</p>
                         <a href="/fizetes" class="btn-unlock">
                             TIPP FELOLDÁSA (AKTIVÁLÁS) <i class="fas fa-arrow-right ml-1"></i>
                         </a>
                     </div>
                 </div>
 
-                <div class="card opacity-50">
+                <div class="card opacity-60 hover:opacity-100 transition">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Tegnapi Eredmény</h3>
+                        <span class="text-[9px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded border border-zinc-700"><%= dateStr %></span>
+                    </div>
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-history text-zinc-500"></i>
+                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-500">
+                            <i class="fas fa-check"></i>
+                        </div>
                         <div>
-                            <p class="text-[10px] text-zinc-400 uppercase font-bold">Tegnapi statisztika</p>
-                            <p class="text-xs font-bold text-white">NYERTES NAP (+4.5%) ✅</p>
+                            <p class="text-xs font-bold text-white">NYERTES NAP ✅</p>
+                            <p class="text-[9px] text-zinc-500 uppercase">A rendszer hibátlanul teljesített.</p>
                         </div>
                     </div>
                 </div>
@@ -211,24 +214,20 @@
             const hasLicense = <%= user.hasLicense %>;
             const userName = "<%= user.fullname %>";
             
-            // Különböző üzenetek Aktív vs Inaktív tagnak
             let messages = [];
 
             if (hasLicense) {
-                // Üzenetek AKTÍV tagnak
                 messages = [
                     { text: `Üdv újra, ${userName}!`, delay: 500 },
-                    { text: "A rendszered <strong>AKTÍV</strong>. A 30 napos ciklus elindult.", delay: 1500 },
-                    { text: "Mai profit cél: <span class='text-green-500 font-bold'>+4.8%</span>. A tippet bal oldalon láthatod.", delay: 3000 },
-                    { text: "Tedd meg a fogadást pontosan a megadott téttel, majd dőlj hátra.", delay: 5000 }
+                    { text: "A rendszered <strong>AKTÍV</strong>. A mai piacokat elemeztem.", delay: 1500 },
+                    { text: "Mindent rendben találtam. A tőkéd biztonságos növekedéséhez kövesd a bal oldali utasítást.", delay: 3000 }
                 ];
             } else {
-                // Üzenetek INGYENES tagnak
                 messages = [
                     { text: `Üdvözöllek, ${userName}. Én a Skyhigh AI vagyok.`, delay: 500 },
-                    { text: "A mai piaci elemzés elkészült. <strong>94%-os találati esélyt</strong> mértem.", delay: 2000 },
-                    { text: "Jelenleg nem látod a profit számlálót és a tippet, mert a licenced inaktív.", delay: 4000 },
-                    { text: "A vagyonépítéshez aktiváld a rendszert a bal oldali gombbal.", delay: 6000 }
+                    { text: "A globális szkennelés befejeződött.", delay: 1500 },
+                    { text: "A matematikai modellem <strong>94%-os valószínűséget</strong> jelez a mai napra.", delay: 3000 },
+                    { text: "Az odds jelenleg ideális, de csökkenni fog. Javaslom az azonnali aktiválást.", delay: 5000 }
                 ];
             }
 
