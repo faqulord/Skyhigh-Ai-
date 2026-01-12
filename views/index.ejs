@@ -2,57 +2,85 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh AI | Élj a hobbidból</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyhigh AI | Élj a hobbidból profin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; }
+        .bento { background: #080808; border: 1px solid #141414; border-radius: 32px; }
         .green-glow { color: #22c55e; text-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
-        .bento { background: #080808; border: 1px solid #141414; border-radius: 28px; }
+        .nav-link { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #666; transition: 0.3s; }
+        .nav-link:hover { color: #fff; }
     </style>
 </head>
 <body class="pb-20">
-    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 px-4 py-4">
-        <div class="flex justify-between items-center mb-4">
+
+    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 px-6 py-5">
+        <div class="flex justify-between items-center max-w-5xl mx-auto">
             <div class="flex items-center gap-2">
                 <i class="fas fa-robot text-purple-500"></i>
-                <span style="font-family: 'Orbitron';" class="text-sm tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
+                <span class="font-black tracking-tighter uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></span>
             </div>
-            <a href="/regisztracio" class="bg-white text-black text-[9px] font-black px-4 py-2 rounded-full uppercase">Belépés</a>
-        </div>
-        <div class="flex gap-2 overflow-x-auto no-scrollbar">
-            <a href="/" class="px-4 py-2 bg-green-500 text-black rounded-lg text-[9px] font-black uppercase flex-shrink-0">Főoldal</a>
-            <a href="/technologia" class="px-4 py-2 bg-zinc-900 rounded-lg text-[9px] font-black uppercase flex-shrink-0">Technológia</a>
-            <a href="/strategia" class="px-4 py-2 bg-zinc-900 rounded-lg text-[9px] font-black uppercase flex-shrink-0">Stratégia</a>
-            <a href="/mlm" class="px-4 py-2 bg-zinc-900 rounded-lg text-[9px] font-black uppercase flex-shrink-0">MLM</a>
+            <div class="flex gap-4">
+                <a href="/technologia" class="nav-link">Technológia</a>
+                <a href="/regisztracio" class="bg-white text-black px-4 py-1.5 rounded-full text-[9px] font-black">LOGIN</a>
+            </div>
         </div>
     </nav>
 
-    <header class="pt-48 px-6 text-center">
-        <h1 class="text-4xl font-black uppercase tracking-tighter leading-none mb-6">
-            Hagyd abba a munkát. <br> <span class="green-glow text-5xl italic">Kezdj el élni.</span>
+    <header class="pt-40 pb-20 px-8 text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none mb-8">
+            Váltsd a hobbid <br> <span class="green-glow italic text-5xl md:text-7xl">Készpénzre.</span>
         </h1>
-        <p class="text-zinc-500 text-[11px] leading-relaxed px-6 uppercase tracking-widest font-bold mb-10">
-            A szoftver, ami a szerencsejátékot <br> <span class="text-white">kiszámítható profittá</span> alakítja.
+        <p class="text-zinc-500 text-xs md:text-sm font-bold uppercase tracking-[0.2em] mb-12 leading-relaxed">
+            A profi sportfogadás nem szerencse, hanem egy <span class="text-white italic text-lg">üzleti modell</span>. <br> 
+            Te adod a tőkét, a Skyhigh AI adja a matematikát.
         </p>
-        <div class="space-y-4">
-            <a href="/regisztracio" class="block w-full bg-green-500 text-black py-5 rounded-3xl font-black text-xs uppercase tracking-widest shadow-lg shadow-green-500/20">Azonnali Indítás</a>
-            <a href="/technologia" class="block w-full border border-white/10 py-5 rounded-3xl text-[10px] font-bold uppercase tracking-widest">Hogyan működik a robot?</a>
-        </div>
+        <a href="/regisztracio" class="inline-block bg-green-500 text-black px-12 py-6 rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-green-500/20 active:scale-95 transition">Indítsd el a birodalmad</a>
     </header>
 
-    <section class="px-6 mt-20">
-        <div class="bento p-8 text-center">
-            <i class="fas fa-gem text-purple-500 text-3xl mb-4"></i>
-            <h3 class="text-lg font-black uppercase italic mb-2">Prémium Hozzáférés</h3>
-            <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">A hobbidból megélni nem álom, <br> hanem matek.</p>
+    <section class="px-6 mb-20 max-w-5xl mx-auto">
+        <div class="bento p-10 border-l-4 border-green-500">
+            <h3 class="text-xl font-black uppercase italic mb-6">A Növekedési Görbe</h3>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div>
+                    <h4 class="text-green-500 font-black text-xs uppercase mb-3 tracking-widest">Fázis 1: Start (1-3 hónap)</h4>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed uppercase">Már az első hetekben látni fogod a tőke emelkedését. Ez a szakasz a fegyelemről szól: napi 1 tipp, pontos végrehajtás, látható profit.</p>
+                </div>
+                <div>
+                    <h4 class="text-purple-500 font-black text-xs uppercase mb-3 tracking-widest">Fázis 2: Exponenciális (6-12 hónap)</h4>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed uppercase">Itt válik a hobbi megélhetéssé. A profit visszaforgatásával a 6. és 12. hónap végére a kezdőtőkéd többszörösét építjük fel matematikailag.</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer class="text-center py-10 opacity-20">
-        <p class="text-[8px] font-black tracking-[0.5em] uppercase text-green-500">Skyhigh AI • Director Mode</p>
+    <section class="px-6 mb-20 max-w-5xl mx-auto">
+        <h2 class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em] mb-10 text-center italic">A Szoftveres Háttérország</h2>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="bento p-8 text-center">
+                <i class="fas fa-desktop text-green-500 text-2xl mb-4"></i>
+                <h5 class="text-[11px] font-black uppercase mb-2">Profi Felhasználói Panel</h5>
+                <p class="text-[9px] text-zinc-500 uppercase font-bold italic">Tűpontos napi/havi statisztikák, profitvezetés és egyenlegkövetés.</p>
+            </div>
+            <div class="bento p-8 text-center">
+                <i class="fas fa-user-tie text-white text-2xl mb-4"></i>
+                <h5 class="text-[11px] font-black uppercase mb-2">Személyi Asszisztens</h5>
+                <p class="text-[9px] text-zinc-500 uppercase font-bold italic">Egy robot, aki neked dolgozik. Minden nap emlékszik a stratégiádra.</p>
+            </div>
+            <div class="bento p-8 text-center">
+                <i class="fas fa-users text-purple-500 text-2xl mb-4"></i>
+                <h5 class="text-[11px] font-black uppercase mb-2">MLM Csapatrendszer</h5>
+                <p class="text-[9px] text-zinc-500 uppercase font-bold italic">Hívj meg másokat és kapsz 3% jutalékot, amit levonhatsz a licenc árából.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center py-20 opacity-30 border-t border-white/5">
+        <p class="text-[8px] font-black tracking-[0.8em] uppercase text-green-500">SKYHIGH AI SYSTEM • DIRECTOR MODE</p>
     </footer>
+
 </body>
 </html>
