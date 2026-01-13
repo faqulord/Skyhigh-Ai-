@@ -12,16 +12,16 @@
     </style>
 </head>
 <body class="p-4 md:p-8 flex justify-center min-h-screen">
-    <div class="max-w-md w-full">
+    <div class="max-w-md w-full pb-20">
         <header class="flex justify-between items-center mb-10 pt-4">
-            <h1 style="font-family: 'Orbitron';" class="text-xl font-bold text-purple-500 italic uppercase">Admin HQ</h1>
+            <h1 style="font-family: 'Orbitron';" class="text-xl font-bold text-purple-500 uppercase">Admin HQ</h1>
             <a href="/dashboard" class="bg-zinc-900 px-4 py-1 rounded-full text-[10px] font-bold uppercase text-zinc-400">Dashboard</a>
         </header>
 
         <div class="fox-card p-6 mb-8 text-center <%= tipExists ? 'purple-neon border-2' : '' %>">
             <% if (tipExists) { %>
                 <div class="text-3xl mb-2">🦊💜</div>
-                <h2 class="text-xs font-black text-purple-400 uppercase tracking-widest animate-pulse">A Napi Fix kint van minden elofizetonek!</h2>
+                <h2 class="text-xs font-black text-purple-400 uppercase tracking-widest animate-pulse">A Napi Fix élesítve van!</h2>
             <% } else { %>
                 <form action="/admin/run-robot" method="POST">
                     <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs">Elemzés Indítása (08:00)</button>
@@ -29,11 +29,11 @@
             <% } %>
         </div>
 
-        <div class="fox-card p-6 mb-8 border border-purple-500/20">
-            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 text-center tracking-widest">Havi Profit Kalkulátor (<%= currentMonthName %>)</h3>
+        <div class="fox-card p-6 mb-8 border border-purple-500/20 shadow-lg overflow-hidden">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 text-center tracking-widest">Profit Kalkulátor (<%= currentMonthName %>)</h3>
             <table class="w-full text-[9px] text-left">
-                <thead class="text-zinc-600"><tr><th class="pb-2">Nap</th><th class="pb-2">Match</th><th class="pb-2 text-right">+/-</th><th class="pb-2 text-right">Össz.</th></tr></thead>
-                <tbody class="divide-y divide-white/5">
+                <thead class="text-zinc-600 uppercase"><tr><th>Nap</th><th>Meccs</th><th class="text-right">Profit</th><th class="text-right">Havi</th></tr></thead>
+                <tbody class="divide-y divide-white/5 text-zinc-300">
                     <% calculatorData.forEach(row => { %>
                         <tr><td class="py-2"><%= row.date.split('-')[2] %>.</td><td class="py-2 truncate max-w-[80px]"><%= row.match %></td><td class="py-2 text-right <%= row.dailyProfit >= 0 ? 'text-green-500' : 'text-red-500' %>"><%= row.dailyProfit %>%</td><td class="py-2 text-right font-black"><%= row.totalRunning.toFixed(1) %>%</td></tr>
                     <% }) %>
@@ -41,35 +41,44 @@
             </table>
         </div>
 
-        <div class="fox-card p-6 mb-8">
-            <div id="chat-win" class="h-40 overflow-y-auto mb-4 space-y-2 text-[10px] bg-black p-3 rounded-xl border border-white/5">
-                <p class="text-purple-400 italic">Róka: Készen állok a konzultációra, Főnök.</p>
+        <div class="fox-card p-6 mb-8 border border-purple-500/30">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-4 text-center tracking-widest italic">Róka Stratégiai Napló</h3>
+            <div id="chat-window" class="h-48 overflow-y-auto mb-4 space-y-3 text-[10px] p-3 bg-black rounded-xl">
+                <% chatHistory.forEach(msg => { %>
+                    <div class="<%= msg.sender === 'Admin' ? 'text-right' : 'text-left' %>">
+                        <p class="text-[8px] text-zinc-600 font-bold uppercase"><%= msg.sender %></p>
+                        <p class="<%= msg.sender === 'Admin' ? 'text-zinc-400' : 'text-purple-400 font-bold italic' %>"><%= msg.text %></p>
+                    </div>
+                <% }) %>
             </div>
             <div class="flex gap-2">
-                <input type="text" id="chat-in" class="flex-1 bg-zinc-900 rounded-xl p-3 text-[10px]" placeholder="Üzenet a Rókának...">
-                <button onclick="talkToFox()" class="bg-purple-600 px-4 rounded-xl text-[10px] font-bold">OK</button>
+                <input type="text" id="chat-in" class="flex-1 bg-zinc-900 rounded-xl p-3 text-[10px] text-white" placeholder="Üzenet...">
+                <button onclick="send()" class="bg-purple-600 px-4 rounded-xl font-bold text-xs uppercase">Ok</button>
             </div>
         </div>
 
-        <div class="fox-card p-6 mb-8">
-            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-6 text-center">Tagok Kezelése</h3>
-            <% users.forEach(u => { %>
-                <div class="flex justify-between items-center border-b border-white/5 pb-2 mb-2">
-                    <span class="text-[10px] truncate w-32"><%= u.fullname %> (<%= u.email %>)</span>
-                    <% if (!u.hasLicense) { %>
-                        <form action="/admin/activate-user" method="POST"><input type="hidden" name="userId" value="<%= u._id %>"><button class="bg-green-600 text-[9px] px-3 py-1 rounded-lg uppercase">Aktiválás</button></form>
-                    <% } else { %><span class="text-green-500 text-[9px] uppercase font-bold">AKTÍV</span><% } %>
-                </div>
-            <% }) %>
+        <div class="fox-card p-6">
+            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-6 text-center">Tagok Aktiválása</h3>
+            <div class="space-y-4">
+                <% users.forEach(u => { %>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                        <span class="text-[10px] truncate w-32"><%= u.fullname %></span>
+                        <% if (!u.hasLicense) { %>
+                            <form action="/admin/activate-user" method="POST"><input type="hidden" name="userId" value="<%= u._id %>"><button class="bg-green-600 text-[8px] px-2 py-1 rounded uppercase font-bold">Aktivál</button></form>
+                        <% } else { %><span class="text-green-500 text-[8px] font-bold">TAG</span><% } %>
+                    </div>
+                <% }) %>
+            </div>
         </div>
     </div>
     <script>
-        async function talkToFox() {
-            const i = document.getElementById('chat-in'); const w = document.getElementById('chat-win');
-            if(!i.value) return; w.innerHTML += `<p class="text-zinc-500 text-right">Admin: ${i.value}</p>`;
-            const r = await fetch('/admin/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:i.value})});
-            const d = await r.json(); w.innerHTML += `<p class="text-purple-400 italic">Róka: ${d.reply}</p>`;
-            i.value = ''; w.scrollTop = w.scrollHeight;
+        const win = document.getElementById('chat-window'); win.scrollTop = win.scrollHeight;
+        async function send() {
+            const i = document.getElementById('chat-in'); if(!i.value) return;
+            win.innerHTML += `<div class="text-right"><p class="text-[8px] text-zinc-600 font-bold uppercase">Admin</p><p class="text-zinc-400">${i.value}</p></div>`;
+            const res = await fetch('/admin/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:i.value})});
+            const d = await res.json(); win.innerHTML += `<div class="text-left"><p class="text-[8px] text-zinc-600 font-bold uppercase">Róka</p><p class="text-purple-400 font-bold italic">${d.reply}</p></div>`;
+            i.value = ''; win.scrollTop = win.scrollHeight;
         }
     </script>
 </body>
