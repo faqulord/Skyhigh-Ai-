@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v14.0 - Precíziós Dátumozás Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v15.0 - Öreg Róka Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -23,7 +23,7 @@ const Tip = mongoose.model('Tip', new mongoose.Schema({
     league: String, match: String, prediction: String, odds: String, reasoning: String,
     profitPercent: { type: Number, default: 0 }, matchTime: String, bookmaker: String,
     status: { type: String, default: 'pending' }, 
-    date: { type: String, index: true } // YYYY-MM-DD formátum
+    date: { type: String, index: true }
 }));
 
 const MonthlyStat = mongoose.model('MonthlyStat', new mongoose.Schema({
@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_precision_2026',
+    secret: 'skyhigh_oldfox_final_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -47,10 +47,10 @@ app.use(session({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // DÁTUM SEGÉDFÜGGVÉNYEK
-const getDbDate = () => new Date().toLocaleDateString('en-CA'); // Mindig YYYY-MM-DD
+const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 const getHuFullDate = () => new Date().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// ROBOT: +3 ÓRÁS SZABÁLY ÉS DÁTUM FIX
+// ROBOT FUNKCIÓ
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -68,16 +68,16 @@ async function runAiRobot() {
 
         const matchData = fixtures.slice(0, 15).map(f => {
             const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
-            return `${f.teams.home.name} vs ${f.teams.away.name} (Liga: ${f.league.name}, Idő: ${time})`;
+            return `${f.teams.home.name} vs ${f.teams.away.name} (Bajnokság: ${f.league.name}, Idő: ${time})`;
         }).join(" | ");
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [{ 
                 role: "system", 
-                content: "Te vagy az 'Öreg Róka'. Profi sportfogadó. Csak MAGYARUL válaszolj. Válasz JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" 
+                content: "Te vagy az 'Öreg Róka'. Dörzsölt, veterán sportfogadó. Csak MAGYARUL válaszolj. Válasz JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" 
             },
-            { role: "user", content: `Válassz egy MASTER TIPPET a mai napra (${getHuFullDate()}): ${matchData}` }],
+            { role: "user", content: `Elemezz 10 évre visszamenőleg és adj MASTER TIPPET mára: ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -94,9 +94,16 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
+// --- ÚTVONALAK ---
+
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
+    
+    if (user.email === OWNER_EMAIL) {
+        user.isAdmin = true; user.hasLicense = true; await user.save();
+    }
+
     if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
     
     const dailyTip = await Tip.findOne({ date: getDbDate() });
@@ -111,7 +118,7 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
     const licensedCount = await User.countDocuments({ hasLicense: true });
-    res.render('admin', { users, currentTip, stats, totalRevenue: licensedCount * 19900, status: req.query.status, dbDate: getDbDate() });
+    res.render('admin', { users, currentTip, stats, totalRevenue: licensedCount * 19900, licensedCount, status: req.query.status, dbDate: getDbDate() });
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
@@ -136,14 +143,14 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     res.redirect('/admin?status=settled');
 });
 
-// LOGIN, REGISTER, STB. (Kihagyva a rövidség kedvéért, de maradhat a régi kódodból)
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/', (req, res) => res.render('index'));
 app.post('/user/set-capital', async (req, res) => {
     await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
     res.redirect('/dashboard');
 });
+
+app.get('/login', (req, res) => res.render('login'));
+app.get('/register', (req, res) => res.render('register'));
+app.get('/', (req, res) => res.render('index'));
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
