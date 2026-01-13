@@ -4,6 +4,7 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const MongoStore = require('connect-mongo');
 const OpenAI = require('openai');
+const axios = require('axios');
 
 const User = require('./models/User');
 const Tip = require('./models/Tip');
@@ -11,7 +12,10 @@ const Tip = require('./models/Tip');
 const app = express();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-mongoose.connect(process.env.MONGO_URL || process.env.MONGO_URI);
+// Adatbázis csatlakozás
+mongoose.connect(process.env.MONGO_URL || process.env.MONGO_URI)
+    .then(() => console.log('🚀 Skyhigh Core Online'))
+    .catch(err => console.error('❌ DB Hiba:', err));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -19,18 +23,16 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.use(session({
-    secret: 'skyhigh_ultra_core_2026',
+    secret: 'skyhigh_quantum_secure_2026',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || process.env.MONGO_URI }),
     cookie: { maxAge: 86400000 }
 }));
 
+// Middlewares
 const requireLogin = (req, res, next) => req.session.userId ? next() : res.redirect('/login');
-const requireAdmin = (req, res, next) => {
-    if (req.session.userId && req.session.isAdmin) return next();
-    res.redirect('/dashboard');
-};
+const requireAdmin = (req, res, next) => (req.session.userId && req.session.isAdmin) ? next() : res.redirect('/dashboard');
 
 // --- ÚTVONALAK ---
 app.get('/', (req, res) => res.render('index'));
@@ -43,7 +45,7 @@ app.post('/auth/register', async (req, res) => {
         const hashed = await bcrypt.hash(req.body.password, 10);
         await new User({ fullname: req.body.fullname, email: req.body.email, password: hashed }).save();
         res.redirect('/login');
-    } catch { res.send('Hiba történt.'); }
+    } catch { res.send('Hiba: Az email már foglalt.'); }
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -52,38 +54,29 @@ app.post('/auth/login', async (req, res) => {
         req.session.userId = user._id;
         req.session.isAdmin = user.isAdmin || (req.body.email === 'stylefaqu@gmail.com');
         res.redirect('/dashboard');
-    } else { res.send('Hiba.'); }
+    } else { res.send('Hibás adatok.'); }
 });
 
-app.get('/dashboard', requireLogin, async (req, res) => {
-    const user = await User.findById(req.session.userId);
-    const todayTip = await Tip.findOne().sort({ createdAt: -1 });
-    const pastTips = await Tip.find().sort({ createdAt: -1 }).limit(10);
-    res.render('dashboard', { user, isAdmin: req.session.isAdmin, dailyTip: todayTip, pastTips });
-});
-
-// --- ADMIN PANEL STATISZTIKÁVAL ---
-app.get('/admin', requireAdmin, async (req, res) => {
-    const users = await User.find().sort({ date: -1 });
-    
-    // Számítások
-    const totalUsers = users.length;
-    const activeSubscribers = users.filter(u => u.hasLicense).length;
-    const monthlyRevenue = activeSubscribers * 20000; // 20.000 Ft per aktív tag
-
-    res.render('admin', { 
-        users, 
-        stats: {
-            totalUsers,
-            activeSubscribers,
-            monthlyRevenue
-        }
-    });
-});
-
+// Admin funkciók
 app.post('/admin/make-admin', requireAdmin, async (req, res) => {
     await User.findOneAndUpdate({ email: req.body.email }, { isAdmin: true });
     res.redirect('/admin');
+});
+
+app.get('/admin', requireAdmin, async (req, res) => {
+    const users = await User.find().sort({ date: -1 });
+    const totalUsers = users.length;
+    const activeSubs = users.filter(u => u.hasLicense).length;
+    const revenue = activeSubs * 20000;
+    res.render('admin', { users, stats: { totalUsers, activeSubs, revenue } });
+});
+
+// Dashboard
+app.get('/dashboard', requireLogin, async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    const todayTip = await Tip.findOne().sort({ createdAt: -1 });
+    const pastTips = await Tip.find().sort({ createdAt: -1 }).limit(5);
+    res.render('dashboard', { user, isAdmin: req.session.isAdmin, dailyTip: todayTip, pastTips });
 });
 
 app.post('/api/set-capital', requireLogin, async (req, res) => {
@@ -91,16 +84,22 @@ app.post('/api/set-capital', requireLogin, async (req, res) => {
     res.json({ success: true });
 });
 
+// AI Robot - Skyhigh Core
 app.post('/api/chat', requireLogin, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
-        const systemPrompt = `Te a Skyhigh Core vagy. A cél a 6 hónapos profit. Tőke: ${user.startingCapital} Ft.`;
+        const systemPrompt = `Te vagy a Skyhigh Core, egy zseniális Digitális Elme. Élőben elemzed a piacokat. 
+        A cél a 6 hónapos profit-ciklus. Tőke: ${user.startingCapital} Ft. Tét: tőke 5%-a. 
+        Ha nincs licenc, emlékeztesd 5 üzenetenként a licenc-jog frissítésére. 
+        Stílusod: Profi, szigorú, de barátságos. Magyarázd el a 30 napos matekot és a Master Tipp jelentőségét.`;
+
         const response = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [{ role: "system", content: systemPrompt }, { role: "user", content: req.body.message }]
         });
         res.json({ reply: response.choices[0].message.content });
-    } catch { res.json({ reply: "Hiba." }); }
+    } catch { res.json({ reply: "Rendszerhiba." }); }
 });
 
-app.listen(process.env.PORT || 3000);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Skyhigh System Online: ${PORT}`));
