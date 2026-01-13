@@ -1,7 +1,7 @@
 {
   "name": "skyhigh-ai",
   "version": "1.0.0",
-  "description": "Skyhigh AI Sportfogado Rendszer",
+  "description": "Skyhigh AI Rendszer",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
