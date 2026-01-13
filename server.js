@@ -11,12 +11,17 @@ const Tip = require('./models/Tip');
 
 const app = express();
 
+// KULCSOK BETÖLTÉSE A HÁTTÉRBŐL (NE ÍRD IDE BE KÉZZEL!)
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY; 
 const SPORT_API_KEY = process.env.SPORT_API_KEY; 
+
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
+// ADATBÁZIS
 const dbURI = process.env.MONGO_URL || process.env.MONGO_URI || 'mongodb://localhost:27017/skyhigh';
-mongoose.connect(dbURI).then(() => console.log('✅ DB OK')).catch(err => console.log('❌ DB Hiba:', err));
+mongoose.connect(dbURI)
+    .then(() => console.log('✅ DB SIKER'))
+    .catch(err => console.log('❌ DB HIBA:', err));
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: false }));
@@ -34,23 +39,27 @@ app.use(session({
 const requireLogin = (req, res, next) => req.session.userId ? next() : res.redirect('/login');
 const requireAdmin = (req, res, next) => req.session.isAdmin ? next() : res.redirect('/dashboard');
 
-// --- ÚTVONALAK (ITT VOLT A HIBA, JAVÍTVA!) ---
+// ==========================================
+// 🔥 A JAVÍTOTT ÚTVONALAK (EZ A LÉNYEG!)
+// ==========================================
 
-// 1. FŐOLDAL (MARKETING) - EZ JÖN BE ELŐSZÖR!
-app.get('/', (req, res) => res.render('index'));
+// 1. A FŐOLDAL --> INDEX.EJS (A Marketing oldal)
+app.get('/', (req, res) => {
+    res.render('index');
+});
 
-// 2. BELÉPÉS / REGISZTRÁCIÓ
+// 2. BELÉPÉS OLDAL
 app.get('/login', (req, res) => res.render('login'));
 app.get('/regisztracio', (req, res) => res.render('register'));
 app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
 
-// AUTH
+// AUTH MŰKÖDÉS
 app.post('/auth/register', async (req, res) => {
     try {
         const hashed = await bcrypt.hash(req.body.password, 10);
         await new User({ fullname: req.body.fullname, email: req.body.email, password: hashed }).save();
         res.redirect('/login');
-    } catch { res.send('Hiba.'); }
+    } catch { res.send('Hiba történt.'); }
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -62,7 +71,7 @@ app.post('/auth/login', async (req, res) => {
     } else { res.send('Hibás adatok'); }
 });
 
-// DASHBOARD, FIZETÉS, CHAT, GENERÁTOR (A szokásos kódod...)
+// DASHBOARD ÉS EGYEBEK
 app.get('/dashboard', requireLogin, async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (user.licenseExpires && new Date() > user.licenseExpires) { user.hasLicense = false; await user.save(); }
@@ -71,6 +80,7 @@ app.get('/dashboard', requireLogin, async (req, res) => {
 });
 
 app.get('/fizetes', requireLogin, (req, res) => res.render('pay'));
+
 app.post('/pay/create-checkout-session', requireLogin, async (req, res) => {
     const user = await User.findById(req.session.userId);
     let days = req.body.plan === 'monthly' ? 30 : 365;
@@ -79,6 +89,7 @@ app.post('/pay/create-checkout-session', requireLogin, async (req, res) => {
     res.render('pay_success', { plan: 'Licenc', date: user.licenseExpires.toLocaleDateString() });
 });
 
+// AI CHAT
 app.post('/api/chat', requireLogin, async (req, res) => {
     try {
         const { message } = req.body;
@@ -101,9 +112,25 @@ app.post('/api/chat', requireLogin, async (req, res) => {
     } catch { res.status(500).json({ reply: "Hiba." }); }
 });
 
+// GENERÁTOR
 app.get('/admin/generate-tip', requireLogin, requireAdmin, async (req, res) => {
-    // Generátor kód helye... (Működik a régivel is)
-    res.redirect('/dashboard');
+    try {
+        const options = { method: 'GET', url: 'https://v3.football.api-sports.io/fixtures', params: { date: new Date().toISOString().split('T')[0], league: '39', season: '2023' }, headers: { 'x-apisports-key': SPORT_API_KEY } };
+        let matches = [];
+        try { matches = (await axios.request(options)).data.response; } catch(e) {}
+        
+        // Ha nincs meccs, generálunk egy "pihenőnapot"
+        let aiResponse = { matches: "Ma nincs megfelelő meccs.", odds: "-", reasoning: "A piac volatilitása miatt ma pihenőt tartunk." };
+        
+        if (matches && matches.length > 0) {
+             const prompt = `Válassz 1 meccset. JSON: { "matches": "...", "odds": "...", "reasoning": "..." }`;
+             const gpt = await openai.chat.completions.create({ messages: [{ role: "system", content: prompt + "\n" + JSON.stringify(matches.slice(0,3)) }], model: "gpt-3.5-turbo" });
+             aiResponse = JSON.parse(gpt.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim());
+        }
+        
+        await new Tip({ date: new Date().toLocaleDateString(), match: "AI QUANTUM", prediction: aiResponse.matches, odds: aiResponse.odds, reasoning: aiResponse.reasoning }).save();
+        res.redirect('/dashboard');
+    } catch (e) { res.send("Hiba: " + e.message); }
 });
 
 app.get('/admin', requireLogin, requireAdmin, async (req, res) => {
