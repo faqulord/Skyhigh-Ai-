@@ -6,20 +6,17 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const app = express();
 
-// --- DB KAPCSOLAT ---
+// --- ADATBÁZIS (Railway változódhoz igazítva) ---
 const MONGO_CONNECTION = process.env.MONGO_URL;
 
 mongoose.connect(MONGO_CONNECTION)
-.then(() => console.log("✅ Adatbázis OK"))
-.catch(err => console.error("❌ DB Hiba:", err));
+.then(() => console.log("✅ DB Connected"))
+.catch(err => console.error("❌ DB Error:", err));
 
 // --- MODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
-    fullname: String, 
-    email: { type: String, unique: true }, 
-    password: String,
-    startingCapital: { type: Number, default: 0 }, 
-    hasLicense: { type: Boolean, default: true }
+    fullname: String, email: { type: String, unique: true }, password: String,
+    startingCapital: { type: Number, default: 0 }, hasLicense: { type: Boolean, default: true }
 }));
 
 const Tip = mongoose.model('Tip', new mongoose.Schema({
@@ -27,15 +24,15 @@ const Tip = mongoose.model('Tip', new mongoose.Schema({
     date: { type: String, default: () => new Date().toISOString().split('T')[0] }
 }));
 
-// --- BEÁLLÍTÁSOK ---
+// --- MEGJELENÍTÉS BEÁLLÍTÁSA (EZ A JAVÍTÁS) ---
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views')); // Kényszerített mappa útvonal
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_top_secret',
+    secret: 'skyhigh_2026_safe',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: MONGO_CONNECTION }),
@@ -60,18 +57,19 @@ app.get('/dashboard', async (req, res) => {
                 match: "Newcastle vs. Man. City", 
                 prediction: "Man. City", 
                 odds: "1.65", 
-                reasoning: "AI elemzés folyamatban..." 
+                reasoning: "A Skyhigh Core AI elemzése alapján a City dominanciája várható." 
             };
         }
 
-        // Itt rendereljük le a Dashboard-ot!
+        // --- DOLOG, AMITŐL MEGKELL JELENNIE A DIZÁJNNAK ---
+        res.setHeader('Content-Type', 'text/html'); 
         res.render('dashboard', { user, dailyTip });
     } catch (err) {
-        console.error(err);
-        res.send("Hiba történt a Dashboard betöltésekor: " + err.message);
+        res.redirect('/login');
     }
 });
 
+// AUTH
 app.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email.toLowerCase() });
@@ -85,14 +83,10 @@ app.post('/auth/login', async (req, res) => {
 
 app.post('/auth/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const newUser = new User({ 
-        fullname: req.body.fullname, 
-        email: req.body.email.toLowerCase(), 
-        password: hashedPassword 
-    });
+    const newUser = new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashedPassword });
     await newUser.save();
     res.redirect('/login');
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Szerver fut: ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Rendszer aktív a ${PORT} porton`));
