@@ -1,14 +1,50 @@
-<body class="bg-black text-white flex items-center justify-center min-h-screen p-6">
-    <div class="max-w-md w-full bg-zinc-900 border border-purple-500/30 p-8 rounded-[2rem] shadow-2xl">
-        <h1 class="text-2xl font-black text-purple-500 italic mb-4 uppercase">Neural Konfiguráció</h1>
-        <p class="text-zinc-400 text-sm mb-8 italic">Add meg a tőkéd, amivel ma indulsz. A robot ehhez számolja a pontos profitot.</p>
-        
-        <form action="/user/set-capital" method="POST" class="space-y-6">
-            <div>
-                <label class="text-[10px] uppercase text-zinc-500 font-bold mb-2 block tracking-widest">Kezdő Tőke (Ft)</label>
-                <input type="number" name="capital" required placeholder="Példa: 100000" class="w-full bg-black border border-white/10 rounded-xl py-4 px-4 font-bold text-xl outline-none focus:border-purple-500">
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Csomagválasztás | Skyhigh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
+        .price-card { background: #0a0a0a; border: 2px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.2); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+    <div class="max-w-sm w-full">
+        <div class="price-card p-10 rounded-[3rem] text-center relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/10 blur-3xl rounded-full"></div>
+            
+            <p class="text-[10px] text-purple-500 font-black uppercase tracking-[4px] mb-4">Master Hozzáférés</p>
+            <h2 class="text-4xl font-black mb-8 italic">30 NAPOS <br>PROFIT</h2>
+            
+            <div class="space-y-4 mb-10 text-left">
+                <div class="flex items-center gap-3 text-xs text-zinc-300">
+                    <span class="text-purple-500 text-lg">✓</span> <span>Napi 1 Master Tipp (Reggel 8:00)</span>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-zinc-300">
+                    <span class="text-purple-500 text-lg">✓</span> <span>Flashscore szinkronizált ligák</span>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-zinc-300">
+                    <span class="text-purple-500 text-lg">✓</span> <span>Bankroll-alapú tét számítás</span>
+                </div>
             </div>
-            <button type="submit" class="w-full bg-purple-600 py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-purple-600/20">Platform Aktiválása</button>
-        </form>
+
+            <div class="mb-10">
+                <p class="text-4xl font-black">19.900 Ft</p>
+                <p class="text-[10px] text-zinc-500 uppercase font-bold mt-2">Nincs apróbetű. Csak matek.</p>
+            </div>
+
+            <form action="/create-checkout-session" method="POST">
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl font-black uppercase text-sm tracking-widest transition shadow-lg shadow-purple-600/20 active:scale-95">
+                    Fizetés Card-al
+                </button>
+            </form>
+            
+            <p class="mt-6 text-[9px] text-zinc-600 uppercase font-bold">Biztonságos Stripe fizetés</p>
+        </div>
+        
+        <a href="/logout" class="block text-center mt-8 text-zinc-700 text-[10px] font-black uppercase hover:text-white transition">Inkább később</a>
     </div>
 </body>
+</html>
