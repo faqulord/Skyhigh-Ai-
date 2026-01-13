@@ -4,24 +4,31 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skyhigh Admin HQ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
 </head>
-<body class="bg-black text-white p-4 font-sans">
+<body class="bg-[#050505] text-white p-4 font-sans">
     <div class="max-w-md mx-auto">
         <header class="flex justify-between items-center mb-8 pt-4">
-            <h1 style="font-family: 'Orbitron';" class="text-xl text-orange-500 italic">ADMIN HQ</h1>
-            <a href="/dashboard" class="bg-zinc-800 px-4 py-1 rounded-full text-[10px] font-bold uppercase">Dashboard</a>
+            <h1 class="text-xl text-orange-500 font-bold italic">ADMIN HQ</h1>
+            <a href="/dashboard" class="bg-zinc-800 px-4 py-1 rounded-full text-[10px] font-bold uppercase">Vissza</a>
         </header>
 
+        <% if (error) { %>
+            <div class="bg-red-600/20 border border-red-500 text-red-500 p-4 rounded-xl text-xs mb-6 font-bold">
+                ⚠️ HIBA: <%= error %>
+            </div>
+        <% } %>
+
         <div class="bg-zinc-900 p-6 rounded-3xl border border-orange-500/30 mb-8 text-center shadow-xl">
-            <h3 class="text-[10px] font-black uppercase mb-4 text-orange-500 tracking-widest">Mai Elemzés Indítása</h3>
-            <form action="/admin/run-robot" method="POST">
-                <button type="submit" class="w-full bg-orange-600 py-4 rounded-2xl font-black uppercase text-xs">Reggel 8:00 szimuláció (+3h szabály)</button>
+            <h3 class="text-[10px] font-black uppercase mb-4 text-orange-500 tracking-widest">Elemzés Vezérlés</h3>
+            <form action="/admin/run-robot" method="POST" onsubmit="this.querySelector('button').innerText='Számítás folyamatban... (Akár 1 perc)'; this.querySelector('button').disabled=true;">
+                <button type="submit" class="w-full bg-orange-600 py-4 rounded-2xl font-black uppercase text-xs">
+                    Reggel 8:00 Szimuláció Futtatása
+                </button>
             </form>
             
             <% if (currentTip && currentTip.status === 'pending') { %>
-                <div class="mt-6 border-t border-white/5 pt-4">
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold mb-3">Tipp Eredményezése:</p>
+                <div class="mt-6 border-t border-white/5 pt-4 text-left">
+                    <p class="text-[10px] text-zinc-400 font-bold mb-2 uppercase">Aktív Tipp: <%= currentTip.match %></p>
                     <div class="flex gap-2">
                         <form action="/admin/settle-tip" method="POST" class="flex-1">
                             <input type="hidden" name="tipId" value="<%= currentTip._id %>">
@@ -39,41 +46,32 @@
         </div>
 
         <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-8">
-            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center">Belső Havi Statisztika</h3>
-            <div class="overflow-hidden rounded-xl border border-white/5">
-                <table class="w-full text-[10px] text-left">
-                    <thead class="bg-white/5 text-zinc-500 uppercase">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center">Havi Mérleg</h3>
+            <table class="w-full text-[10px] text-left">
+                <thead class="bg-white/5 text-zinc-500">
+                    <tr><th class="p-2">Hónap</th><th class="p-2">Tipp</th><th class="p-2">Hozam</th><th class="p-2">Win%</th></tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <% stats.forEach(s => { %>
                         <tr>
-                            <th class="p-3">Hónap</th>
-                            <th class="p-3">Tipp</th>
-                            <th class="p-3 text-green-500">Hozam</th>
-                            <th class="p-3">Win%</th>
+                            <td class="p-2 font-mono"><%= s.month %></td>
+                            <td class="p-2"><%= s.totalTips %></td>
+                            <td class="p-2 font-bold text-green-400">+<%= s.totalProfit %>%</td>
+                            <td class="p-2"><%= Math.round((s.winCount / s.totalTips) * 100) %>%</td>
                         </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        <% stats.forEach(s => { %>
-                            <tr>
-                                <td class="p-3 font-mono"><%= s.month %></td>
-                                <td class="p-3"><%= s.totalTips %> db</td>
-                                <td class="p-3 font-bold text-green-400">+<%= s.totalProfit %>%</td>
-                                <td class="p-3 font-bold"><%= Math.round((s.winCount / s.totalTips) * 100) %>%</td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
+                    <% }) %>
+                </tbody>
+            </table>
         </div>
 
         <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
-            <h3 class="text-[10px] font-black uppercase text-orange-500 mb-6 tracking-widest text-center">Ügyfelek</h3>
-            <div class="space-y-3">
-                <% users.forEach(u => { %>
-                    <div class="flex justify-between items-center text-[11px] border-b border-white/5 pb-2">
-                        <span><%= u.fullname %></span>
-                        <span class="text-orange-500 font-mono"><%= u.startingCapital.toLocaleString() %> Ft</span>
-                    </div>
-                <% }) %>
-            </div>
+            <h3 class="text-[10px] font-black uppercase text-orange-500 mb-4 text-center">Ügyfélbázis</h3>
+            <% users.forEach(u => { %>
+                <div class="flex justify-between items-center text-[10px] border-b border-white/5 py-2">
+                    <span><%= u.fullname %></span>
+                    <span class="text-orange-500 font-bold"><%= u.startingCapital.toLocaleString() %> Ft</span>
+                </div>
+            <% }) %>
         </div>
     </div>
 </body>
