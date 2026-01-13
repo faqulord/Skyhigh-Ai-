@@ -2,87 +2,58 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh Admin | Executive Terminal</title>
+    <title>Admin Control | Skyhigh AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #000; color: white; font-family: 'Inter', sans-serif; }
-        .admin-card { background: #050505; border: 1px solid #141414; border-radius: 24px; transition: 0.3s; }
-        .admin-card:hover { border-color: #7c3aed; }
-        .stat-glow { text-shadow: 0 0 15px rgba(167, 139, 250, 0.4); }
-        .input-dark { background: #080808; border: 1px solid #1a1a1a; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 10px; }
-    </style>
 </head>
-<body class="p-4 md:p-10 max-w-6xl mx-auto">
-
-    <header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 text-center md:text-left">
-        <div>
-            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Skyhigh <span class="text-red-600">Executive</span></h1>
-            <p class="text-[9px] text-zinc-600 font-bold uppercase tracking-[5px] mt-1 italic">Vállalati Pénzügyi Monitoring</p>
+<body class="bg-zinc-950 text-white p-10">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10 border-b border-white/5 pb-6">
+            <h1 class="text-3xl font-black italic text-red-500 uppercase italic tracking-tighter">Skyhigh <span class="text-white">Admin</span></h1>
+            <form action="/admin/run-ai" method="POST">
+                <button class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest transition">
+                    <i class="fas fa-robot mr-2"></i> AI Kényszerített Indítása
+                </button>
+            </form>
         </div>
-        <a href="/dashboard" class="bg-zinc-900 text-zinc-400 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition">Vissza a terminálhoz</a>
-    </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div class="admin-card p-8 text-center">
-            <p class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-2">Regisztrált Tagok</p>
-            <p class="text-4xl font-black stat-glow"><%= stats.totalUsers %></p>
-        </div>
-        <div class="admin-card p-8 text-center border-blue-900/20">
-            <p class="text-[9px] text-blue-500 uppercase font-black tracking-widest mb-2">Aktív Licenc</p>
-            <p class="text-4xl font-black text-blue-500 stat-glow"><%= stats.activeSubs %></p>
-        </div>
-        <div class="admin-card p-8 text-center border-green-900/20">
-            <p class="text-[9px] text-green-500 uppercase font-black tracking-widest mb-2">Havi Bevétel</p>
-            <p class="text-4xl font-black text-green-500 stat-glow"><%= stats.revenue.toLocaleString() %> <span class="text-xs uppercase">Ft</span></p>
-        </div>
-    </div>
-
-    <div class="admin-card p-8 mb-12">
-        <h3 class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-6 italic text-center md:text-left">Társtulajdonos Felhatalmazása</h3>
-        <form action="/admin/make-admin" method="POST" class="flex flex-col md:flex-row gap-4">
-            <input type="email" name="email" placeholder="Email cím megadása..." required 
-                class="input-dark flex-1 p-5 rounded-2xl text-sm outline-none focus:border-red-600 transition">
-            <button class="bg-white text-black px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-red-600 hover:text-white transition duration-500 shadow-xl">
-                Jogosultság Átadása
-            </button>
-        </form>
-    </div>
-
-    <div class="space-y-4">
-        <h3 class="text-[10px] font-black text-zinc-700 uppercase tracking-[10px] mb-6 ml-4">Operátori Adatbázis</h3>
-        <% users.forEach(u => { %>
-            <div class="admin-card p-6 flex flex-col md:flex-row justify-between items-center gap-4 hover:bg-[#080808]">
-                <div class="flex items-center gap-4 text-center md:text-left">
-                    <div class="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800">
-                        <i class="fas fa-user text-zinc-700"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <p class="font-bold text-lg"><%= u.fullname %></p>
-                            <% if (u.isAdmin) { %>
-                                <span class="text-red-600 text-[8px] font-black border border-red-600/30 px-2 py-0.5 rounded uppercase tracking-tighter">Owner</span>
-                            <% } %>
-                        </div>
-                        <p class="text-xs text-zinc-600 font-mono tracking-tight"><%= u.email %></p>
-                    </div>
-                </div>
-                <div class="text-center md:text-right">
-                    <p class="text-green-500 font-mono font-black text-xl tracking-tighter"><%= (u.startingCapital || 0).toLocaleString() %> Ft</p>
-                    <p class="text-[9px] font-black uppercase tracking-widest <%= u.hasLicense ? 'text-blue-500' : 'text-zinc-700' %>">
-                        <%= u.hasLicense ? 'Premium Client' : 'Demo Mode' %>
-                    </p>
-                </div>
+        <div class="grid grid-cols-1 gap-6">
+            <div class="bg-zinc-900 border border-white/5 rounded-3xl p-8">
+                <h2 class="text-xl font-bold mb-6 italic">Felhasználók Kezelése (<%= allUsers.length %>)</h2>
+                <table class="w-full text-left">
+                    <tr class="text-[10px] text-zinc-500 uppercase tracking-widest border-b border-white/5">
+                        <th class="pb-4">Név / Email</th>
+                        <th class="pb-4">Licenc</th>
+                        <th class="pb-4">Regisztrált</th>
+                        <th class="pb-4 text-right">Művelet</th>
+                    </tr>
+                    <% allUsers.forEach(u => { %>
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                        <td class="py-4">
+                            <p class="font-bold"><%= u.fullname %></p>
+                            <p class="text-[10px] text-zinc-500"><%= u.email %></p>
+                        </td>
+                        <td class="py-4">
+                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase <%= u.hasLicense ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500' %>">
+                                <%= u.hasLicense ? 'Aktív' : 'Nincs' %>
+                            </span>
+                        </td>
+                        <td class="py-4 text-xs text-zinc-500"><%= u.createdAt.toLocaleDateString() %></td>
+                        <td class="py-4 text-right">
+                            <form action="/admin/toggle-license/<%= u._id %>" method="POST">
+                                <button class="text-[10px] font-black uppercase text-purple-500 hover:text-white transition">
+                                    Licenc Váltás
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </table>
             </div>
-        <% }) %>
+        </div>
+        <div class="mt-10">
+            <a href="/dashboard" class="text-zinc-600 uppercase text-[10px] font-bold tracking-widest hover:text-white">Vissza a Dashboardra</a>
+        </div>
     </div>
-
-    <footer class="py-20 text-center opacity-20">
-        <div class="text-xl font-black italic tracking-tighter uppercase">Skyhigh<span class="text-purple-600">.AI</span></div>
-    </footer>
-
 </body>
 </html>
