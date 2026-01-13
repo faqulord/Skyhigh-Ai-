@@ -12,7 +12,6 @@ const OWNER_EMAIL = "stylefaqu@gmail.com";
 
 mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Neural Engine Active"));
 
-// ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -25,18 +24,20 @@ const Tip = mongoose.model('Tip', new mongoose.Schema({
 }));
 
 app.set('view engine', 'ejs');
-app.use(express.static('public'));
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(session({
-    secret: 'skyhigh_neural_2026',
+    secret: 'skyhigh_neural_safe_2026',
     resave: false, saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
-// ROBOT LOGIKA
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 async function runAiRobot() {
     const today = new Date().toISOString().split('T')[0];
     const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
@@ -52,7 +53,10 @@ async function runAiRobot() {
     await Tip.findOneAndUpdate({ date: today }, result, { upsert: true });
 }
 
-// ÚTVONALAK
+app.get('/', (req, res) => res.render('index'));
+app.get('/login', (req, res) => res.render('login'));
+app.get('/register', (req, res) => res.render('register'));
+
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
@@ -65,13 +69,13 @@ app.get('/dashboard', async (req, res) => {
 });
 
 app.get('/admin', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (!user || !user.isAdmin) return res.redirect('/dashboard');
+    if (!user.isAdmin) return res.redirect('/dashboard');
     const users = await User.find().sort({ createdAt: -1 });
     const tips = await Tip.find().sort({ date: -1 }).limit(30);
     const licensedCount = await User.countDocuments({ hasLicense: true });
-    const totalRevenue = licensedCount * 49;
-    res.render('admin', { user, users, tips, totalRevenue, licensedCount, status: req.query.status });
+    res.render('admin', { user, users, tips, totalRevenue: licensedCount * 49, licensedCount, status: req.query.status });
 });
 
 app.post('/admin/run-robot', async (req, res) => {
@@ -84,7 +88,12 @@ app.post('/user/set-capital', async (req, res) => {
     res.redirect('/dashboard');
 });
 
-// AUTH... (Login/Register/Logout marad a korábbi verziókból)
+app.post('/auth/register', async (req, res) => {
+    const hashed = await bcrypt.hash(req.body.password, 10);
+    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
+    res.redirect('/login');
+});
+
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
