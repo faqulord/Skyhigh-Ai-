@@ -5,38 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Skyhigh AI | Bejelentkezés</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #000; color: white; -webkit-tap-highlight-color: transparent; }
-        input { font-size: 16px !important; } /* Megakadályozza az iPhone automatikus zoomját */
+        body { background-color: #000; color: white; font-family: 'Inter', sans-serif; }
+        .login-glow { background: radial-gradient(circle at 50% 50%, #1e0b36 0%, #000 100%); }
+        .input-field { background: #050505; border: 1px solid #1a1a1a; transition: 0.3s; }
+        .input-field:focus { border-color: #7c3aed; box-shadow: 0 0 15px rgba(124, 58, 237, 0.2); }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-6 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+<body class="login-glow min-h-screen flex items-center justify-center p-6">
 
-    <div class="w-full max-w-sm space-y-8 bg-zinc-950/50 p-8 rounded-[32px] border border-zinc-900 backdrop-blur-xl">
-        <div class="text-center">
-            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Skyhigh<span class="text-purple-600">.AI</span></h1>
-            <p class="text-[9px] text-zinc-500 uppercase tracking-[4px] mt-2 font-bold italic">Rendszer Belépés</p>
+    <div class="w-full max-w-sm space-y-8 text-center">
+        <div class="mb-10">
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase mb-2">Skyhigh<span class="text-purple-600">.AI</span></h1>
+            <p class="text-[9px] text-zinc-500 uppercase tracking-[5px] font-bold italic">Secure Terminal Access</p>
         </div>
 
-        <form action="/auth/login" method="POST" class="space-y-5">
-            <div>
-                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Azonosító</label>
+        <form action="/auth/login" method="POST" class="space-y-4">
+            <div class="text-left">
+                <label class="text-[10px] text-zinc-600 uppercase font-black ml-4 mb-2 block">Azonosító</label>
                 <input type="email" name="email" required placeholder="email@skyhigh.ai" 
-                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
+                    class="input-field w-full rounded-2xl p-4 text-sm outline-none">
             </div>
-            <div>
-                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Jelszó</label>
+            <div class="text-left">
+                <label class="text-[10px] text-zinc-600 uppercase font-black ml-4 mb-2 block">Jelszó</label>
                 <input type="password" name="password" required placeholder="••••••••" 
-                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
+                    class="input-field w-full rounded-2xl p-4 text-sm outline-none">
             </div>
-            <button type="submit" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-purple-600 hover:text-white transition duration-500 active:scale-95">
-                Belépés a Terminálba
+            
+            <button type="submit" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white hover:text-black transition duration-500 shadow-[0_0_30px_rgba(124,58,237,0.3)] active:scale-95">
+                Belépés a Rendszerbe
             </button>
         </form>
 
-        <div class="text-center pt-4">
+        <div class="pt-6">
             <a href="/regisztracio" class="text-[10px] text-zinc-500 hover:text-purple-400 transition uppercase font-bold tracking-widest">
-                Új operátor regisztrációja
+                Új Operátor Jelentkezése
             </a>
         </div>
     </div>
