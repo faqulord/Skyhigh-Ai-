@@ -10,8 +10,9 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka ALMA v27.0 - FINAL"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka ALMA v28.0 - FRIENDLY PACK READY"));
 
+// ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -39,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_alma_v27_legal_fox',
+    secret: 'skyhigh_alma_v28_friendly_fox',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -48,6 +49,7 @@ app.use(session({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 
+// ROBOT MOTOR
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -78,6 +80,8 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
+// --- ÚTVONALAK ---
+
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
@@ -87,6 +91,12 @@ app.get('/dashboard', async (req, res) => {
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
     res.render('dashboard', { user, dailyTip, recommendedStake, displayDate: new Date().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' }), nextTipText: (new Date().getHours() < 8) ? "Ma 08:00" : "Holnap 08:00" });
+});
+
+app.get('/pricing', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    res.render('pricing', { user });
 });
 
 app.get('/admin', checkAdmin, async (req, res) => {
@@ -155,7 +165,6 @@ app.post('/user/set-capital', async (req, res) => {
     res.redirect('/dashboard');
 });
 
-app.get('/pricing', (req, res) => res.render('pricing'));
 app.get('/terms', (req, res) => res.render('terms'));
 app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
