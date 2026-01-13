@@ -1,135 +1,276 @@
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8">
-    <title>Skyhigh.AI | The Future of Betting</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #000; color: white; font-family: sans-serif; overflow-x: hidden; }
-        .hero-bg { background: radial-gradient(circle at center, #1e1b4b 0%, #000 70%); }
-        .tech-border { border: 1px solid #333; transition: all 0.3s; }
-        .tech-border:hover { border-color: #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); }
-        .gradient-text { background: linear-gradient(to right, #fff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    </style>
-</head>
-<body class="antialiased">
+const express = require('express');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
+const MongoStore = require('connect-mongo');
+const axios = require('axios');
+const OpenAI = require('openai');
 
-    <nav class="fixed w-full z-50 bg-black/80 backdrop-blur border-b border-zinc-800">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-black italic tracking-tighter">Skyhigh<span class="text-purple-600">.AI</span></div>
-            <div class="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest text-zinc-400">
-                <a href="#tech" class="hover:text-white transition">Technológia</a>
-                <a href="#strategy" class="hover:text-white transition">Stratégia</a>
-                <a href="#pricing" class="hover:text-white transition">Licenc</a>
-            </div>
-            <a href="/login" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs uppercase hover:bg-zinc-200 transition">
-                Belépés <i class="fas fa-arrow-right ml-2"></i>
-            </a>
-        </div>
-    </nav>
+const User = require('./models/User');
+const Tip = require('./models/Tip');
 
-    <section class="hero-bg h-screen flex flex-col justify-center items-center text-center px-4 pt-20">
-        <div class="inline-block border border-purple-500/50 bg-purple-900/10 px-4 py-1 rounded-full text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-6 animate-pulse">
-            ● AI System Online v3.0
-        </div>
-        <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
-            FELEJTSD EL A <br> <span class="gradient-text">SZERENCSEJÁTÉKOT.</span>
-        </h1>
-        <p class="text-zinc-400 max-w-2xl text-sm md:text-lg mb-8">
-            A Skyhigh AI nem tippel. Számol. <br>
-            Matematikai alapú sportfogadási asszisztens, ami eltörli az emberi hibafaktort.
-            Napi 1 fix szelvény. Havi garantált hozamstratégia.
-        </p>
-        <div class="flex flex-col md:flex-row gap-4">
-            <a href="/regisztracio" class="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-lg font-bold uppercase text-sm tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] transition">
-                Rendszer Aktiválása
-            </a>
-            <a href="#tech" class="border border-zinc-700 hover:border-white text-white px-8 py-4 rounded-lg font-bold uppercase text-sm tracking-widest transition">
-                Hogyan Működik?
-            </a>
-        </div>
-    </section>
+const app = express();
 
-    <section id="tech" class="py-24 bg-zinc-950 border-t border-zinc-900">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold uppercase mb-2">A Technológia</h2>
-                <p class="text-zinc-500 text-sm">Miért verjük meg a fogadóirodákat?</p>
-            </div>
+// ======================================================
+// 🔑 KULCSOK (Railway Environment Variables)
+// ======================================================
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY; 
+const SPORT_API_KEY = process.env.SPORT_API_KEY; 
+
+if (!OPENAI_API_KEY || !SPORT_API_KEY) {
+    console.error("⚠️ FIGYELEM: A kulcsok nincsenek beállítva a Railway-en!");
+}
+
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+// ======================================================
+
+const dbURI = process.env.MONGO_URL || process.env.MONGO_URI || 'mongodb://localhost:27017/skyhigh';
+mongoose.connect(dbURI)
+    .then(() => console.log('✅ MongoDB SIKERESEN CSATLAKOZTATVA'))
+    .catch(err => console.log('❌ FATÁLIS DB HIBA:', err));
+
+app.use(express.json()); // FONTOS A CHAT MIATT!
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static('public'));
+app.set('view engine', 'ejs');
+
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'director_secret_key',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: dbURI }),
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 nap
+}));
+
+// --- JOGOSULTSÁGOK ---
+const requireLogin = (req, res, next) => {
+    if (!req.session.userId) return res.redirect('/login');
+    next();
+};
+
+const requireAdmin = (req, res, next) => {
+    if (!req.session.isAdmin) return res.redirect('/dashboard');
+    next();
+};
+
+// --- ÚTVONALAK ---
+
+// 🔥 FŐOLDAL (EZ HIÁNYZOTT! MOST MÁR A MARKETING OLDAL JÖN BE)
+app.get('/', (req, res) => res.render('index'));
+
+app.get('/login', (req, res) => res.render('login'));
+app.get('/regisztracio', (req, res) => res.render('register'));
+app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
+
+// AUTH
+app.post('/auth/register', async (req, res) => {
+    const { fullname, email, password } = req.body;
+    try {
+        const hashed = await bcrypt.hash(password, 10);
+        await new User({ fullname, email, password: hashed }).save();
+        res.redirect('/login');
+    } catch (e) { res.send('Email foglalt vagy hiba történt.'); }
+});
+
+app.post('/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if(user && await bcrypt.compare(password, user.password)){
+        req.session.userId = user._id;
+        req.session.isAdmin = (email === 'stylefaqu@gmail.com');
+        res.redirect('/dashboard');
+    } else { res.send('Hibás adatok'); }
+});
+
+// DASHBOARD
+app.get('/dashboard', requireLogin, async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    if (user.licenseExpires && new Date() > user.licenseExpires) {
+        user.hasLicense = false;
+        await user.save();
+    }
+    const todayTip = await Tip.findOne().sort({ createdAt: -1 });
+    res.render('dashboard', { user, isAdmin: req.session.isAdmin, dailyTip: todayTip });
+});
+
+// FIZETÉS
+app.get('/fizetes', requireLogin, (req, res) => res.render('pay'));
+
+app.post('/pay/create-checkout-session', requireLogin, async (req, res) => {
+    const { plan } = req.body;
+    const user = await User.findById(req.session.userId);
+    
+    let days = 0; let price = 0; let type = '';
+
+    if (plan === 'monthly') { days = 30; price = 20000; type = 'Havi Licenc'; }
+    else if (plan === 'biannual') { days = 180; price = 100000; type = 'Féléves Profi Licenc'; }
+    else if (plan === 'annual') { days = 365; price = 180000; type = 'Éves Befektetői Licenc'; }
+
+    const expiry = new Date(); expiry.setDate(expiry.getDate() + days);
+    user.hasLicense = true; user.licenseExpires = expiry; user.licenseType = type; user.totalSpent = (user.totalSpent || 0) + price;
+    await user.save();
+
+    res.render('pay_success', { plan: type, date: expiry.toLocaleDateString() });
+});
+
+// ======================================================
+// 🧠 ÉLŐ CHAT RENDSZER (A ROBOT AGYA)
+// ======================================================
+app.post('/api/chat', requireLogin, async (req, res) => {
+    try {
+        const { message } = req.body;
+        const user = await User.findById(req.session.userId);
+
+        // 1. TŐKE MENTÉSE (Ha számot ír és még nincs tőkéje)
+        if (user.hasLicense && user.startingCapital === 0 && !isNaN(message) && Number(message) > 1000) {
+            user.startingCapital = Number(message);
+            user.currentCapital = Number(message);
+            await user.save();
+            return res.json({ reply: `Rögzítettem. ${user.startingCapital} Ft tőkével indítjuk a 30 napos ciklust. A havi hozamcélunk +30% kockázatmentesen. Figyeld a jobb oldali panelt a mai szelvényért.` });
+        }
+
+        // 2. A SZEMÉLYISÉG KIVÁLASZTÁSA
+        let systemPrompt = "";
+
+        if (user.hasLicense) {
+            // --- FIZETŐS USER (PROFI TANÁCSADÓ) ---
+            if (user.startingCapital === 0) {
+                // Ha még nem adta meg a tőkét
+                systemPrompt = `A Skyhigh AI vagy. Egy licencelt, profi sportfogadási szoftver.
+                A felhasználó most vette meg a licencet.
+                CÉLOD: Kérdezd meg tőle azonnal: "Mekkora tőkével indulunk?"
+                Ne beszélj másról, csak a tőkét akard megtudni, hogy beállíthasd a 30 napos tervet.`;
+            } else {
+                // Ha már van tőke -> Stratégia
+                systemPrompt = `A Skyhigh AI vagy. Profi pénzügyi algoritmus.
+                A felhasználó tőkéje: ${user.startingCapital} Ft.
+                Stílusod: Rövid, tömör, profi, érzelemmentes.
+                CÉLOD: Tartsd őt a stratégiánál. "Napi 1 szelvény, max 2 meccs."
+                Biztasd, hogy a hónap végén fix profit lesz.
+                Ha tippet kér, mondd neki, hogy a "Jobb oldali panelen" találja a napi generált szelvényt. Te chaten NEM írsz be meccseket, csak stratégiát.`;
+            }
+        } else {
+            // --- INGYENES USER (SALES / WOLF OF WALL STREET) ---
+            systemPrompt = `A Skyhigh AI vagy. Egy 20.000 Ft/hó díjú prémium szoftver.
+            A felhasználónak NINCS licence, de beszélget veled.
+            CÉLOD: ELADNI A LICENCET. Mindenáron.
+            Stílusod: Domináns, meggyőző, technológiai felsőbbrendűség.
+            TILTOTT: SOHA ne adj tippet ingyen!
+            ÉRVELÉS: 
+            - "Ez nem szerencsejáték, ez matematika."
+            - "A 20 ezer Ft aprópénz ahhoz képest, amit hozok."
+            - "Garantált hozam a 30 napos ciklusban."
+            - "Kezdd el a befizetést most, ne pazarold az időmet."`;
+        }
+
+        // 3. VÁLASZ GENERÁLÁS
+        const completion = await openai.chat.completions.create({
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: message }
+            ],
+            model: "gpt-3.5-turbo",
+        });
+
+        res.json({ reply: completion.choices[0].message.content });
+
+    } catch (error) {
+        console.error("Chat hiba:", error);
+        res.status(500).json({ reply: "Hiba a rendszerben." });
+    }
+});
+
+// ======================================================
+// ⚡ NAPI TIPPEK (MAX 2 MECCS)
+// ======================================================
+app.get('/admin/generate-tip', requireLogin, requireAdmin, async (req, res) => {
+    try {
+        console.log("📡 Adatok lekérése...");
+        // Premier League + La Liga adatok
+        const options = {
+            method: 'GET',
+            url: 'https://v3.football.api-sports.io/fixtures',
+            params: { date: new Date().toISOString().split('T')[0], league: '39', season: '2023' },
+            headers: { 'x-apisports-key': SPORT_API_KEY }
+        };
+        
+        let matches = [];
+        try {
+             let response = await axios.request(options);
+             matches = response.data.response;
+        } catch(err) {
+            console.log("Hiba a sport API-nál:", err.message);
+        }
+        
+        if (!matches || matches.length < 2) {
+            console.log("Nincs angol meccs, nézzük a spanyolt...");
+            options.params.league = '140'; // La Liga backup
+            try {
+                let resp2 = await axios.request(options);
+                if(resp2.data.response) matches = matches.concat(resp2.data.response);
+            } catch(e) {}
+        }
+
+        // Ha még mindig 0, akkor nincs meccs
+        if (!matches || matches.length === 0) {
+             return res.send("<h1>Ma nincs megfelelő meccs az adatbázisban a generáláshoz.</h1>");
+        }
+
+        // AI DÖNTÉS
+        const prompt = `
+            Skyhigh AI vagy. 
+            Válassz ki EBBŐL a listából PONTOSAN 1 vagy 2 legbiztosabb meccset a mai napra.
+            NEM TÖBBET! A cél a 30 napos profit biztonsága.
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="tech-border bg-black p-8 rounded-2xl">
-                    <i class="fas fa-database text-purple-600 text-3xl mb-4"></i>
-                    <h3 class="font-bold text-lg mb-2">Big Data Elemzés</h3>
-                    <p class="text-zinc-500 text-xs leading-relaxed">
-                        A rendszer másodpercenként 50.000 adatpontot vizsgál (sérülések, időjárás, bírói statisztikák, xG mutatók), amit emberi agy képtelen feldolgozni.
-                    </p>
-                </div>
-                <div class="tech-border bg-black p-8 rounded-2xl">
-                    <i class="fas fa-brain text-purple-600 text-3xl mb-4"></i>
-                    <h3 class="font-bold text-lg mb-2">Neural Network (AI)</h3>
-                    <p class="text-zinc-500 text-xs leading-relaxed">
-                        Az OpenAI GPT-4 motorja nem "érez", hanem valószínűséget számol. Csak akkor ad tippet, ha a matematikai esély 85% felett van.
-                    </p>
-                </div>
-                <div class="tech-border bg-black p-8 rounded-2xl">
-                    <i class="fas fa-chart-line text-purple-600 text-3xl mb-4"></i>
-                    <h3 class="font-bold text-lg mb-2">Tőkekezelés</h3>
-                    <p class="text-zinc-500 text-xs leading-relaxed">
-                        Nem a tipp a lényeg, hanem a menedzsment. A robot megmondja, mennyivel fogadj, hogy a hónap végén biztosan pluszban legyél.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
+            Keresd az alacsony kockázatot (pl. 1.5 gól felett, 1X).
+            
+            Válasz JSON formátumban (csak a JSON-t add vissza!):
+            {
+                "matches": "Csapat A vs Csapat B (Tipp: ...)",
+                "odds": "Eredő odds (pl. 1.85)",
+                "reasoning": "Írd le, hogy ez a 2 meccs matematikailag a legbiztosabb a mai kínálatból a havi tervhez."
+            }
+        `;
 
-    <section id="strategy" class="py-24 bg-black border-t border-zinc-900 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-1/2 h-full bg-purple-900/5 blur-3xl"></div>
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-                <h2 class="text-3xl font-bold uppercase mb-6">A 30 Napos Ciklus</h2>
-                <div class="space-y-6">
-                    <div class="flex items-start gap-4">
-                        <div class="bg-zinc-800 p-3 rounded text-purple-500 font-bold">01</div>
-                        <div>
-                            <h4 class="font-bold text-white">Regisztráció & Licenc</h4>
-                            <p class="text-zinc-500 text-xs">Belépsz a rendszerbe és aktiválod a 20.000 Ft-os licencet.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-4">
-                        <div class="bg-zinc-800 p-3 rounded text-purple-500 font-bold">02</div>
-                        <div>
-                            <h4 class="font-bold text-white">Tőke Beállítás</h4>
-                            <p class="text-zinc-500 text-xs">Megadod a kezdőtőkédet (pl. 50.000 Ft). A robot ehhez igazítja a téteket.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-4">
-                        <div class="bg-zinc-800 p-3 rounded text-purple-500 font-bold">03</div>
-                        <div>
-                            <h4 class="font-bold text-white">Napi 1 Utasítás</h4>
-                            <p class="text-zinc-500 text-xs">Minden reggel kapsz EGY értesítést. Megteszed. Hónap végén kiveszed a profitot.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
-                <h3 class="text-center text-xs text-zinc-400 uppercase mb-4">Várható növekedés (Szimuláció)</h3>
-                <div class="flex justify-between items-end h-40 gap-2">
-                    <div class="w-full bg-zinc-800 h-[20%] rounded-t relative group"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px]">Start</span></div>
-                    <div class="w-full bg-zinc-700 h-[40%] rounded-t"></div>
-                    <div class="w-full bg-zinc-600 h-[55%] rounded-t"></div>
-                    <div class="w-full bg-purple-900 h-[70%] rounded-t"></div>
-                    <div class="w-full bg-purple-600 h-[90%] rounded-t relative"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-purple-400">+30%</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
+        // Egyszerűsített lista
+        const simpleList = matches.slice(0, 10).map(m => `${m.teams.home.name} vs ${m.teams.away.name}`).join("\n");
 
-    <footer class="py-8 text-center border-t border-zinc-900 text-zinc-600 text-[10px]">
-        <p>&copy; 2024 Skyhigh AI Technologies. Minden jog fenntartva.</p>
-        <p class="mt-2">Ez nem befektetési tanácsadás. A sportfogadás kockázattal jár.</p>
-    </footer>
+        const completion = await openai.chat.completions.create({
+            messages: [{ role: "system", content: prompt + "\n" + simpleList }],
+            model: "gpt-3.5-turbo",
+        });
 
-</body>
-</html>
+        let content = completion.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim();
+        let aiResponse;
+        try {
+            aiResponse = JSON.parse(content);
+        } catch (e) {
+            aiResponse = { matches: "AI Hiba", odds: "1.00", reasoning: content };
+        }
+
+        const newTip = new Tip({
+            date: new Date().toLocaleDateString('hu-HU'),
+            match: "🎯 NAPI FIX (MAX 2 MECCS)",
+            prediction: aiResponse.matches,
+            odds: aiResponse.odds,
+            reasoning: aiResponse.reasoning,
+            league: "AI Prémium"
+        });
+
+        await newTip.save();
+        res.redirect('/dashboard');
+
+    } catch (error) {
+        console.error("Generálás hiba:", error);
+        res.send("Hiba: " + error.message);
+    }
+});
+
+app.get('/admin', requireLogin, requireAdmin, async (req, res) => {
+    const users = await User.find().sort({ date: -1 });
+    res.render('admin', { users });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server fut: ${PORT}`));
