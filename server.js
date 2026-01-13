@@ -10,9 +10,10 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
+// Adatbázis Kapcsolat
 mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Neural Engine Active"));
 
-// ADATMODELLEK
+// Modellek
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -32,57 +33,56 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_final_v4',
+    secret: 'skyhigh_vfinal_2026',
     resave: false, saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-// ROBOT FUNKCIÓ - KÉNYSZERÍTETT ELEMZÉS
+// ROBOT FUNKCIÓ - EXTRA HIBAKERESÉSSEL
 async function runAiRobot() {
-    try {
-        const today = new Date().toISOString().split('T')[0];
-        console.log("🤖 Robot elemzés indítása...");
-
-        const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
-            headers: { 'x-apisports-key': process.env.SPORT_API_KEY }
-        });
-
-        const fixtures = response.data.response.slice(0, 15);
-        if (fixtures.length === 0) throw new Error("Nincs elérhető meccs mára az API-ban.");
-
-        const matchData = fixtures.map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(", ");
-
-        const aiRes = await openai.chat.completions.create({
-            model: "gpt-4",
-            messages: [
-                { role: "system", content: "Profi sportfogadási matematikus vagy. JSON válasz: {match, prediction, odds, reasoning, profitPercent (szám 1-10)}" },
-                { role: "user", content: `Elemezd a kínálatot és válassz egy MASTER TIPPET: ${matchData}` }
-            ],
-            response_format: { type: "json_object" }
-        });
-
-        const result = JSON.parse(aiRes.choices[0].message.content);
-        await Tip.findOneAndUpdate({ date: today }, result, { upsert: true });
-        console.log("✅ Adatbázis frissítve a mai tipppel.");
-        return true;
-    } catch (e) {
-        console.error("CRITICAL ROBOT ERROR:", e.message);
-        throw e;
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (!process.env.SPORT_API_KEY || !process.env.OPENAI_API_KEY) {
+        throw new Error("HIÁNYZÓ API KULCSOK A RAILWAY-EN!");
     }
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    // 1. Sport Adatok Lekérése
+    const sportRes = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
+        headers: { 'x-apisports-key': process.env.SPORT_API_KEY }
+    });
+
+    if (!sportRes.data.response || sportRes.data.response.length === 0) {
+        throw new Error("Nincs meccs adat az API-ban mára.");
+    }
+
+    const matches = sportRes.data.response.slice(0, 15).map(m => 
+        `${m.teams.home.name} vs ${m.teams.away.name} (${m.league.name})`
+    ).join(", ");
+
+    // 2. AI Elemzés
+    const aiRes = await openai.chat.completions.create({
+        model: "gpt-4-turbo-preview",
+        messages: [
+            { role: "system", content: "Profi sportfogadó matematikus vagy. Válaszd ki a nap Master Tippjét. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" },
+            { role: "user", content: `Meccsek: ${matches}` }
+        ],
+        response_format: { type: "json_object" }
+    });
+
+    const result = JSON.parse(aiRes.choices[0].message.content);
+    await Tip.findOneAndUpdate({ date: today }, result, { upsert: true });
+    return true;
 }
 
-// BIZTONSÁGI MIDDLEWARE - CSAK ADMINOKNAK
-const isAdmin = async (req, res, next) => {
+// BIZTONSÁG
+const checkAdmin = async (req, res, next) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (user && user.isAdmin) {
-        next();
-    } else {
-        res.status(403).send("Hozzáférés megtagadva! Ez a felület csak adminisztrátoroknak elérhető.");
-    }
+    if (user && user.isAdmin) return next();
+    res.status(403).send("STOP! Csak Admin!");
 };
 
 // ÚTVONALAK
@@ -90,7 +90,6 @@ app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     
-    // Automatikus Tulajdonos jog
     if (user.email === OWNER_EMAIL && !user.isAdmin) { 
         user.isAdmin = true; user.hasLicense = true; await user.save(); 
     }
@@ -103,32 +102,42 @@ app.get('/dashboard', async (req, res) => {
     res.render('dashboard', { user, dailyTip, history });
 });
 
-// ADMIN PANEL - Most már védett!
-app.get('/admin', isAdmin, async (req, res) => {
+app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const tips = await Tip.find().sort({ date: -1 }).limit(30);
     const licensedCount = await User.countDocuments({ hasLicense: true });
-    res.render('admin', { users, tips, totalRevenue: licensedCount * 49, licensedCount, status: req.query.status });
+    res.render('admin', { 
+        users, tips, licensedCount, 
+        totalRevenue: licensedCount * 49,
+        error: req.query.error,
+        success: req.query.success 
+    });
 });
 
-app.post('/admin/run-robot', isAdmin, async (req, res) => {
-    try { 
-        await runAiRobot(); 
-        res.redirect('/admin?status=success'); 
-    } catch (e) { 
-        res.redirect('/admin?status=error'); 
+app.post('/admin/run-robot', checkAdmin, async (req, res) => {
+    try {
+        await runAiRobot();
+        res.redirect('/admin?success=1');
+    } catch (e) {
+        console.error(e);
+        res.redirect(`/admin?error=${encodeURIComponent(e.message)}`);
     }
 });
 
-// EGYÉB ÚTVONALAK (Login, Register, stb.)
-app.get('/', (req, res) => res.render('index'));
+// Alap útvonalak (Register/Login marad a régi)
 app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
+app.get('/', (req, res) => res.render('index'));
 
 app.post('/user/set-capital', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
     await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
     res.redirect('/dashboard');
+});
+
+app.post('/auth/register', async (req, res) => {
+    const hashed = await bcrypt.hash(req.body.password, 10);
+    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
+    res.redirect('/login');
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -139,12 +148,6 @@ app.post('/auth/login', async (req, res) => {
     } else res.send("Hiba!");
 });
 
-app.post('/auth/register', async (req, res) => {
-    const hashed = await bcrypt.hash(req.body.password, 10);
-    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
-    res.redirect('/login');
-});
-
-app.get('/logout', (req, res) => { req.session.destroy(() => res.redirect('/')); });
+app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
 
 app.listen(process.env.PORT || 8080);
