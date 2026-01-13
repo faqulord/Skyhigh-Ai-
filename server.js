@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v25.0 - ONLINE"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka ALMA Build - ONLINE"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_purple_fox_final_v25',
+    secret: 'skyhigh_alma_build_v25',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
