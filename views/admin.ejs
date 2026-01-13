@@ -4,30 +4,30 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white p-4 font-sans">
+<body class="bg-black text-white p-6 font-sans">
     <div class="max-w-md mx-auto">
-        <h1 class="text-xl font-black italic text-purple-500 uppercase mb-6 tracking-tighter">Skyhigh Admin HQ</h1>
+        <h1 class="text-xl font-black italic text-purple-500 uppercase mb-8 tracking-tighter">Skyhigh HQ</h1>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-6 shadow-xl">
-            <p class="text-[9px] uppercase text-zinc-500 font-bold mb-1">Bevétel (Összesen)</p>
-            <h2 class="text-3xl font-black text-green-500 italic"><%= totalRevenue %> Ft</h2>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-6">
+            <p class="text-[9px] uppercase text-zinc-500 font-bold mb-1 tracking-widest">Összes Bevétel</p>
+            <h2 class="text-3xl font-black text-green-500 italic"><%= totalRevenue.toLocaleString() %> Ft</h2>
         </div>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-purple-500/30 mb-6 text-center">
-            <h3 class="text-[10px] font-black uppercase mb-4 text-zinc-400">Manuális Robot Indítás</h3>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-purple-500/30 mb-8 text-center">
+            <h3 class="text-[10px] font-black uppercase mb-4 text-zinc-400">Elemzés Kényszerítése</h3>
             <form action="/admin/run-robot" method="POST">
-                <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-purple-600/20 active:scale-95 transition">Reggeli 8:00 elemzés szimulálása</button>
+                <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest">Robot Indítása</button>
             </form>
-            <% if (status === 'success') { %><p class="text-purple-400 text-[10px] mt-4 font-bold animate-pulse uppercase tracking-widest">✅ Robot sikeresen frissítve!</p><% } %>
+            <% if (status === 'success') { %><p class="text-purple-400 text-[10px] mt-4 font-bold animate-pulse">✅ TIPP SIKERESEN GENERÁLVA!</p><% } %>
         </div>
 
         <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
-            <h3 class="text-xs font-black uppercase text-purple-500 mb-4 tracking-tighter">Előfizetők Listája</h3>
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center">Előfizetők</h3>
             <div class="space-y-4">
                 <% users.forEach(u => { %>
                 <div class="flex justify-between border-b border-white/5 pb-2">
-                    <div class="text-xs font-bold"><%= u.fullname %></div>
-                    <div class="text-xs text-purple-400 font-mono"><%= u.startingCapital %> Ft</div>
+                    <div class="text-[11px] font-bold"><%= u.fullname %></div>
+                    <div class="text-[11px] text-purple-400 font-mono"><%= u.startingCapital.toLocaleString() %> Ft</div>
                 </div>
                 <% }) %>
             </div>
