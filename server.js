@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Neural Engine v19.0 Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v20.0 Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_purple_fox_final_v19',
+    secret: 'skyhigh_purple_fox_v20_final',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -46,8 +46,8 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 const getHuFullDate = () => new Date().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// ROBOT ENGINE
-async function runAiRobot() {
+// ROBOT MOTOR - +3 ÓRÁS SZABÁLLYAL
+async function runAiRobot(isManual = false) {
     try {
         const dbDate = getDbDate();
         const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${dbDate}`, {
@@ -57,11 +57,11 @@ async function runAiRobot() {
         const fixtures = response.data.response.filter(f => (new Date(f.fixture.date) - now) > (3 * 60 * 60 * 1000));
         if (fixtures.length === 0) return false;
         
-        const matchData = fixtures.slice(0, 15).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (Liga: ${f.league.name})`).join(" | ");
+        const matchData = fixtures.slice(0, 20).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (Eredmények.com liga: ${f.league.name}, Kezdés: ${new Date(f.fixture.date).toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Budapest'})})`).join(" | ");
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. Cyber-sportfogadó zseni. JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
-                       { role: "user", content: `Add meg a nap Master Tippjét: ${matchData}` }],
+            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. Cyber-sportfogadó zseni. Csak MAGYARUL válaszolj. Válasz JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
+                       { role: "user", content: `Add meg a nap legbiztosabb MASTER TIPPÉT: ${matchData}` }],
             response_format: { type: "json_object" }
         });
         const result = JSON.parse(aiRes.choices[0].message.content);
@@ -77,12 +77,23 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
+// ADMIN CHAT MODUL
+app.post('/admin/chat', checkAdmin, async (req, res) => {
+    try {
+        const aiRes = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [{ role: "system", content: "Te vagy a Rafinált Robot Róka. Most az Adminnal (a főnökkel) beszélsz. Legyél tisztelettudó, profi, rafinált és szakmai. A válaszaid legyenek rövidek és lényegretörőek." },
+                       { role: "user", content: req.body.message }]
+        });
+        res.json({ reply: aiRes.choices[0].message.content });
+    } catch (e) { res.status(500).json({ error: "Hiba." }); }
+});
+
 // --- ÚTVONALAK ---
 
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    
     if (user.email === OWNER_EMAIL) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     if (!user.hasLicense) return res.redirect('/pricing');
     if (user.startingCapital === 0) return res.render('set-capital', { user });
@@ -93,26 +104,11 @@ app.get('/dashboard', async (req, res) => {
     res.render('dashboard', { user, dailyTip, history, recommendedStake, displayDate: getHuFullDate() });
 });
 
-app.get('/pricing', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-    res.render('pricing', { user });
-});
-
-// FIZETÉS SZIMULÁCIÓ (KÉSŐBB STRIPE)
-app.post('/create-checkout-session', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    // Itt most csak átirányítunk egy siker oldalra, mintha fizetett volna
-    await User.findByIdAndUpdate(req.session.userId, { hasLicense: true });
-    res.redirect('/dashboard');
-});
-
-// ADMIN FUNKCIÓK
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
-    res.render('admin', { users, currentTip, stats, totalRevenue: (await User.countDocuments({hasLicense:true})) * 19900, dbDate: getDbDate(), status: req.query.status });
+    res.render('admin', { users, currentTip, stats, totalRevenue: (await User.countDocuments({hasLicense:true})) * 19900, dbDate: getDbDate(), status: req.query.status, tipExists: !!currentTip });
 });
 
 app.post('/admin/activate-user', checkAdmin, async (req, res) => {
@@ -121,13 +117,14 @@ app.post('/admin/activate-user', checkAdmin, async (req, res) => {
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
-    req.setTimeout(180000); await runAiRobot();
+    req.setTimeout(180000); await runAiRobot(true);
     res.redirect('/admin?status=success');
 });
 
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     const { tipId, status } = req.body;
     const tip = await Tip.findById(tipId);
+    if (!tip) return res.redirect('/admin');
     tip.status = status; await tip.save();
     const month = tip.date.substring(0, 7);
     let ms = await MonthlyStat.findOne({ month }) || new MonthlyStat({ month });
@@ -136,6 +133,18 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     else { ms.totalProfit -= 10; }
     await ms.save();
     res.redirect('/admin');
+});
+
+app.get('/pricing', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    res.render('pricing', { user });
+});
+
+app.post('/create-checkout-session', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    await User.findByIdAndUpdate(req.session.userId, { hasLicense: true });
+    res.redirect('/dashboard');
 });
 
 app.post('/user/set-capital', async (req, res) => {
