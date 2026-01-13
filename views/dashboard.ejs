@@ -2,82 +2,112 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Skyhigh AI | Terminál</title>
+    <title>Skyhigh AI | Vezérlőpult</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #050505; color: white; font-family: sans-serif; }
-        .tech-card { background: #0c0c0e; border: 1px solid #1f1f22; border-radius: 16px; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        .tech-card { background: #0c0c0e; border: 1px solid #1f1f22; border-radius: 20px; }
+        .onboarding-overlay { background: rgba(0,0,0,0.9); backdrop-blur: 10px; }
     </style>
 </head>
-<body class="p-6 max-w-7xl mx-auto">
+<body class="p-6 md:p-10 max-w-7xl mx-auto">
+
     <header class="flex justify-between items-center mb-10">
-        <h1 class="text-2xl font-black italic">Skyhigh<span class="text-purple-500">.AI</span></h1>
-        <div class="flex gap-4 items-center">
-            <span class="text-[10px] text-green-500 font-bold uppercase tracking-widest animate-pulse">● Live Analysis</span>
-            <a href="/logout" class="text-xs text-zinc-500 hover:text-white">KIJELENTKEZÉS</a>
+        <h1 class="text-2xl font-black italic tracking-tighter">Skyhigh<span class="text-purple-500">.AI</span></h1>
+        <div class="flex items-center gap-4">
+            <% if (isAdmin) { %>
+                <a href="/admin" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase shadow-[0_0_20px_rgba(220,38,38,0.3)] transition">Admin Panel</a>
+            <% } %>
+            <a href="/logout" class="text-zinc-500 hover:text-white text-xs font-bold uppercase tracking-widest transition">Kilépés</a>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-8 tech-card flex flex-col h-[600px]">
-            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-4 text-sm"></div>
-            <form id="chatForm" class="p-4 bg-zinc-900/50 border-t border-zinc-800 flex gap-2">
-                <input type="text" id="userInput" placeholder="Adatbevitel..." class="w-full bg-black border border-zinc-800 rounded-xl p-4 outline-none focus:border-purple-600">
-                <button type="submit" class="bg-purple-600 px-6 rounded-xl"><i class="fas fa-paper-plane"></i></button>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="tech-card p-6 border-zinc-800">
+            <p class="text-[10px] text-zinc-500 uppercase font-bold mb-1">Licenc Jog</p>
+            <p class="text-xl font-black <%= user.hasLicense ? 'text-green-500' : 'text-red-500 animate-pulse' %>">
+                <%= user.hasLicense ? 'AKTÍV' : 'FRISSÍTÉS SZÜKSÉGES' %>
+            </p>
+        </div>
+        <div class="tech-card p-6 border-zinc-800 text-center">
+            <p class="text-[10px] text-zinc-500 uppercase font-bold mb-1">Ciklus</p>
+            <p class="text-lg font-bold">6 Hónapos Profit-Terv</p>
+        </div>
+        <div class="tech-card p-6 border-zinc-800 text-right">
+            <p class="text-[10px] text-zinc-500 uppercase font-bold mb-1">Kezelői Tőke</p>
+            <p class="text-xl font-mono font-bold text-purple-500"><%= user.startingCapital || 0 %> Ft</p>
+        </div>
+    </div>
+
+    <% if (!user.startingCapital || user.startingCapital == 0) { %>
+    <div id="onboarding" class="onboarding-overlay fixed inset-0 flex items-center justify-center z-50 p-6">
+        <div class="bg-zinc-950 p-10 border border-zinc-800 rounded-[32px] max-w-md text-center shadow-2xl">
+            <h2 class="text-3xl font-black mb-4 italic">Üdvözlöm az <span class="text-purple-500 text-center">Operatív Törzsben!</span></h2>
+            <p class="text-sm text-zinc-400 mb-8 leading-relaxed italic text-center">A szoftver készen áll a 6 hónapos profit termelésre. Első lépésként határozza meg a kezelt tőkét:</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="setCap(50000)" class="bg-zinc-900 py-4 rounded-2xl hover:bg-purple-600 transition font-bold">50.000 Ft</button>
+                <button onclick="setCap(100000)" class="bg-zinc-900 py-4 rounded-2xl hover:bg-purple-600 transition font-bold">100.000 Ft</button>
+                <button onclick="setCap(500000)" class="bg-zinc-900 py-4 rounded-2xl hover:bg-purple-600 transition font-bold">500.000 Ft</button>
+                <input type="number" id="customCap" placeholder="Egyéni összeg" class="bg-black border border-zinc-800 p-4 rounded-2xl text-center outline-none focus:border-purple-600">
+            </div>
+            <button onclick="saveCap()" class="mt-8 w-full bg-white text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-purple-500 hover:text-white transition">Rendszer Indítása</button>
+        </div>
+    </div>
+    <% } %>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-8 tech-card flex flex-col h-[550px] overflow-hidden">
+            <div id="chatBox" class="flex-1 p-6 overflow-y-auto space-y-6 bg-[#080808]">
+                <div class="flex justify-start">
+                    <div class="bg-zinc-900 p-4 rounded-2xl rounded-tl-none text-sm border border-zinc-800 max-w-[85%] leading-relaxed italic">
+                        <strong class="text-purple-500 block text-[10px] uppercase mb-2 tracking-widest">Skyhigh Core</strong>
+                        Üdvözlöm! Elkezdjük a közös munkát. Az én feladatom a matematikai fölény biztosítása, az Ön feladata minden szelvényt pontosan megtenni. Ide jelentkezve látni fogja a napi elemzéseket magyarázattal és statisztikákkal.
+                    </div>
+                </div>
+            </div>
+            <form id="chatForm" class="p-4 bg-zinc-900/50 border-t border-zinc-800 flex gap-3">
+                <input type="text" id="userInput" placeholder="Üzenet küldése a szoftvernek..." class="w-full bg-black border border-zinc-800 rounded-xl p-4 text-sm outline-none focus:border-purple-600">
+                <button class="bg-purple-600 px-6 rounded-xl"><i class="fas fa-paper-plane text-center"></i></button>
             </form>
         </div>
 
         <div class="lg:col-span-4 space-y-4">
-            <div class="tech-card p-6 border-purple-600/30">
-                <h3 class="text-[10px] font-bold text-zinc-500 uppercase mb-2">Következő Master Tipp</h3>
-                <div id="countdown" class="text-3xl font-mono text-white font-black">00:00:00</div>
-            </div>
-
-            <div class="tech-card p-6">
-                <h3 class="text-[10px] font-bold text-zinc-500 uppercase mb-4">Múltbeli Eredmények</h3>
-                <table class="w-full text-[11px]">
-                    <tbody class="text-zinc-400">
-                        <% pastTips.forEach(tip => { %>
-                        <tr class="border-b border-zinc-900">
-                            <td class="py-2"><%= tip.date %></td>
-                            <td class="py-2 text-white font-bold"><%= tip.odds %></td>
-                            <td class="py-2 text-right">✅</td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
+            <div class="tech-card p-6 bg-purple-600/5 border-purple-600/20">
+                <h3 class="text-[10px] font-black text-zinc-500 uppercase mb-4 tracking-widest text-center">Napi Master Elemzés</h3>
+                <% if (dailyTip) { %>
+                    <p class="font-bold text-white mb-2 italic text-center uppercase"><%= dailyTip.match %></p>
+                    <p class="text-xs text-zinc-400 leading-relaxed text-center"><%= dailyTip.reasoning %></p>
+                <% } else { %>
+                    <p class="text-xs text-zinc-600 italic text-center">Számítás folyamatban...</p>
+                <% } %>
             </div>
         </div>
     </div>
 
     <script>
-        // Visszaszámláló reggel 8-ig
-        function timer() {
-            const now = new Date();
-            const target = new Date();
-            target.setHours(8,0,0,0);
-            if(now > target) target.setDate(target.getDate()+1);
-            const diff = target - now;
-            const h = Math.floor(diff/3600000).toString().padStart(2,'0');
-            const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
-            const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
-            document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
+        function setCap(v) { document.getElementById('customCap').value = v; }
+        async function saveCap() {
+            const capital = document.getElementById('customCap').value;
+            if(!capital) return alert("Kérem adjon meg egy összeget!");
+            await fetch('/api/set-capital', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ capital })
+            });
+            location.reload();
         }
-        setInterval(timer, 1000);
 
-        // Chat logika
         const chatBox = document.getElementById('chatBox');
         document.getElementById('chatForm').onsubmit = async (e) => {
             e.preventDefault();
             const msg = document.getElementById('userInput').value;
-            chatBox.innerHTML += `<div class="text-right text-purple-400 font-bold">${msg}</div>`;
+            if(!msg) return;
             document.getElementById('userInput').value = '';
-            const res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:msg}) });
+            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-purple-600 p-3 rounded-2xl rounded-tr-none text-sm font-bold shadow-lg">${msg}</div></div>`;
+            const res = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: msg}) });
             const data = await res.json();
-            chatBox.innerHTML += `<div class="text-zinc-300 bg-zinc-900 p-3 rounded-xl border border-zinc-800"><b>CORE:</b> ${data.reply}</div>`;
+            chatBox.innerHTML += `<div class="flex justify-start"><div class="bg-zinc-900 p-4 rounded-2xl rounded-tl-none text-sm border border-zinc-800 leading-relaxed italic"><strong class="text-purple-500 block text-[10px] uppercase mb-2 tracking-widest">Skyhigh Core</strong>${data.reply}</div></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
         };
     </script>
