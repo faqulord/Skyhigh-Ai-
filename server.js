@@ -12,7 +12,6 @@ const Tip = require('./models/Tip');
 const app = express();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Adatbázis csatlakozás
 mongoose.connect(process.env.MONGO_URL || process.env.MONGO_URI)
     .then(() => console.log('🚀 Skyhigh Core Online'))
     .catch(err => console.error('❌ DB Hiba:', err));
@@ -23,14 +22,13 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.use(session({
-    secret: 'skyhigh_quantum_secure_2026',
+    secret: 'skyhigh_quantum_2026_final',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || process.env.MONGO_URI }),
     cookie: { maxAge: 86400000 }
 }));
 
-// Middlewares
 const requireLogin = (req, res, next) => req.session.userId ? next() : res.redirect('/login');
 const requireAdmin = (req, res, next) => (req.session.userId && req.session.isAdmin) ? next() : res.redirect('/dashboard');
 
@@ -45,7 +43,7 @@ app.post('/auth/register', async (req, res) => {
         const hashed = await bcrypt.hash(req.body.password, 10);
         await new User({ fullname: req.body.fullname, email: req.body.email, password: hashed }).save();
         res.redirect('/login');
-    } catch { res.send('Hiba: Az email már foglalt.'); }
+    } catch { res.send('Hiba: Email foglalt.'); }
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -54,29 +52,30 @@ app.post('/auth/login', async (req, res) => {
         req.session.userId = user._id;
         req.session.isAdmin = user.isAdmin || (req.body.email === 'stylefaqu@gmail.com');
         res.redirect('/dashboard');
-    } else { res.send('Hibás adatok.'); }
+    } else { res.send('Hiba.'); }
 });
 
-// Admin funkciók
+// ADMIN
+app.get('/admin', requireAdmin, async (req, res) => {
+    const users = await User.find().sort({ date: -1 });
+    const stats = {
+        totalUsers: users.length,
+        activeSubs: users.filter(u => u.hasLicense).length,
+        revenue: users.filter(u => u.hasLicense).length * 20000
+    };
+    res.render('admin', { users, stats });
+});
+
 app.post('/admin/make-admin', requireAdmin, async (req, res) => {
     await User.findOneAndUpdate({ email: req.body.email }, { isAdmin: true });
     res.redirect('/admin');
 });
 
-app.get('/admin', requireAdmin, async (req, res) => {
-    const users = await User.find().sort({ date: -1 });
-    const totalUsers = users.length;
-    const activeSubs = users.filter(u => u.hasLicense).length;
-    const revenue = activeSubs * 20000;
-    res.render('admin', { users, stats: { totalUsers, activeSubs, revenue } });
-});
-
-// Dashboard
+// DASHBOARD
 app.get('/dashboard', requireLogin, async (req, res) => {
     const user = await User.findById(req.session.userId);
     const todayTip = await Tip.findOne().sort({ createdAt: -1 });
-    const pastTips = await Tip.find().sort({ createdAt: -1 }).limit(5);
-    res.render('dashboard', { user, isAdmin: req.session.isAdmin, dailyTip: todayTip, pastTips });
+    res.render('dashboard', { user, isAdmin: req.session.isAdmin, dailyTip: todayTip });
 });
 
 app.post('/api/set-capital', requireLogin, async (req, res) => {
@@ -84,15 +83,28 @@ app.post('/api/set-capital', requireLogin, async (req, res) => {
     res.json({ success: true });
 });
 
-// AI Robot - Skyhigh Core
+// LICENC AKTIVÁLÁS LOGIKA
+app.post('/api/activate-license', requireLogin, async (req, res) => {
+    try {
+        const { plan } = req.body;
+        let days = plan === 'yearly' ? 365 : 30;
+        await User.findByIdAndUpdate(req.session.userId, {
+            hasLicense: true,
+            licenseExpires: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+            freeMessagesCount: 0
+        });
+        res.json({ success: true });
+    } catch { res.status(500).json({ success: false }); }
+});
+
+// AI CHAT
 app.post('/api/chat', requireLogin, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
-        const systemPrompt = `Te vagy a Skyhigh Core, egy zseniális Digitális Elme. Élőben elemzed a piacokat. 
-        A cél a 6 hónapos profit-ciklus. Tőke: ${user.startingCapital} Ft. Tét: tőke 5%-a. 
-        Ha nincs licenc, emlékeztesd 5 üzenetenként a licenc-jog frissítésére. 
-        Stílusod: Profi, szigorú, de barátságos. Magyarázd el a 30 napos matekot és a Master Tipp jelentőségét.`;
-
+        const systemPrompt = `Te vagy a Skyhigh Core, a 6 hónapos profit-ciklus felelőse. 
+        Tőke: ${user.startingCapital} Ft. Ha nincs licenc, minden 2. üzenetnél emlékeztesd a licencvásárlásra szigorúan. 
+        Te élőben elemzed a meccseket. Mondd el, hogy a profit matek, nem szerencse.`;
+        
         const response = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [{ role: "system", content: systemPrompt }, { role: "user", content: req.body.message }]
@@ -102,4 +114,4 @@ app.post('/api/chat', requireLogin, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Skyhigh System Online: ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Skyhigh Live: ${PORT}`));
