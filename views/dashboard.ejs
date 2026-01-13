@@ -3,107 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Control Panel</title>
+    <title>Skyhigh AI | Vezérlőpult</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; }
-        .tech-card { background: #0f0f11; border: 1px solid #27272a; border-radius: 20px; }
-        .glass-btn { background: rgba(39, 39, 42, 0.5); border: 1px solid #3f3f46; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .glass-btn:hover { background: #a855f7; border-color: #a855f7; color: white; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+        .tech-card { background: #0c0c0e; border: 1px solid #1f1f22; border-radius: 16px; }
+        .glass-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid #27272a; padding: 8px 16px; border-radius: 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: 0.2s; color: #a1a1aa; }
+        .glass-btn:hover { background: #a855f7; border-color: #a855f7; color: white; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-blur: 10px; }
         .modal.active { display: flex; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-7xl mx-auto">
+<body class="p-4 md:p-10 max-w-6xl mx-auto">
 
-    <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
-        <div class="flex items-center gap-6">
+    <header class="flex justify-between items-center mb-12">
+        <div class="flex items-center gap-8">
             <h1 class="text-2xl font-black italic tracking-tighter">Skyhigh<span class="text-purple-500">.AI</span></h1>
-            <div class="flex gap-2">
-                <button onclick="openModal('techModal')" class="glass-btn"><i class="fas fa-microchip mr-2"></i> Tech</button>
-                <button onclick="openModal('stratModal')" class="glass-btn"><i class="fas fa-chess-knight mr-2"></i> Stratégia</button>
-            </div>
+            <nav class="hidden md:flex gap-3">
+                <button onclick="openModal('techModal')" class="glass-btn">Technológia</button>
+                <button onclick="openModal('stratModal')" class="glass-btn">Stratégia</button>
+            </nav>
         </div>
         
         <div class="flex items-center gap-6">
-            <div class="text-right">
-                <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Operator Status</p>
-                <p class="text-sm font-bold <%= user.hasLicense ? 'text-green-500' : 'text-red-500 animate-pulse' %>">
-                    <%= user.hasLicense ? 'ACTIVE LICENCE' : 'ACCESS RESTRICTED' %>
+            <div class="text-right hidden sm:block">
+                <p class="text-[9px] text-zinc-500 uppercase font-bold tracking-[2px]">Rendszer Állapot</p>
+                <p class="text-xs font-bold <%= user.hasLicense ? 'text-green-500' : 'text-purple-500' %>">
+                    <%= user.hasLicense ? 'AKTÍV LICENC' : 'DEMO MÓD' %>
                 </p>
             </div>
-            <a href="/logout" class="text-zinc-500 hover:text-white transition text-xs font-bold uppercase border-l border-zinc-800 pl-6">Exit</a>
+            <a href="/logout" class="bg-zinc-900 p-2 px-4 rounded-lg text-zinc-400 hover:text-white transition text-[10px] font-bold uppercase">Kilépés</a>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-8 tech-card flex flex-col h-[600px] shadow-2xl overflow-hidden border-purple-500/10">
-            <div class="p-4 bg-zinc-900/50 border-b border-zinc-800 flex justify-between items-center text-[10px] font-bold text-zinc-400">
-                <span><i class="fas fa-circle text-green-500 mr-2 animate-pulse"></i> NEURAL ENGINE ONLINE</span>
-                <span>v4.0.21-QUANTUM</span>
-            </div>
-            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[#080808]">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-8 tech-card flex flex-col h-[650px] shadow-2xl border-white/5">
+            <div class="p-4 border-b border-zinc-800/50 flex justify-between items-center bg-zinc-900/20">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Skyhigh Kvantum-Asszisztens</span>
                 </div>
-            <form id="chatForm" class="p-4 bg-zinc-900 border-t border-zinc-800 flex gap-3">
-                <input type="text" id="userInput" placeholder="Adatbevitel vagy kérdés..." class="w-full bg-black border border-zinc-700 rounded-xl p-4 text-xs focus:border-purple-500 outline-none transition">
-                <button type="submit" class="bg-purple-600 px-6 rounded-xl hover:bg-purple-500 transition shadow-lg shadow-purple-900/40">
-                    <i class="fas fa-paper-plane"></i>
+            </div>
+
+            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-6">
+                <div class="flex justify-start">
+                    <div class="bg-zinc-900/50 text-zinc-300 p-4 rounded-2xl rounded-tl-none text-sm border border-zinc-800 max-w-[80%]">
+                        <p>Üdvözlöm, Operátor. A rendszer készen áll az elemzésre. Milyen tőkével dolgozunk a mai napon?</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="chatForm" class="p-4 bg-zinc-900/30 border-t border-zinc-800 flex gap-2">
+                <input type="text" id="userInput" placeholder="Írjon az asszisztensnek..." class="w-full bg-black/50 border border-zinc-800 rounded-xl p-4 text-sm focus:border-purple-500 outline-none transition">
+                <button type="submit" class="bg-purple-600 w-14 rounded-xl hover:bg-purple-500 transition flex items-center justify-center shadow-lg shadow-purple-900/20">
+                    <i class="fas fa-paper-plane text-sm"></i>
                 </button>
             </form>
         </div>
 
-        <div class="lg:col-span-4 space-y-6">
+        <div class="lg:col-span-4 space-y-4">
+            
             <% if (!user.hasLicense) { %>
-                <div class="tech-card p-8 border-red-500/30 bg-red-900/5 text-center">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                    <h3 class="text-lg font-black uppercase mb-2">Licenc Zárolva</h3>
-                    <p class="text-xs text-zinc-400 mb-6 leading-relaxed">A matematikai modell és a napi Master Tippek eléréséhez 30 napos aktív licencre van szükség.</p>
-                    <a href="/fizetes" class="block w-full bg-white text-black py-4 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-purple-600 hover:text-white transition-all duration-300">
-                        Vásárlás (20.000 Ft)
+                <div class="tech-card p-6 border-purple-500/20 bg-purple-500/5">
+                    <h3 class="text-sm font-bold mb-2">Licenc Szükséges</h3>
+                    <p class="text-xs text-zinc-400 mb-6 leading-relaxed">A Master Tippek és a teljes bankroll menedzsment csak előfizetőknek érhető el.</p>
+                    <a href="/fizetes" class="block w-full bg-white text-black py-4 rounded-xl font-black uppercase text-[10px] text-center tracking-widest hover:bg-purple-600 hover:text-white transition-all">
+                        Licenc Aktiválása (20.000 Ft)
                     </a>
                 </div>
             <% } else { %>
-                <div class="tech-card p-8 border-green-500/30 bg-green-900/5">
-                    <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Daily Quantum Pick</h3>
+                <div class="tech-card p-6 border-green-500/20">
+                    <h3 class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Napi Quantum Tipp</h3>
                     <% if (dailyTip) { %>
-                        <div class="bg-black/40 border border-zinc-800 p-4 rounded-xl mb-4">
-                            <p class="text-sm font-black text-white italic mb-1 uppercase tracking-tight"><%= dailyTip.match %></p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-purple-400 font-mono">Prediction: <%= dailyTip.prediction %></span>
-                                <span class="text-xs font-black text-green-500">Odds: <%= dailyTip.odds %></span>
+                        <div class="bg-black/60 p-4 rounded-xl border border-zinc-800 mb-3">
+                            <p class="text-sm font-bold text-white mb-1 uppercase"><%= dailyTip.match %></p>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-purple-400 text-xs font-bold"><%= dailyTip.prediction %></span>
+                                <span class="text-green-500 font-bold">ODDS: <%= dailyTip.odds %></span>
                             </div>
                         </div>
-                        <p class="text-[10px] text-zinc-500 italic"><%= dailyTip.reasoning %></p>
+                        <p class="text-[10px] text-zinc-500 leading-relaxed italic"><%= dailyTip.reasoning %></p>
                     <% } else { %>
-                        <p class="text-xs text-zinc-600">Szerver szinkronizáció folyamatban...</p>
+                        <p class="text-xs text-zinc-600 italic text-center py-4">Elemzés folyamatban...</p>
                     <% } %>
                 </div>
             <% } %>
+
+            <div class="tech-card p-6 border-zinc-800">
+                <h3 class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Rendszer Paraméterek</h3>
+                <div class="space-y-3 text-[11px]">
+                    <div class="flex justify-between"><span class="text-zinc-500">Modell:</span><span class="text-zinc-300">Skyhigh-v4 (Pro)</span></div>
+                    <div class="flex justify-between"><span class="text-zinc-500">Tőke:</span><span class="text-zinc-300"><%= user.startingCapital %> Ft</span></div>
+                    <div class="flex justify-between"><span class="text-zinc-500">Stratégia:</span><span class="text-green-500 font-bold">Fix 30 Napos</span></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="techModal" class="modal">
-        <div class="bg-zinc-950 border border-zinc-800 p-8 rounded-3xl max-w-2xl w-full">
-            <h2 class="text-2xl font-black uppercase mb-4 text-purple-500">Technológiai Háttér</h2>
-            <div class="space-y-4 text-sm text-zinc-400 leading-relaxed">
-                <p><strong class="text-white uppercase text-[10px]">Neural Core:</strong> A Skyhigh AI az OpenAI GPT-4 architektúráját használja, kiegészítve saját fejlesztésű sport-statisztikai modulokkal.</p>
-                <p><strong class="text-white uppercase text-[10px]">Data Stream:</strong> Percenként 12.000 adatpontot elemzünk: játékos-sérülések, időjárás, arbitrázs lehetőségek és piaci mozgások.</p>
-                <div class="p-4 bg-zinc-900 rounded-xl text-[11px] font-mono text-purple-300">System.integrity_check: 100% | Accuracy_rate: 87.4%</div>
-            </div>
-            <button onclick="closeModal('techModal')" class="mt-8 text-[10px] font-black uppercase text-zinc-500 hover:text-white underline">Vissza a terminálhoz</button>
+        <div class="bg-zinc-950 border border-zinc-800 p-10 rounded-3xl max-w-xl w-full">
+            <h2 class="text-2xl font-black uppercase mb-6 text-purple-500">Kvantum Technológia</h2>
+            <p class="text-zinc-400 text-sm leading-relaxed mb-6">A Skyhigh AI nem tippeket ad, hanem valószínűségszámítást végez. A GPT-4 motorunk minden reggel 15.000+ adatpontot elemez (formamutatók, xG, sérülések és piaci mozgások), hogy megtalálja az értéket.</p>
+            <button onclick="closeModal('techModal')" class="w-full py-4 border border-zinc-800 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition">Bezárás</button>
         </div>
     </div>
 
     <div id="stratModal" class="modal">
-        <div class="bg-zinc-950 border border-zinc-800 p-8 rounded-3xl max-w-2xl w-full">
-            <h2 class="text-2xl font-black uppercase mb-4 text-green-500">30 Napos Stratégia</h2>
-            <div class="space-y-4 text-sm text-zinc-400 leading-relaxed">
-                <p><strong class="text-white uppercase text-[10px]">Ciklus alapú profit:</strong> Mi nem egy meccsben, hanem 30 napos ciklusban gondolkodunk. A cél a tőke havi 25-40%-os növelése.</p>
-                <p><strong class="text-white uppercase text-[10px]">Bankroll Management:</strong> Szigorúan tilos a tőke 5%-ánál többet kockáztatni egyetlen tippre. A robotunk ezt számolja ki Önnek.</p>
-                <p class="text-white font-bold italic">"A fegyelem pénzt szül, a kapzsiság csődöt."</p>
+        <div class="bg-zinc-950 border border-zinc-800 p-10 rounded-3xl max-w-xl w-full">
+            <h2 class="text-2xl font-black uppercase mb-6 text-green-500">Fix Profit Stratégia</h2>
+            <div class="space-y-4 text-zinc-400 text-sm mb-6">
+                <p>1. <strong>Szigorú tőkekezelés:</strong> Soha ne tegyél fel többet a bankod 5%-ánál!</p>
+                <p>2. <strong>Ciklus szemlélet:</strong> A profitot 30 napos egységekben mérjük.</p>
+                <p>3. <strong>Érzelemmentes fogadás:</strong> A robot utasításait követni kell, függetlenül az előző nap eredményétől.</p>
             </div>
-            <button onclick="closeModal('stratModal')" class="mt-8 text-[10px] font-black uppercase text-zinc-500 hover:text-white underline">Értettem</button>
+            <button onclick="closeModal('stratModal')" class="w-full py-4 border border-zinc-800 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition">Értettem</button>
         </div>
     </div>
 
@@ -119,15 +136,16 @@
             const text = document.getElementById('userInput').value;
             if(!text) return;
             document.getElementById('userInput').value = '';
-            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-purple-600 text-white p-3 rounded-2xl rounded-tr-none text-xs shadow-lg">${text}</div></div>`;
-            
+            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-purple-600 text-white p-3 px-5 rounded-2xl rounded-tr-none text-sm shadow-xl font-medium">${text}</div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ message: text })
             });
             const data = await res.json();
-            chatBox.innerHTML += `<div class="flex justify-start"><div class="bg-zinc-800 text-zinc-300 p-4 rounded-2xl rounded-tl-none text-xs border border-zinc-700 leading-relaxed shadow-xl"><strong class="text-purple-500 block text-[10px] uppercase mb-1">Skyhigh AI</strong>${data.reply}</div></div>`;
+            chatBox.innerHTML += `<div class="flex justify-start"><div class="bg-zinc-900 text-zinc-300 p-4 px-6 rounded-2xl rounded-tl-none text-sm border border-zinc-800 leading-relaxed shadow-lg"><strong class="text-purple-500 block text-[9px] uppercase tracking-widest mb-2 italic">Rendszerüzenet</strong>${data.reply}</div></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
         });
     </script>
