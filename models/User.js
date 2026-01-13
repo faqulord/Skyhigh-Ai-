@@ -5,10 +5,16 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
+    
+    // LICENC ADATOK
     hasLicense: { type: Boolean, default: false },
     licenseExpires: { type: Date, default: null },
-    startingCapital: { type: Number, default: 0 },
-    currentCapital: { type: Number, default: 0 },
+    
+    // BANK MENEDZSMENT & KORLÁTOK
+    startingCapital: { type: Number, default: 0 }, // Kezdőtőke
+    currentCapital: { type: Number, default: 0 },  // Aktuális egyenleg
+    freeMessagesCount: { type: Number, default: 0 }, // Ingyenes üzenetek számlálója
+    
     date: { type: Date, default: Date.now }
 });
 
