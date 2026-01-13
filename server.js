@@ -9,17 +9,16 @@ const { OpenAI } = require('openai');
 const path = require('path');
 const app = express();
 
-// --- KONFIGURÁCIÓ (RAILWAY VÁLTOZÓK HASZNÁLATA) ---
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const SPORT_API_KEY = process.env.SPORT_API_KEY;
 const MONGO_CONNECTION = process.env.MONGO_URL;
 
-mongoose.connect(MONGO_CONNECTION).then(() => console.log("🚀 Skyhigh Neural Engine Online"));
+mongoose.connect(MONGO_CONNECTION).then(() => console.log("🚀 Skyhigh Engine Online"));
 
-// --- MODELLEK ---
+// --- ADATMODELL ---
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true }, password: String,
-    startingCapital: { type: Number, default: 0 }, hasLicense: { type: Boolean, default: false },
+    hasLicense: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false }, createdAt: { type: Date, default: Date.now }
 }));
 
@@ -30,73 +29,83 @@ const Tip = mongoose.model('Tip', new mongoose.Schema({
 
 // --- BEÁLLÍTÁSOK ---
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'skyhigh_quantum_safe_2026',
+    secret: 'skyhigh_top_secret_2026',
     resave: false, saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: MONGO_CONNECTION })
 }));
 
-// --- 🤖 AI MASTER TIP GENERÁTOR ---
+// --- 🤖 AI CHAT ÉS ELEMZÉS ---
 async function runAiAnalysis() {
     try {
         const today = new Date().toISOString().split('T')[0];
         const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
             headers: { 'x-apisports-key': SPORT_API_KEY }
         });
-        const fixtures = response.data.response.slice(0, 15);
-        const matchData = fixtures.map(f => `${f.teams.home.name} vs ${f.teams.away.name}`).join(", ");
-
-        const aiResponse = await openai.chat.completions.create({
+        const matches = response.data.response.slice(0, 10).map(m => `${m.teams.home.name} vs ${m.teams.away.name}`).join(", ");
+        const aiRes = await openai.chat.completions.create({
             model: "gpt-4",
-            messages: [{ role: "system", content: "Profi fogadási matematikus vagy. Válassz egy Master Tippet JSON-ban: {match, prediction, odds, reasoning}" },
-                       { role: "user", content: `Meccsek: ${matchData}` }]
+            messages: [{ role: "system", content: "Profi sportfogadási AI vagy. Adj Master Tippet JSON-ban: {match, prediction, odds, reasoning}" },
+                       { role: "user", content: `Mai meccsek: ${matches}` }]
         });
-        const result = JSON.parse(aiResponse.choices[0].message.content);
+        const result = JSON.parse(aiRes.choices[0].message.content);
         await Tip.findOneAndUpdate({ date: today }, result, { upsert: true });
-        console.log("✅ AI Tipp kész.");
-    } catch (err) { console.error("AI hiba:", err.message); }
+    } catch (e) { console.log("AI Hiba:", e.message); }
 }
 cron.schedule('0 8 * * *', runAiAnalysis);
 
-// --- ÚTVONALAK ---
-app.get('/', (req, res) => res.render('index'));
-app.get('/login', (req, res) => res.render('login'));
-app.get('/regisztracio', (req, res) => res.render('register'));
+// AI Chat végpont
+app.post('/api/chat', async (req, res) => {
+    if (!req.session.userId) return res.status(403).json({error: "Bejelentkezés szükséges"});
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [{role: "system", content: "Skyhigh AI vagy, egy profi fogadási tanácsadó."}, {role: "user", content: req.body.message}]
+        });
+        res.json({ reply: completion.choices[0].message.content });
+    } catch (e) { res.status(500).json({error: e.message}); }
+});
 
-app.get('/dashboard', async (req, res) => {
+// --- MIDDLEWARE: LICENC ELLENŐRZÉS ---
+const checkLicense = async (req, res, next) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (!user.hasLicense && !user.isAdmin) return res.render('buy-license', { user });
+    if (user.isAdmin || user.hasLicense) return next();
+    res.render('buy-license'); // Ha nincs licenc, ide dobja
+};
+
+// --- ÚTVONALAK ---
+app.get('/dashboard', checkLicense, async (req, res) => {
+    const user = await User.findById(req.session.userId);
     const today = new Date().toISOString().split('T')[0];
     const dailyTip = await Tip.findOne({ date: today });
     res.render('dashboard', { user, dailyTip });
 });
 
 app.get('/admin', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (!user || !user.isAdmin) return res.send("Hozzáférés megtagadva!");
-    const allUsers = await User.find().sort({ createdAt: -1 });
-    res.render('admin', { user, allUsers });
+    if (!user || !user.isAdmin) return res.redirect('/');
+    const users = await User.find();
+    res.render('admin', { users });
 });
 
+// Admin Műveletek
+app.post('/admin/run-ai', async (req, res) => { await runAiAnalysis(); res.redirect('/admin'); });
+app.post('/admin/give-license/:id', async (req, res) => {
+    await User.findByIdAndUpdate(req.params.id, { hasLicense: true });
+    res.redirect('/admin');
+});
+
+// Auth
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.userId = user._id;
         req.session.save(() => res.redirect('/dashboard'));
-    } else { res.send("Hibás belépés!"); }
+    } else res.send("Hiba");
 });
 
-app.post('/auth/register', async (req, res) => {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashedPassword }).save();
-    res.redirect('/login');
-});
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Skyhigh Online`));
+app.listen(process.env.PORT || 8080, "0.0.0.0");
