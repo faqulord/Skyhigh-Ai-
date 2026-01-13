@@ -1,20 +1,11 @@
 <!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Belépés | Skyhigh AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-black text-white flex items-center justify-center min-h-screen p-6 font-sans">
-    <div class="max-w-xs w-full text-center">
-        <div class="text-5xl mb-8">🦊</div>
-        <h2 class="text-xl font-black uppercase tracking-tighter mb-8 italic text-purple-500">Neural Login</h2>
+<html lang="hu"><head><meta charset="UTF-8"><title>Belépés</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-black text-white flex items-center justify-center min-h-screen">
+    <div class="max-w-xs w-full text-center"><div class="text-5xl mb-8">🦊</div><h2 class="text-purple-500 font-black italic mb-8 uppercase italic">Neural Login</h2>
         <form action="/auth/login" method="POST" class="space-y-4">
-            <input type="email" name="email" placeholder="Email" class="w-full bg-zinc-900 border-none rounded-2xl p-4 text-sm" required>
-            <input type="password" name="password" placeholder="Jelszó" class="w-full bg-zinc-900 border-none rounded-2xl p-4 text-sm" required>
-            <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-purple-600/20">Belépés a Rendszerbe</button>
+            <input type="email" name="email" placeholder="Email" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm" required>
+            <input type="password" name="password" placeholder="Jelszó" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm" required>
+            <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs">Belépés</button>
         </form>
-        <p class="mt-8 text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Nincs fiókod? <a href="/register" class="text-purple-500">Regisztrálj</a></p>
     </div>
-</body>
-</html>
+</body></html>
