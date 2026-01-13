@@ -6,12 +6,12 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const app = express();
 
-// --- ADATBÁZIS (Railway változódhoz igazítva) ---
+// --- ADATBÁZIS ---
 const MONGO_CONNECTION = process.env.MONGO_URL;
 
 mongoose.connect(MONGO_CONNECTION)
-.then(() => console.log("✅ DB Connected"))
-.catch(err => console.error("❌ DB Error:", err));
+.then(() => console.log("✅ Adatbázis Kapcsolat: OK"))
+.catch(err => console.error("❌ Adatbázis Hiba:", err));
 
 // --- MODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -24,15 +24,15 @@ const Tip = mongoose.model('Tip', new mongoose.Schema({
     date: { type: String, default: () => new Date().toISOString().split('T')[0] }
 }));
 
-// --- MEGJELENÍTÉS BEÁLLÍTÁSA (EZ A JAVÍTÁS) ---
+// --- MEGJELENÍTÉS ÉS PATH BEÁLLÍTÁSOK ---
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); // Kényszerített mappa útvonal
+app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_2026_safe',
+    secret: 'skyhigh_master_key_2026',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: MONGO_CONNECTION }),
@@ -41,9 +41,15 @@ app.use(session({
 
 // --- ÚTVONALAK ---
 
-app.get('/', (req, res) => res.render('index'));
-app.get('/login', (req, res) => res.render('login'));
-app.get('/regisztracio', (req, res) => res.render('register'));
+app.get('/', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.render('index');
+});
+
+app.get('/login', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.render('login');
+});
 
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
@@ -61,32 +67,32 @@ app.get('/dashboard', async (req, res) => {
             };
         }
 
-        // --- DOLOG, AMITŐL MEGKELL JELENNIE A DIZÁJNNAK ---
-        res.setHeader('Content-Type', 'text/html'); 
-        res.render('dashboard', { user, dailyTip });
+        // --- KÉNYSZERÍTETT HTML RENDERELÉS ---
+        res.setHeader('Content-Type', 'text/html');
+        return res.render('dashboard', { user, dailyTip });
+        
+    } catch (err) {
+        console.error("Dashboard Render Hiba:", err);
+        res.status(500).send("Belső szerver hiba a megjelenítésnél.");
+    }
+});
+
+app.post('/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (user && await bcrypt.compare(password, user.password)) {
+            req.session.userId = user._id;
+            req.session.save(() => res.redirect('/dashboard'));
+        } else {
+            res.setHeader('Content-Type', 'text/html');
+            res.send("<h2>Hibás adatok! <a href='/login'>Próbáld újra</a></h2>");
+        }
     } catch (err) {
         res.redirect('/login');
     }
 });
 
-// AUTH
-app.post('/auth/login', async (req, res) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (user && await bcrypt.compare(password, user.password)) {
-        req.session.userId = user._id;
-        req.session.save(() => res.redirect('/dashboard'));
-    } else {
-        res.send("Hibás adatok!");
-    }
-});
-
-app.post('/auth/register', async (req, res) => {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const newUser = new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashedPassword });
-    await newUser.save();
-    res.redirect('/login');
-});
-
+// Port és indítás
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Rendszer aktív a ${PORT} porton`));
+app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Skyhigh Master Engine Online: ${PORT}`));
