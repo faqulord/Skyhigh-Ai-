@@ -2,36 +2,35 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Bejelentkezés</title>
+    <title>Skyhigh AI | Belépés</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { background-color: #000; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .box { background: #0a0a0a; border: 1px solid #222; padding: 40px; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 0 50px rgba(34, 197, 94, 0.1); }
-        input { width: 100%; background: #111; border: 1px solid #333; padding: 16px; margin-bottom: 16px; border-radius: 12px; color: white; outline: none; transition: 0.3s; }
-        input:focus { border-color: #22c55e; }
-        .btn { width: 100%; background: white; color: black; padding: 16px; font-weight: 900; border-radius: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
-        .btn:hover { background: #ccc; transform: scale(1.02); }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body{background-color:black;color:white;}</style>
 </head>
-<body>
-    <div class="box">
-        <div class="text-center mb-10">
-            <i class="fas fa-robot text-purple-500 text-3xl mb-4"></i>
-            <h2 class="text-2xl font-black uppercase italic">Skyhigh<span class="text-green-500">.Ai</span></h2>
-        </div>
-
-        <form action="/auth/login" method="POST">
-            <input type="email" name="email" placeholder="E-mail cím" required>
-            <input type="password" name="password" placeholder="Jelszó" required>
-            
-            <button type="submit" class="btn">Belépés</button>
+<body class="flex items-center justify-center h-screen bg-[url('https://media.giphy.com/media/U3qYN8S0j3bpK/giphy.gif')] bg-cover">
+    <div class="absolute inset-0 bg-black/90"></div> <div class="relative z-10 w-full max-w-md p-8 bg-zinc-950/80 backdrop-blur border border-zinc-800 rounded-2xl text-center shadow-[0_0_50px_rgba(168,85,247,0.2)]">
+        <a href="/" class="absolute top-4 left-4 text-zinc-500 hover:text-white"><i class="fas fa-arrow-left"></i> Vissza</a>
+        
+        <h1 class="text-3xl font-black italic mb-2 mt-4">Skyhigh<span class="text-purple-600">.AI</span></h1>
+        <p class="text-xs text-zinc-400 mb-8 uppercase tracking-widest">Operator Access Portal</p>
+        
+        <form action="/auth/login" method="POST" class="space-y-4 text-left">
+            <div>
+                <label class="text-[10px] text-zinc-500 uppercase font-bold ml-1">Azonosító (Email)</label>
+                <input type="email" name="email" required class="w-full p-3 bg-black border border-zinc-800 rounded text-white focus:border-purple-600 outline-none transition">
+            </div>
+            <div>
+                <label class="text-[10px] text-zinc-500 uppercase font-bold ml-1">Jelszó</label>
+                <input type="password" name="password" required class="w-full p-3 bg-black border border-zinc-800 rounded text-white focus:border-purple-600 outline-none transition">
+            </div>
+            <button type="submit" class="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded uppercase shadow-lg shadow-purple-900/50 transition transform hover:scale-[1.02]">
+                Belépés a Terminálba
+            </button>
         </form>
-
-        <div class="text-center mt-8 space-y-4">
-            <a href="/regisztracio" class="block text-xs text-zinc-500 hover:text-green-500 uppercase font-bold">Még nincs fiókod? Regisztráció</a>
-            <a href="/" class="block text-xs text-zinc-600 hover:text-white">Vissza a főoldalra</a>
+        
+        <div class="mt-6 border-t border-zinc-800 pt-4">
+            <p class="text-xs text-zinc-500">Még nincs hozzáférésed?</p>
+            <a href="/regisztracio" class="text-white text-xs font-bold uppercase hover:text-purple-400">Regisztráció itt</a>
         </div>
     </div>
 </body>
