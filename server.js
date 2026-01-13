@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh v16.0 - Eredmények.com Szinkron Aktív"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka Engine Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_fox_ultra_final_2026',
+    secret: 'skyhigh_purple_fox_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -49,7 +49,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 const getHuFullDate = () => new Date().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// ROBOT: ELEMZÉS FLASHSCORE SZINKRONNAL
+// ROBOT FUNKCIÓ - RAFINÁLT RÓKA SZEMÉLYISÉG
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -66,17 +66,17 @@ async function runAiRobot() {
         if (fixtures.length === 0) return false;
 
         const matchData = fixtures.slice(0, 20).map(f => {
-            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Budapest' });
-            return `${f.teams.home.name} vs ${f.teams.away.name} (Eredmények.com liga: ${f.league.name}, Idő: ${time})`;
+            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+            return `${f.teams.home.name} vs ${f.teams.away.name} (Liga: ${f.league.name}, Idő: ${time})`;
         }).join(" | ");
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [{ 
                 role: "system", 
-                content: "Te vagy az 'Öreg Róka'. Csak MAGYARUL válaszolj. Válasz JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}. A 'league' legyen pontos, ahogy az Eredmények.com (Flashscore) írja (pl. ANGLIA: Premier League)." 
+                content: "Te vagy a 'Rafinált Robot Róka'. Egy cyber-sportfogadó zseni. A célod, hogy a 30 napos ciklus végén minden ügyfeled profitban legyen. A stílusod high-tech, magabiztos és rafinált. Csak MAGYARUL válaszolj. Válasz JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" 
             },
-            { role: "user", content: `Válassz egy MASTER TIPPET mára (${getHuFullDate()}): ${matchData}` }],
+            { role: "user", content: `Válaszd ki a nap legbiztosabb tippjét a 30 napos profit stratégia alapján: ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -96,13 +96,11 @@ const checkAdmin = async (req, res, next) => {
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (user.email === OWNER_EMAIL && !user.isAdmin) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
+    if (user.email === OWNER_EMAIL) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
-    
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find({ status: { $ne: 'pending' } }).sort({ _id: -1 }).limit(5);
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
-
     res.render('dashboard', { user, dailyTip, history, recommendedStake, displayDate: getHuFullDate() });
 });
 
@@ -135,6 +133,7 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     res.redirect('/admin?status=settled');
 });
 
+// LOGIN, REGISTER...
 app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
 app.get('/', (req, res) => res.render('index'));
