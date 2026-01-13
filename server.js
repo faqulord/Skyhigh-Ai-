@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural Gold Aktív"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v10.0 Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_gold_ultra_2026',
+    secret: 'skyhigh_neural_message_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -49,13 +49,11 @@ async function runAiRobot() {
         const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${dbDate}`, {
             headers: { 'x-apisports-key': process.env.SPORT_API_KEY }
         });
-
         const fixtures = response.data.response;
         if (!fixtures || fixtures.length === 0) return false;
 
-        // Csak a jövőbeli meccsek, pontos időponttal
-        const matchData = fixtures.slice(0, 25).map(f => {
-            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Budapest' });
+        const matchData = fixtures.slice(0, 20).map(f => {
+            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
             return `${f.teams.home.name} vs ${f.teams.away.name} (Kezdés: ${time}, Liga: ${f.league.name})`;
         }).join(" | ");
 
@@ -63,9 +61,9 @@ async function runAiRobot() {
             model: "gpt-4-turbo-preview",
             messages: [{ 
                 role: "system", 
-                content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válaszod egy JSON: {match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}. A matchTime a megadott listából származzon (pl. 20:45)!" 
+                content: "Te egy exkluzív sportfogadó tanácsadó vagy. Csak MAGYARUL válaszolj. Válaszod egy profi, érvelő üzenet legyen. JSON formátum: {match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" 
             },
-            { role: "user", content: `Válaszd ki a nap MASTER TIPPÉT: ${matchData}` }],
+            { role: "user", content: `Válaszd ki a nap Master Tippjét 10 éves statisztika alapján: ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -87,9 +85,14 @@ app.get('/dashboard', async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (user.email === OWNER_EMAIL && !user.isAdmin) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
+    
     const dailyTip = await Tip.findOne({ date: getDbDate() });
-    const history = await Tip.find().sort({ _id: -1 }).limit(10);
-    res.render('dashboard', { user, dailyTip, history });
+    const history = await Tip.find().sort({ _id: -1 }).limit(5);
+    
+    // TÉT SZÁMÍTÁS: A Bankroll 10%-a
+    const recommendedStake = Math.floor(user.startingCapital * 0.10);
+
+    res.render('dashboard', { user, dailyTip, history, recommendedStake });
 });
 
 app.get('/admin', checkAdmin, async (req, res) => {
