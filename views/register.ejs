@@ -1,42 +1,33 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Regisztráció | Skyhigh AI</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Regisztráció | Skyhigh</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; }
-        .reg-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-top: 3px solid #8b5cf6; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card { background: #0a0a0a; border: 1px solid #1a1a1a; border-top: 3px solid #8b5cf6; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-[100dvh] p-6">
-    <div class="max-w-xs w-full">
-        <div class="reg-card p-8 rounded-[2rem] text-center">
-            <div class="text-5xl mb-6">🦊</div>
+<body class="p-6 flex items-center justify-center min-h-[100dvh]">
+    <div class="w-full max-w-xs">
+        <div class="card p-8 rounded-[2.5rem] text-center shadow-2xl">
+            <div class="text-5xl mb-6">🦊💜</div>
             <h2 style="font-family: 'Orbitron';" class="text-lg text-purple-500 font-black uppercase italic mb-8 tracking-tighter">Új Hozzáférés</h2>
-            
             <form action="/auth/register" method="POST" class="space-y-4">
-                <input type="text" name="fullname" placeholder="Teljes Neved" class="w-full bg-zinc-900 border-none rounded-2xl p-4 text-sm focus:ring-2 focus:ring-purple-600 outline-none" required>
-                <input type="email" name="email" placeholder="Email címed" class="w-full bg-zinc-900 border-none rounded-2xl p-4 text-sm focus:ring-2 focus:ring-purple-600 outline-none" required>
-                <input type="password" name="password" placeholder="Jelszó" class="w-full bg-zinc-900 border-none rounded-2xl p-4 text-sm focus:ring-2 focus:ring-purple-600 outline-none" required>
-                
+                <input type="text" name="fullname" placeholder="Teljes Neved" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-purple-600 outline-none" required>
+                <input type="email" name="email" placeholder="Email címed" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-purple-600 outline-none" required>
+                <input type="password" name="password" placeholder="Jelszó" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-purple-600 outline-none" required>
                 <div class="flex items-center gap-2 text-left px-2">
                     <input type="checkbox" name="terms" id="terms" class="accent-purple-600 w-4 h-4" required>
-                    <label for="terms" class="text-[9px] text-zinc-500 font-bold uppercase">
-                        Elfogadom az <a href="/terms" class="text-purple-500 underline">ÁSZF</a>-et
+                    <label for="terms" class="text-[9px] text-zinc-500 font-bold uppercase tracking-tight leading-none">
+                        Elfogadom a <a href="/terms" class="text-purple-500 underline">Lila ÁSZF</a>-et
                     </label>
                 </div>
-
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg shadow-purple-600/20 transition-all active:scale-95">
-                    Regisztráció
-                </button>
+                <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-purple-600/20 active:scale-95 transition">Regisztráció</button>
             </form>
-
-            <p class="mt-8 text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
-                Van már fiókod? <a href="/login" class="text-purple-500 underline">Lépj be</a>
-            </p>
+            <p class="mt-6 text-[10px] text-zinc-600 font-bold uppercase">Már van fiókod? <a href="/login" class="text-purple-500">Belépés</a></p>
         </div>
     </div>
 </body>
