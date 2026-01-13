@@ -2,39 +2,60 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Skyhigh AI | Operator Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skyhigh AI | Regisztráció</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body{background-color:black;color:white; font-family: sans-serif;}</style>
+    <style>
+        body { background-color: #000; color: white; -webkit-tap-highlight-color: transparent; }
+        input { font-size: 16px !important; }
+        .custom-checkbox:checked { background-color: #7c3aed; }
+    </style>
 </head>
-<body class="flex items-center justify-center h-screen bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
-    <div class="w-full max-w-md p-10 bg-zinc-950/90 backdrop-blur-xl border border-zinc-800 rounded-3xl text-center shadow-[0_0_50px_rgba(168,85,247,0.15)]">
-        <div class="mb-8">
-            <h1 class="text-3xl font-black italic tracking-tighter">Skyhigh<span class="text-purple-600">.AI</span></h1>
-            <p class="text-[10px] text-zinc-500 uppercase tracking-[4px] mt-2">New Operator Enrollment</p>
+<body class="flex items-center justify-center min-h-screen p-6 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+
+    <div class="w-full max-w-sm space-y-8 bg-zinc-950/50 p-8 rounded-[32px] border border-zinc-900 backdrop-blur-xl">
+        <div class="text-center">
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Skyhigh<span class="text-purple-600">.AI</span></h1>
+            <p class="text-[9px] text-zinc-500 uppercase tracking-[4px] mt-2 font-bold italic">Operátor Jelentkezés</p>
         </div>
 
-        <form action="/auth/register" method="POST" class="space-y-4 text-left">
+        <form action="/auth/register" method="POST" class="space-y-4">
             <div>
-                <label class="text-[10px] text-zinc-500 uppercase font-bold ml-1">Teljes Név</label>
-                <input type="text" name="fullname" required class="w-full p-4 bg-black border border-zinc-800 rounded-xl text-white focus:border-purple-600 outline-none transition duration-300">
+                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Teljes Név</label>
+                <input type="text" name="fullname" required placeholder="Gipsz Jakab" 
+                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
             </div>
+            
             <div>
-                <label class="text-[10px] text-zinc-500 uppercase font-bold ml-1">Rendszer Azonosító (Email)</label>
-                <input type="email" name="email" required class="w-full p-4 bg-black border border-zinc-800 rounded-xl text-white focus:border-purple-600 outline-none transition duration-300">
+                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Email Cím</label>
+                <input type="email" name="email" required placeholder="pelda@skyhigh.ai" 
+                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
             </div>
+
             <div>
-                <label class="text-[10px] text-zinc-500 uppercase font-bold ml-1">Biztonsági Jelszó</label>
-                <input type="password" name="password" required class="w-full p-4 bg-black border border-zinc-800 rounded-xl text-white focus:border-purple-600 outline-none transition duration-300">
+                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Jelszó</label>
+                <input type="password" name="password" required placeholder="••••••••" 
+                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
             </div>
-            <button type="submit" class="w-full py-4 bg-white text-black font-black rounded-xl uppercase text-xs tracking-widest hover:bg-purple-600 hover:text-white transition-all duration-500 transform hover:scale-[1.02]">
-                Hozzáférés Létrehozása
+
+            <div class="flex items-start gap-3 px-2 py-2">
+                <input type="checkbox" required class="mt-1 w-4 h-4 rounded border-zinc-800 bg-black custom-checkbox">
+                <p class="text-[10px] text-zinc-500 leading-tight italic">
+                    Elfogadom a <span class="text-zinc-300">Felhasználói Feltételeket</span> és tudomásul veszem, hogy a szoftver használata saját felelősségre történik.
+                </p>
+            </div>
+
+            <button type="submit" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white hover:text-black transition duration-500 active:scale-95 shadow-lg shadow-purple-900/20">
+                Fiók Létrehozása
             </button>
         </form>
 
-        <div class="mt-8 pt-6 border-t border-zinc-900 text-xs text-zinc-500">
-            Már van regisztrált fiókod? <a href="/login" class="text-white font-bold hover:text-purple-500 transition">Belépés a Terminálba</a>
+        <div class="text-center pt-2">
+            <a href="/login" class="text-[10px] text-zinc-500 hover:text-purple-400 transition uppercase font-bold tracking-widest">
+                Van már fiókom. Belépek.
+            </a>
         </div>
     </div>
+
 </body>
 </html>
