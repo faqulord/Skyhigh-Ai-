@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v15.0 - Öreg Róka Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Neural Engine Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_oldfox_final_2026',
+    secret: 'skyhigh_fox_gold_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -46,11 +46,10 @@ app.use(session({
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// DÁTUM SEGÉDFÜGGVÉNYEK
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 const getHuFullDate = () => new Date().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// ROBOT FUNKCIÓ
+// ROBOT: +3 ÓRÁS SZIGORÚ SZABÁLY ÉS LIGA INFÓ
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -61,23 +60,24 @@ async function runAiRobot() {
         const now = new Date();
         const fixtures = response.data.response.filter(f => {
             const matchTime = new Date(f.fixture.date);
+            // CSAK OLYAN MECCS, AMI LEGALÁBB 3 ÓRA MÚLVA KEZDŐDIK
             return (matchTime - now) > (3 * 60 * 60 * 1000); 
         });
 
         if (fixtures.length === 0) return false;
 
-        const matchData = fixtures.slice(0, 15).map(f => {
-            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
-            return `${f.teams.home.name} vs ${f.teams.away.name} (Bajnokság: ${f.league.name}, Idő: ${time})`;
+        const matchData = fixtures.slice(0, 20).map(f => {
+            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Budapest' });
+            return `${f.teams.home.name} vs ${f.teams.away.name} (Liga: ${f.league.name}, Pontos Kezdés: ${time})`;
         }).join(" | ");
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [{ 
                 role: "system", 
-                content: "Te vagy az 'Öreg Róka'. Dörzsölt, veterán sportfogadó. Csak MAGYARUL válaszolj. Válasz JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" 
+                content: "Te vagy az 'Öreg Róka', a magyar sportfogadás veteránja. Csak MAGYARUL válaszolj. Válaszod egy profi érvelés legyen. JSON formátum: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}. A matchTime csak óra:perc legyen (pl. 20:45)!" 
             },
-            { role: "user", content: `Elemezz 10 évre visszamenőleg és adj MASTER TIPPET mára: ${matchData}` }],
+            { role: "user", content: `Elemezz és adj egy Master Tippet a mai napra (${getHuFullDate()}): ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -90,26 +90,19 @@ async function runAiRobot() {
 const checkAdmin = async (req, res, next) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (user && (user.isAdmin || user.email === OWNER_EMAIL)) return next();
+    if (user && (user.isAdmin || user.email === OWNER_EMAIL)) {
+        if (user.email === OWNER_EMAIL && !user.isAdmin) { user.isAdmin = true; await user.save(); }
+        return next();
+    }
     res.redirect('/dashboard');
 };
-
-// --- ÚTVONALAK ---
 
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    
-    if (user.email === OWNER_EMAIL) {
-        user.isAdmin = true; user.hasLicense = true; await user.save();
-    }
-
-    if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
-    
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find({ status: { $ne: 'pending' } }).sort({ _id: -1 }).limit(5);
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
-
     res.render('dashboard', { user, dailyTip, history, recommendedStake, displayDate: getHuFullDate() });
 });
 
@@ -143,20 +136,20 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     res.redirect('/admin?status=settled');
 });
 
+// AUTH... (Login/Register/Logout)
+app.get('/login', (req, res) => res.render('login'));
+app.get('/register', (req, res) => res.render('register'));
+app.get('/', (req, res) => res.render('index'));
 app.post('/user/set-capital', async (req, res) => {
     await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
     res.redirect('/dashboard');
 });
-
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/', (req, res) => res.render('index'));
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.userId = user._id;
         req.session.save(() => res.redirect('/dashboard'));
-    } else res.send("Hiba!");
+    } else res.send("Belépési hiba!");
 });
 app.post('/auth/register', async (req, res) => {
     const hashed = await bcrypt.hash(req.body.password, 10);
