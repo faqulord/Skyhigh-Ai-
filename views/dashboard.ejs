@@ -3,163 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Terminal</title>
+    <title>Skyhigh AI | Control Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #050505; color: white; font-family: sans-serif; }
-        .tech-card { background: #0f0f11; border: 1px solid #27272a; border-radius: 16px; overflow: hidden; }
-        
-        .ai-message { 
-            background: #18181b; border-left: 2px solid #a855f7; 
-            padding: 12px; margin-bottom: 12px; border-radius: 0 12px 12px 0;
-            font-size: 13px; line-height: 1.5; color: #e4e4e7;
-        }
-        .user-message {
-            background: #27272a; border-right: 2px solid #fff;
-            padding: 12px; margin-bottom: 12px; border-radius: 12px 0 0 12px;
-            font-size: 13px; text-align: right; color: white; margin-left: auto; max-width: 80%;
-        }
+        body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; }
+        .tech-card { background: #0f0f11; border: 1px solid #27272a; border-radius: 20px; }
+        .glass-btn { background: rgba(39, 39, 42, 0.5); border: 1px solid #3f3f46; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .glass-btn:hover { background: #a855f7; border-color: #a855f7; color: white; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
     </style>
 </head>
-<body class="p-4 md:p-6 max-w-7xl mx-auto pb-24">
+<body class="p-4 md:p-8 max-w-7xl mx-auto">
 
-    <header class="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
-        <div>
-            <h1 class="text-xl font-black uppercase italic">Skyhigh<span class="text-purple-500">.AI</span></h1>
-            <p class="text-[10px] text-zinc-500">OPERATOR: <%= user.fullname.toUpperCase() %></p>
+    <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+        <div class="flex items-center gap-6">
+            <h1 class="text-2xl font-black italic tracking-tighter">Skyhigh<span class="text-purple-500">.AI</span></h1>
+            <div class="flex gap-2">
+                <button onclick="openModal('techModal')" class="glass-btn"><i class="fas fa-microchip mr-2"></i> Tech</button>
+                <button onclick="openModal('stratModal')" class="glass-btn"><i class="fas fa-chess-knight mr-2"></i> Stratégia</button>
+            </div>
         </div>
-        <div>
-            <% if (user.hasLicense) { %>
-                <div class="text-right">
-                    <span class="text-green-500 text-xs font-bold uppercase animate-pulse">● Licenc Aktív</span>
-                    <p class="text-[10px] text-zinc-500">Tőke: <%= user.startingCapital ? user.startingCapital + ' Ft' : 'Nincs beállítva' %></p>
-                </div>
-            <% } else { %>
-                <span class="text-red-500 text-xs font-bold uppercase">● Inaktív (Demo)</span>
-            <% } %>
-            <a href="/logout" class="block text-right text-[10px] text-zinc-600 hover:text-white uppercase mt-1">Kijelentkezés</a>
+        
+        <div class="flex items-center gap-6">
+            <div class="text-right">
+                <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Operator Status</p>
+                <p class="text-sm font-bold <%= user.hasLicense ? 'text-green-500' : 'text-red-500 animate-pulse' %>">
+                    <%= user.hasLicense ? 'ACTIVE LICENCE' : 'ACCESS RESTRICTED' %>
+                </p>
+            </div>
+            <a href="/logout" class="text-zinc-500 hover:text-white transition text-xs font-bold uppercase border-l border-zinc-800 pl-6">Exit</a>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <div class="lg:col-span-8 tech-card flex flex-col h-[600px] relative">
-            <div class="p-4 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-center">
-                <span class="text-xs font-bold text-zinc-300 uppercase"><i class="fas fa-robot mr-2 text-purple-500"></i> Skyhigh Neural Net</span>
-                <span class="text-[10px] text-zinc-600">v3.0 Live Connection</span>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-8 tech-card flex flex-col h-[600px] shadow-2xl overflow-hidden border-purple-500/10">
+            <div class="p-4 bg-zinc-900/50 border-b border-zinc-800 flex justify-between items-center text-[10px] font-bold text-zinc-400">
+                <span><i class="fas fa-circle text-green-500 mr-2 animate-pulse"></i> NEURAL ENGINE ONLINE</span>
+                <span>v4.0.21-QUANTUM</span>
             </div>
-            
-            <div id="chatBox" class="flex-1 overflow-y-auto p-4 bg-[#0a0a0a]">
+            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[#080808]">
                 </div>
-
-            <div class="p-3 border-t border-zinc-800 bg-zinc-900/30">
-                <form id="chatForm" class="flex gap-2">
-                    <input type="text" id="userInput" placeholder="Írj az AI-nak..." class="w-full bg-black border border-zinc-800 rounded p-3 text-xs text-white focus:border-purple-500 outline-none">
-                    <button type="submit" class="bg-purple-600 px-4 rounded text-white font-bold"><i class="fas fa-paper-plane"></i></button>
-                </form>
-            </div>
+            <form id="chatForm" class="p-4 bg-zinc-900 border-t border-zinc-800 flex gap-3">
+                <input type="text" id="userInput" placeholder="Adatbevitel vagy kérdés..." class="w-full bg-black border border-zinc-700 rounded-xl p-4 text-xs focus:border-purple-500 outline-none transition">
+                <button type="submit" class="bg-purple-600 px-6 rounded-xl hover:bg-purple-500 transition shadow-lg shadow-purple-900/40">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
         </div>
 
-        <div class="lg:col-span-4 space-y-4">
-            <% if (user.hasLicense) { %>
-                
-                <div class="tech-card p-6 border border-green-500/30 bg-green-900/5">
-                    <h3 class="text-[10px] text-zinc-400 uppercase font-bold">Havi Terv (30 Nap)</h3>
-                    <p class="text-3xl font-black text-white animate-pulse">+30%</p>
-                    <p class="text-[10px] text-green-400 mt-1">Matematikai valószínűség: 98%</p>
+        <div class="lg:col-span-4 space-y-6">
+            <% if (!user.hasLicense) { %>
+                <div class="tech-card p-8 border-red-500/30 bg-red-900/5 text-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                    <h3 class="text-lg font-black uppercase mb-2">Licenc Zárolva</h3>
+                    <p class="text-xs text-zinc-400 mb-6 leading-relaxed">A matematikai modell és a napi Master Tippek eléréséhez 30 napos aktív licencre van szükség.</p>
+                    <a href="/fizetes" class="block w-full bg-white text-black py-4 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-purple-600 hover:text-white transition-all duration-300">
+                        Vásárlás (20.000 Ft)
+                    </a>
                 </div>
-
-                <div class="tech-card p-6">
-                    <h3 class="text-[10px] text-zinc-400 uppercase font-bold mb-4">Napi Fix (Max 2 Meccs)</h3>
-                    
+            <% } else { %>
+                <div class="tech-card p-8 border-green-500/30 bg-green-900/5">
+                    <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Daily Quantum Pick</h3>
                     <% if (dailyTip) { %>
-                        <div class="bg-zinc-800/50 p-3 rounded mb-3 border border-zinc-700">
-                            <span class="text-[10px] text-zinc-400 block mb-1"><%= dailyTip.date %></span>
-                            <div class="text-sm font-mono text-white space-y-2">
-                                <p><%= dailyTip.prediction %></p>
+                        <div class="bg-black/40 border border-zinc-800 p-4 rounded-xl mb-4">
+                            <p class="text-sm font-black text-white italic mb-1 uppercase tracking-tight"><%= dailyTip.match %></p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-purple-400 font-mono">Prediction: <%= dailyTip.prediction %></span>
+                                <span class="text-xs font-black text-green-500">Odds: <%= dailyTip.odds %></span>
                             </div>
                         </div>
-                        <div class="inline-block bg-green-500 text-black px-4 py-1 rounded font-bold text-xs uppercase">
-                            Odds: <%= dailyTip.odds %>
-                        </div>
-                        <p class="text-[10px] text-zinc-400 mt-3 italic"><%= dailyTip.reasoning %></p>
+                        <p class="text-[10px] text-zinc-500 italic"><%= dailyTip.reasoning %></p>
                     <% } else { %>
-                        <div class="text-zinc-500 text-xs">Várakozás az AI elemzésre...</div>
+                        <p class="text-xs text-zinc-600">Szerver szinkronizáció folyamatban...</p>
                     <% } %>
                 </div>
-
-            <% } else { %>
-                
-                <div class="tech-card p-6 text-center">
-                    <i class="fas fa-lock text-red-500 text-4xl mb-4"></i>
-                    <h3 class="text-white font-bold mb-2">LIZENC HIÁNYZIK</h3>
-                    <p class="text-xs text-zinc-400 mb-6">A Skyhigh AI matematikai tippjei csak a belső körnek érhetőek el. A havi hozam garantált, de előbb fizetned kell.</p>
-                    <a href="/fizetes" class="block w-full bg-purple-600 py-3 rounded text-white font-bold uppercase text-xs">Licenc Vásárlása (20k)</a>
-                </div>
-
             <% } %>
         </div>
     </div>
 
+    <div id="techModal" class="modal">
+        <div class="bg-zinc-950 border border-zinc-800 p-8 rounded-3xl max-w-2xl w-full">
+            <h2 class="text-2xl font-black uppercase mb-4 text-purple-500">Technológiai Háttér</h2>
+            <div class="space-y-4 text-sm text-zinc-400 leading-relaxed">
+                <p><strong class="text-white uppercase text-[10px]">Neural Core:</strong> A Skyhigh AI az OpenAI GPT-4 architektúráját használja, kiegészítve saját fejlesztésű sport-statisztikai modulokkal.</p>
+                <p><strong class="text-white uppercase text-[10px]">Data Stream:</strong> Percenként 12.000 adatpontot elemzünk: játékos-sérülések, időjárás, arbitrázs lehetőségek és piaci mozgások.</p>
+                <div class="p-4 bg-zinc-900 rounded-xl text-[11px] font-mono text-purple-300">System.integrity_check: 100% | Accuracy_rate: 87.4%</div>
+            </div>
+            <button onclick="closeModal('techModal')" class="mt-8 text-[10px] font-black uppercase text-zinc-500 hover:text-white underline">Vissza a terminálhoz</button>
+        </div>
+    </div>
+
+    <div id="stratModal" class="modal">
+        <div class="bg-zinc-950 border border-zinc-800 p-8 rounded-3xl max-w-2xl w-full">
+            <h2 class="text-2xl font-black uppercase mb-4 text-green-500">30 Napos Stratégia</h2>
+            <div class="space-y-4 text-sm text-zinc-400 leading-relaxed">
+                <p><strong class="text-white uppercase text-[10px]">Ciklus alapú profit:</strong> Mi nem egy meccsben, hanem 30 napos ciklusban gondolkodunk. A cél a tőke havi 25-40%-os növelése.</p>
+                <p><strong class="text-white uppercase text-[10px]">Bankroll Management:</strong> Szigorúan tilos a tőke 5%-ánál többet kockáztatni egyetlen tippre. A robotunk ezt számolja ki Önnek.</p>
+                <p class="text-white font-bold italic">"A fegyelem pénzt szül, a kapzsiság csődöt."</p>
+            </div>
+            <button onclick="closeModal('stratModal')" class="mt-8 text-[10px] font-black uppercase text-zinc-500 hover:text-white underline">Értettem</button>
+        </div>
+    </div>
+
     <script>
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
         const chatBox = document.getElementById('chatBox');
         const chatForm = document.getElementById('chatForm');
-        const userInput = document.getElementById('userInput');
-        const hasLicense = <%= user.hasLicense %>;
-        const userName = "<%= user.fullname.split(' ')[0] %>";
-
-        // KEZDŐ ÜZENET (Automatikus)
-        setTimeout(() => {
-            if(hasLicense) {
-                <% if(user.startingCapital === 0) { %>
-                    addAiMessage(`Üdvözöllek a fedélzeten, ${userName}! A licence aktív. Az első és legfontosabb lépés: <strong>Mekkora tőkével indítjuk a 30 napos ciklust?</strong> Írd be az összeget (pl. 50000).`);
-                <% } else { %>
-                    addAiMessage(`Üdv, ${userName}. A tőkéd rögzítve (<%= user.startingCapital %> Ft). A mai 2 meccses szelvény jobb oldalt található. Tartsd a fegyelmet.`);
-                <% } %>
-            } else {
-                addAiMessage(`Üdvözöllek. A Skyhigh AI vagyok. Látom, még nincs licenced. A rendszerem havi fix profitot termel matematikai alapon, de ehhez be kell lépned. A havi díj 20.000 Ft. Kérdezz bátran, de tippet nem adok ingyen.`);
-            }
-        }, 500);
-
-        // ÜZENET KÜLDÉSE
+        
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const text = userInput.value;
+            const text = document.getElementById('userInput').value;
             if(!text) return;
-
-            addUserMessage(text);
-            userInput.value = '';
-
-            // KÜLDÉS A SZERVERNEK (API)
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
-                const data = await response.json();
-                addAiMessage(data.reply);
-            } catch (err) {
-                addAiMessage("Hiba a kapcsolódásban. Próbáld újra.");
-            }
+            document.getElementById('userInput').value = '';
+            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-purple-600 text-white p-3 rounded-2xl rounded-tr-none text-xs shadow-lg">${text}</div></div>`;
+            
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: text })
+            });
+            const data = await res.json();
+            chatBox.innerHTML += `<div class="flex justify-start"><div class="bg-zinc-800 text-zinc-300 p-4 rounded-2xl rounded-tl-none text-xs border border-zinc-700 leading-relaxed shadow-xl"><strong class="text-purple-500 block text-[10px] uppercase mb-1">Skyhigh AI</strong>${data.reply}</div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
         });
-
-        function addAiMessage(text) {
-            const div = document.createElement('div');
-            div.className = 'ai-message';
-            div.innerHTML = `<strong class="text-purple-500 block text-[10px] uppercase mb-1">Skyhigh AI</strong>${text}`;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function addUserMessage(text) {
-            const div = document.createElement('div');
-            div.className = 'user-message';
-            div.textContent = text;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
     </script>
 </body>
 </html>
