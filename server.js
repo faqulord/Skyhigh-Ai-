@@ -122,4 +122,61 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
         await new ChatMessage({ sender: 'Admin', text: req.body.message }).save();
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a Rafinált Robot Róka. Főnökkel beszélsz."
+            messages: [{ role: "system", content: "Te vagy a Rafinált Robot Róka. Főnökkel beszélsz." }, { role: "user", content: req.body.message }]
+        });
+        const reply = aiRes.choices[0].message.content;
+        await new ChatMessage({ sender: 'Róka', text: reply }).save();
+        res.json({ reply });
+    } catch (e) { res.status(500).send("Hiba"); }
+});
+
+app.post('/admin/run-robot', checkAdmin, async (req, res) => {
+    req.setTimeout(180000); await runAiRobot();
+    res.redirect('/admin?status=success');
+});
+
+app.post('/admin/activate-user', checkAdmin, async (req, res) => {
+    await User.findByIdAndUpdate(req.body.userId, { hasLicense: true });
+    res.redirect('/admin');
+});
+
+app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
+    const { tipId, status } = req.body;
+    const tip = await Tip.findById(tipId);
+    tip.status = status; await tip.save();
+    const month = tip.date.substring(0, 7);
+    let ms = await MonthlyStat.findOne({ month }) || new MonthlyStat({ month });
+    ms.totalTips += 1;
+    if (status === 'win') { ms.winCount += 1; ms.totalProfit += tip.profitPercent; }
+    else { ms.totalProfit -= 10; }
+    await ms.save();
+    res.redirect('/admin');
+});
+
+app.post('/auth/register', async (req, res) => {
+    if (!req.body.terms) return res.send("El kell fogadnod a feltételeket!");
+    const hashed = await bcrypt.hash(req.body.password, 10);
+    const user = await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
+    req.session.userId = user._id; res.redirect('/pricing');
+});
+
+app.post('/auth/login', async (req, res) => {
+    const user = await User.findOne({ email: req.body.email.toLowerCase() });
+    if (user && await bcrypt.compare(req.body.password, user.password)) {
+        req.session.userId = user._id; req.session.save(() => res.redirect('/dashboard'));
+    } else res.send("Hiba!");
+});
+
+app.post('/user/set-capital', async (req, res) => {
+    await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital });
+    res.redirect('/dashboard');
+});
+
+app.get('/pricing', (req, res) => res.render('pricing'));
+app.get('/terms', (req, res) => res.render('terms'));
+app.get('/login', (req, res) => res.render('login'));
+app.get('/register', (req, res) => res.render('register'));
+app.get('/', (req, res) => res.render('index'));
+app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+
+app.listen(process.env.PORT || 8080);
