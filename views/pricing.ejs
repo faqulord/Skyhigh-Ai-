@@ -1,34 +1,14 @@
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Tőke Beállítása</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #050505; color: white; font-family: sans-serif; }
-        .glass { background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 24px; }
-    </style>
-</head>
-<body class="min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-md w-full glass p-8 shadow-2xl shadow-purple-500/20 text-center">
-        <h1 class="text-3xl font-black italic text-purple-500 mb-2 tracking-tighter">SKYHIGH AI</h1>
-        <p class="text-zinc-500 text-[10px] uppercase tracking-widest mb-8 font-bold font-mono">Neural Trading Activation</p>
-
-        <h2 class="text-xl font-bold mb-4">Üdvözöljük a fedélzeten!</h2>
-        <p class="text-zinc-400 text-sm mb-8">A robotnak tudnia kell a kezdőtőkéd mértékét, hogy precízen tudja skálázni a napi profitot és a téteket.</p>
-
-        <form action="/user/set-capital" method="POST" class="space-y-6 text-left">
+<body class="bg-black text-white flex items-center justify-center min-h-screen p-6">
+    <div class="max-w-md w-full bg-zinc-900 border border-purple-500/30 p-8 rounded-[2rem] shadow-2xl">
+        <h1 class="text-2xl font-black text-purple-500 italic mb-4 uppercase">Neural Konfiguráció</h1>
+        <p class="text-zinc-400 text-sm mb-8 italic">Add meg a tőkéd, amivel ma indulsz. A robot ehhez számolja a pontos profitot.</p>
+        
+        <form action="/user/set-capital" method="POST" class="space-y-6">
             <div>
-                <label class="text-[10px] uppercase text-purple-500 font-black tracking-widest ml-1">Kezdőtőke összege (EUR)</label>
-                <input type="number" name="capital" required placeholder="Pl: 1000" 
-                    class="w-full bg-black border border-white/10 rounded-xl py-4 px-5 mt-2 text-white font-bold outline-none focus:border-purple-500 transition">
+                <label class="text-[10px] uppercase text-zinc-500 font-bold mb-2 block tracking-widest">Kezdő Tőke (Ft)</label>
+                <input type="number" name="capital" required placeholder="Példa: 100000" class="w-full bg-black border border-white/10 rounded-xl py-4 px-4 font-bold text-xl outline-none focus:border-purple-500">
             </div>
-            
-            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-4 rounded-xl uppercase tracking-widest transition transform hover:scale-[1.02]">
-                Aktiválás és Belépés
-            </button>
+            <button type="submit" class="w-full bg-purple-600 py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-purple-600/20">Platform Aktiválása</button>
         </form>
     </div>
 </body>
-</html>
