@@ -10,8 +10,9 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Motor v8.0 Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Motor v9.0 Online"));
 
+// ADATMODELLEK - ÚJ MEZŐKKEL
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -19,8 +20,13 @@ const User = mongoose.model('User', new mongoose.Schema({
 }));
 
 const Tip = mongoose.model('Tip', new mongoose.Schema({
-    match: String, prediction: String, odds: String, reasoning: String,
+    match: String, 
+    prediction: String, 
+    odds: String, 
+    reasoning: String,
     profitPercent: { type: Number, default: 0 }, 
+    matchTime: String, // ÚJ: Kezdési időpont
+    bookmaker: String, // ÚJ: Ajánlott iroda
     date: { type: String, index: true }
 }));
 
@@ -31,7 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_v8_final',
+    secret: 'skyhigh_v9_master',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -51,12 +57,19 @@ async function runAiRobot() {
         const fixtures = response.data.response;
         if (!fixtures || fixtures.length === 0) return false;
 
-        const matchData = fixtures.slice(0, 20).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(", ");
+        // Meccsek listázása időponttal együtt az AI számára
+        const matchData = fixtures.slice(0, 20).map(f => {
+            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+            return `${f.teams.home.name} vs ${f.teams.away.name} (Kezdés: ${time}, Liga: ${f.league.name})`;
+        }).join(", ");
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" },
-                       { role: "user", content: `Végezz 10 éves mélyanalízist és válassz egy MASTER TIPPET: ${matchData}` }],
+            messages: [{ 
+                role: "system", 
+                content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válaszod egy szigorú JSON: {match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}. A bookmaker legyen egy konkrét iroda (pl. bet365, Unibet, TippmixPro) ahol a legjobb az ajánlat." 
+            },
+            { role: "user", content: `Válassz egy MASTER TIPPET mára: ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -78,9 +91,10 @@ app.get('/dashboard', async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (user.email === OWNER_EMAIL && !user.isAdmin) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
+    
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find().sort({ _id: -1 }).limit(10);
-    res.render('dashboard', { user, dailyTip, history, displayDate: new Date().toLocaleDateString('hu-HU') });
+    res.render('dashboard', { user, dailyTip, history });
 });
 
 app.get('/admin', checkAdmin, async (req, res) => {
@@ -91,12 +105,12 @@ app.get('/admin', checkAdmin, async (req, res) => {
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
-    req.setTimeout(180000); // 3 percre növelt várakozási idő
+    req.setTimeout(180000);
     const success = await runAiRobot();
     res.redirect(`/admin?status=${success ? 'success' : 'error'}`);
 });
 
-// Többi útvonal változatlan...
+// LOGIN, REGISTER, SET-CAPITAL útvonalak maradnak az előző verzióból...
 app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
 app.get('/', (req, res) => res.render('index'));
