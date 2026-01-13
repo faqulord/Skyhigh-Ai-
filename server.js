@@ -11,19 +11,13 @@ const Tip = require('./models/Tip');
 
 const app = express();
 
-// --- ⚠️ NE ÍRD ÁT EZT A RÉSZT! HAGYD ÍGY! ⚠️ ---
-// A rendszer a Railway beállításaiból olvassa ki a kulcsokat.
-// Ha ide beírod a kulcsot, a GitHub letiltja a mentést!
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY; 
 const SPORT_API_KEY = process.env.SPORT_API_KEY; 
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-// -----------------------------------------------------
 
 const dbURI = process.env.MONGO_URL || process.env.MONGO_URI || 'mongodb://localhost:27017/skyhigh';
-mongoose.connect(dbURI)
-    .then(() => console.log('✅ DB SIKER'))
-    .catch(err => console.log('❌ DB HIBA:', err));
+mongoose.connect(dbURI).then(() => console.log('✅ DB OK')).catch(err => console.log('❌ DB Hiba:', err));
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: false }));
@@ -39,30 +33,11 @@ app.use(session({
 }));
 
 const requireLogin = (req, res, next) => req.session.userId ? next() : res.redirect('/login');
-const requireAdmin = (req, res, next) => req.session.isAdmin ? next() : res.redirect('/dashboard');
 
-// ==========================================
-// 🔥 A FŐOLDAL JAVÍTÁSA (EZÉRT NEM MŰKÖDÖTT EDDIG)
-// ==========================================
-
-// 1. Most már az INDEX (Marketing) oldal jön be először!
-app.get('/', (req, res) => {
-    res.render('index');
-});
-
-// 2. A többi oldal
+// FŐOLDAL ÉS AUTH
+app.get('/', (req, res) => res.render('index'));
 app.get('/login', (req, res) => res.render('login'));
 app.get('/regisztracio', (req, res) => res.render('register'));
-app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
-
-// AUTH RENDSZER
-app.post('/auth/register', async (req, res) => {
-    try {
-        const hashed = await bcrypt.hash(req.body.password, 10);
-        await new User({ fullname: req.body.fullname, email: req.body.email, password: hashed }).save();
-        res.redirect('/login');
-    } catch { res.send('Hiba történt.'); }
-});
 
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
@@ -76,66 +51,32 @@ app.post('/auth/login', async (req, res) => {
 // DASHBOARD
 app.get('/dashboard', requireLogin, async (req, res) => {
     const user = await User.findById(req.session.userId);
-    if (user.licenseExpires && new Date() > user.licenseExpires) { user.hasLicense = false; await user.save(); }
     const todayTip = await Tip.findOne().sort({ createdAt: -1 });
-    res.render('dashboard', { user, isAdmin: req.session.isAdmin, dailyTip: todayTip });
+    res.render('dashboard', { user, dailyTip: todayTip });
 });
 
-app.get('/fizetes', requireLogin, (req, res) => res.render('pay'));
-
-app.post('/pay/create-checkout-session', requireLogin, async (req, res) => {
-    const user = await User.findById(req.session.userId);
-    let days = req.body.plan === 'monthly' ? 30 : 365;
-    user.hasLicense = true; user.licenseExpires = new Date(Date.now() + days*24*60*60*1000); user.freeMessagesCount = 0;
-    await user.save();
-    res.render('pay_success', { plan: 'Licenc', date: user.licenseExpires.toLocaleDateString() });
-});
-
-// CHAT API
+// --- AI ASSZISZTENS PROGRAMOZÁSA ---
 app.post('/api/chat', requireLogin, async (req, res) => {
     try {
         const { message } = req.body;
         const user = await User.findById(req.session.userId);
 
-        if (!user.hasLicense) {
-            if (user.freeMessagesCount >= 2) return res.json({ reply: "⛔ A DEMO kereted lejárt. Fizess elő a folytatáshoz!" });
-            user.freeMessagesCount++; await user.save();
-        } else if (user.startingCapital === 0 && !isNaN(message) && Number(message) > 1000) {
-            user.startingCapital = Number(message); await user.save();
-            return res.json({ reply: `Tőke rögzítve: ${message} Ft. Indul a bank menedzsment.` });
-        }
+        const prompt = `Te vagy a Skyhigh Core, egy barátságos, de szigorú Kvantum-Asszisztens. 
+        STÍLUS: Profi, tényalapú, fegyelmezett. 
+        SZABÁLYOK:
+        1. Ha ez az első üzenet, mutatkozz be: "Üdvözlöm, Operátor. Én a Skyhigh AI Kvantum-Asszisztense vagyok..."
+        2. A Master Tipp minden nap fixen 08:00-kor frissül a felületen. Soha ne adj ki pontos tippet chatben!
+        3. A holnapi meccsekről beszélhetsz szakmai szinten (esélyek, adatok), de tilos konkrét kimenetelt vagy odds-ot jósolni a holnapi napra.
+        4. Tőke: ${user.startingCapital} Ft. Mindig hangsúlyozd az 5%-os bankroll szabályt és a 30 napos ciklust.
+        5. Ha a felhasználó kapzsi, legyél szigorú: "A fegyelem a profit alapja, Operátor."`;
 
-        const prompt = user.hasLicense ? 
-            `Te Skyhigh AI vagy, profi bank menedzser. Tőke: ${user.startingCapital}. Segíts a felhasználónak profin.` :
-            `Te Skyhigh AI vagy, sales robot. Győzd meg, hogy vegye meg a licencet (20k). Még ${2 - user.freeMessagesCount} üzenete van.`;
-
-        const gpt = await openai.chat.completions.create({ messages: [{ role: "system", content: prompt }, { role: "user", content: message }], model: "gpt-3.5-turbo" });
+        const gpt = await openai.chat.completions.create({
+            messages: [{ role: "system", content: prompt }, { role: "user", content: message }],
+            model: "gpt-3.5-turbo"
+        });
         res.json({ reply: gpt.choices[0].message.content });
-    } catch { res.status(500).json({ reply: "Hiba." }); }
-});
-
-// GENERÁTOR
-app.get('/admin/generate-tip', requireLogin, requireAdmin, async (req, res) => {
-    try {
-        const options = { method: 'GET', url: 'https://v3.football.api-sports.io/fixtures', params: { date: new Date().toISOString().split('T')[0], league: '39', season: '2023' }, headers: { 'x-apisports-key': SPORT_API_KEY } };
-        let matches = [];
-        try { matches = (await axios.request(options)).data.response; } catch(e) {}
-        
-        let aiResponse = { matches: "Ma nincs megfelelő meccs.", odds: "-", reasoning: "Piaci elemzés alapján ma pihenőnap." };
-        if (matches && matches.length > 0) {
-             const prompt = `Válassz 1 meccset. JSON: { "matches": "...", "odds": "...", "reasoning": "..." }`;
-             const gpt = await openai.chat.completions.create({ messages: [{ role: "system", content: prompt + "\n" + JSON.stringify(matches.slice(0,3)) }], model: "gpt-3.5-turbo" });
-             aiResponse = JSON.parse(gpt.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim());
-        }
-        await new Tip({ date: new Date().toLocaleDateString(), match: "AI QUANTUM", prediction: aiResponse.matches, odds: aiResponse.odds, reasoning: aiResponse.reasoning }).save();
-        res.redirect('/dashboard');
-    } catch (e) { res.send("Hiba: " + e.message); }
-});
-
-app.get('/admin', requireLogin, requireAdmin, async (req, res) => {
-    const users = await User.find();
-    res.render('admin', { users });
+    } catch { res.status(500).json({ reply: "Rendszerhiba az elemzés során." }); }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server fut: ${PORT}`));
+app.listen(PORT, () => console.log(`Skyhigh System Online: ${PORT}`));
