@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v21.0 Online - Ready for Ads"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v22.0 Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_purple_fox_final_v21',
+    secret: 'skyhigh_purple_fox_v22_final',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -57,10 +57,10 @@ async function runAiRobot() {
         const fixtures = response.data.response.filter(f => (new Date(f.fixture.date) - now) > (3 * 60 * 60 * 1000));
         if (fixtures.length === 0) return false;
         
-        const matchData = fixtures.slice(0, 15).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (Liga: ${f.league.name})`).join(" | ");
+        const matchData = fixtures.slice(0, 20).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (Eredmények.com liga: ${f.league.name}, Idő: ${new Date(f.fixture.date).toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Budapest'})})`).join(" | ");
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. Cyber-sportfogadó zseni. JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
+            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. Cyber-sportfogadó zseni. Csak MAGYARUL válaszolj. Válasz JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
                        { role: "user", content: `Add meg a nap Master Tippjét: ${matchData}` }],
             response_format: { type: "json_object" }
         });
@@ -77,46 +77,50 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
-// ADMIN CHAT
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     try {
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a Rafinált Robot Róka. Most az Adminnal beszélsz. Legyél tisztelettudó és profi." },
+            messages: [{ role: "system", content: "Te vagy a Rafinált Robot Róka. Most az Adminnal beszélsz. Legyél tisztelettudó, szakmai és rafinált." },
                        { role: "user", content: req.body.message }]
         });
         res.json({ reply: aiRes.choices[0].message.content });
     } catch (e) { res.status(500).json({ error: "Hiba." }); }
 });
 
-// ÚTVONALAK
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     if (user.email === OWNER_EMAIL) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     if (!user.hasLicense) return res.redirect('/pricing');
-    
-    // Következő tipp idejének kiszámítása
-    const now = new Date();
-    let nextTipText = "Holnap 08:00";
-    if (now.getHours() < 8) nextTipText = "Ma 08:00";
+    if (user.startingCapital === 0) return res.render('set-capital', { user });
 
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find({ status: { $ne: 'pending' } }).sort({ _id: -1 }).limit(5);
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
-    res.render('dashboard', { user, dailyTip, history, recommendedStake, displayDate: getHuFullDate(), nextTipText });
-});
+    const now = new Date();
+    const nextTipText = now.getHours() < 8 ? "Ma 08:00" : "Holnap 08:00";
 
-app.get('/pricing', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    res.render('pricing');
+    res.render('dashboard', { user, dailyTip, history, recommendedStake, displayDate: getHuFullDate(), nextTipText });
 });
 
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
-    res.render('admin', { users, currentTip, stats, totalRevenue: (await User.countDocuments({hasLicense:true})) * 19900, dbDate: getDbDate(), status: req.query.status, tipExists: !!currentTip });
+    const currentMonthPrefix = getDbDate().substring(0, 7);
+    const monthlyTips = await Tip.find({ date: { $regex: new RegExp('^' + currentMonthPrefix) } }).sort({ date: 1 });
+
+    let runningProfit = 0;
+    const calculatorData = monthlyTips.map(t => {
+        let dailyRes = 0;
+        if (t.status === 'win') dailyRes = parseFloat(t.profitPercent);
+        if (t.status === 'loss') dailyRes = -10;
+        runningProfit += dailyRes;
+        return { date: t.date, match: t.match, status: t.status, dailyProfit: dailyRes, totalRunning: runningProfit };
+    });
+
+    res.render('admin', { users, currentTip, stats, calculatorData, dbDate: getDbDate(), status: req.query.status, tipExists: !!currentTip, currentMonthName: new Date().toLocaleDateString('hu-HU', { month: 'long', year: 'numeric' }) });
 });
 
 app.post('/admin/activate-user', checkAdmin, async (req, res) => {
@@ -152,7 +156,7 @@ app.post('/auth/login', async (req, res) => {
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.userId = user._id;
         req.session.save(() => res.redirect('/dashboard'));
-    } else res.send("Hiba!");
+    } else res.send("Belépési hiba!");
 });
 
 app.post('/auth/register', async (req, res) => {
@@ -164,6 +168,8 @@ app.post('/auth/register', async (req, res) => {
 
 app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
+app.get('/pricing', (req, res) => res.render('pricing'));
 app.get('/', (req, res) => res.render('index'));
 app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+
 app.listen(process.env.PORT || 8080);
