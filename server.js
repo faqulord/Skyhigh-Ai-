@@ -10,19 +10,19 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural Engine v4.0 Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v5.0 Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false }, startingCapital: { type: Number, default: 0 }
-}, { timestamps: true }));
+}));
 
 const Tip = mongoose.model('Tip', new mongoose.Schema({
     match: String, prediction: String, odds: String, reasoning: String,
     profitPercent: { type: Number, default: 0 }, 
-    date: { type: String, default: () => new Date().toLocaleDateString('hu-HU') }
+    date: { type: String, default: () => new Date().toLocaleDateString('hu-HU').replace(/\s/g, '') }
 }));
 
 app.set('view engine', 'ejs');
@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_neural_ultra_2026',
+    secret: 'skyhigh_ultra_secure_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -40,27 +40,40 @@ app.use(session({
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ROBOT LOGIKA
+// ROBOT LOGIKA - STRATÉGIAI ELEMZÉS
 async function runAiRobot() {
     try {
-        const today = new Date().toLocaleDateString('hu-HU');
+        const todayStr = new Date().toLocaleDateString('hu-HU').replace(/\s/g, '');
         const apiDate = new Date().toISOString().split('T')[0];
+        
         const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${apiDate}`, {
             headers: { 'x-apisports-key': process.env.SPORT_API_KEY }
         });
-        const fixtures = response.data.response.slice(0, 15);
+
+        const fixtures = response.data.response.filter(f => {
+            const matchTime = new Date(f.fixture.date);
+            const now = new Date();
+            return (matchTime - now) > (3 * 60 * 60 * 1000); // Minimum 3 óra múlva kezdődjön
+        }).slice(0, 15);
+
         if (fixtures.length === 0) return false;
-        const matches = fixtures.map(m => `${m.teams.home.name} vs ${m.teams.away.name}`).join(", ");
+
+        const matchData = fixtures.map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(", ");
+
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" },
-                       { role: "user", content: `Elemezz 10 évre visszamenőleg: ${matches}` }],
+            messages: [{ 
+                role: "system", 
+                content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válassz egyetlen NAP FIX TIPPÉT. Indoklásodban elemezd az utolsó 10 évet és a matematikai esélyeket. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" 
+            },
+            { role: "user", content: `Elemezd ki és adj egy stratégiát: ${matchData}` }],
             response_format: { type: "json_object" }
         });
+
         const result = JSON.parse(aiRes.choices[0].message.content);
-        await Tip.findOneAndUpdate({ date: today }, result, { upsert: true });
+        await Tip.findOneAndUpdate({ date: todayStr }, result, { upsert: true });
         return true;
-    } catch (e) { console.log(e); return false; }
+    } catch (e) { console.error(e); return false; }
 }
 
 const checkAdmin = async (req, res, next) => {
@@ -80,8 +93,9 @@ app.get('/dashboard', async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (user.email === OWNER_EMAIL && !user.isAdmin) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
-    const today = new Date().toLocaleDateString('hu-HU');
-    const dailyTip = await Tip.findOne({ date: today });
+    
+    const todayStr = new Date().toLocaleDateString('hu-HU').replace(/\s/g, '');
+    const dailyTip = await Tip.findOne({ date: todayStr });
     const history = await Tip.find().sort({ _id: -1 }).limit(10);
     res.render('dashboard', { user, dailyTip, history });
 });
@@ -110,7 +124,7 @@ app.post('/auth/login', async (req, res) => {
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.userId = user._id;
         req.session.save(() => res.redirect('/dashboard'));
-    } else res.send("Hiba a belépésnél!");
+    } else res.send("Hibás adatok!");
 });
 
 app.post('/auth/register', async (req, res) => {
