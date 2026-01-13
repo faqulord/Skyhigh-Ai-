@@ -1,7 +1,7 @@
 {
   "name": "skyhigh-ai",
-  "version": "1.0.0",
-  "description": "Skyhigh Neural Betting Engine",
+  "version": "1.1.0",
+  "description": "Skyhigh Neural Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
