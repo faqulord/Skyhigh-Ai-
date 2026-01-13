@@ -2,71 +2,58 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh | Rafinált Robot Róka</title>
+    <title>Dashboard | Rafinált Robot Róka</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
         .fox-card { background: #0a0a0a; border-radius: 2rem; border-top: 4px solid #8b5cf6; border-bottom: 1px solid #1a1a1a; }
-        .purple-glow { text-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
-        .fox-icon { filter: drop-shadow(0 0 8px #8b5cf6); }
     </style>
 </head>
-<body class="p-4 md:p-10 flex justify-center min-h-screen">
+<body class="p-4 md:p-8 flex justify-center">
     <div class="max-w-md w-full pb-12">
-        
-        <header class="mb-10 pt-4 flex justify-between items-center">
+        <header class="mb-8 pt-4 flex justify-between items-center border-b border-white/5 pb-4">
             <div>
-                <p style="font-family: 'Orbitron';" class="text-[10px] text-purple-500 uppercase tracking-[4px] mb-1">Neural Analyst</p>
-                <h1 class="text-xl font-bold italic tracking-tighter"><%= displayDate %></h1>
+                <p style="font-family: 'Orbitron';" class="text-[9px] text-purple-500 uppercase tracking-[4px] mb-1">Neural Access</p>
+                <h1 class="text-lg font-bold italic"><%= displayDate %></h1>
             </div>
-            <% if (user.isAdmin) { %><a href="/admin" class="bg-purple-600 px-3 py-1 rounded-full text-[9px] font-black uppercase shadow-lg shadow-purple-600/30">Admin</a><% } %>
+            <% if (user.isAdmin) { %><a href="/admin" class="bg-purple-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">Admin</a><% } %>
         </header>
 
-        <div class="fox-card p-8 shadow-2xl relative mb-10 overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/10 blur-3xl rounded-full"></div>
-            
-            <div class="flex items-center gap-4 mb-8">
-                <div class="text-4xl fox-icon">🦊</div>
+        <div class="fox-card p-8 shadow-2xl relative mb-8">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="text-4xl">🦊💜</div>
                 <div>
                     <h2 class="text-[10px] font-black uppercase text-purple-400 tracking-[3px]">A Rafinált Robot Róka</h2>
-                    <p class="text-[9px] text-zinc-500 font-bold uppercase italic">30 napos profit stratégia: ON</p>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase italic">Cél: 30 napos profit</p>
                 </div>
             </div>
 
             <% if (dailyTip) { %>
-                <p class="text-zinc-400 text-[13px] italic mb-8 leading-relaxed">"<%= dailyTip.reasoning %>"</p>
-
-                <div class="bg-purple-600/10 border-l-4 border-purple-500 p-6 mb-8">
-                    <p class="text-[10px] text-purple-400 font-black uppercase mb-2 tracking-widest"><%= dailyTip.league %></p>
-                    <h3 class="text-2xl font-black uppercase mb-2 tracking-tight text-white leading-tight"><%= dailyTip.match %></h3>
-                    <p class="text-xl font-black italic text-purple-300 uppercase tracking-tighter underline underline-offset-8 decoration-purple-500/50"><%= dailyTip.prediction %></p>
+                <p class="text-zinc-400 text-xs italic mb-6 leading-relaxed">"<%= dailyTip.reasoning %>"</p>
+                <div class="bg-purple-600/10 border-l-4 border-purple-500 p-5 mb-6">
+                    <p class="text-[9px] text-purple-400 font-black uppercase mb-1 tracking-widest"><%= dailyTip.league %></p>
+                    <h3 class="text-xl font-black uppercase text-white mb-1 leading-tight"><%= dailyTip.match %></h3>
+                    <p class="text-lg font-black italic text-purple-300 uppercase tracking-tighter"><%= dailyTip.prediction %></p>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div class="bg-white/5 p-5 rounded-2xl text-center border border-white/5">
-                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Kezdés:</p>
-                        <p class="text-lg font-black text-white"><%= dailyTip.matchTime %></p>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                        <p class="text-[8px] text-zinc-500 uppercase font-black">Kezdés</p>
+                        <p class="text-base font-black"><%= dailyTip.matchTime %></p>
                     </div>
-                    <div class="bg-white/5 p-5 rounded-2xl text-center border border-white/5">
-                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Odds:</p>
-                        <p class="text-lg font-black text-purple-400">@<%= dailyTip.odds %></p>
+                    <div class="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                        <p class="text-[8px] text-zinc-500 uppercase font-black">Odds</p>
+                        <p class="text-base font-black text-purple-400">@<%= dailyTip.odds %></p>
                     </div>
                 </div>
-
-                <div class="bg-zinc-900/80 p-6 rounded-[2rem] border border-white/5 text-center shadow-xl">
-                    <p class="text-[10px] text-zinc-500 font-bold uppercase mb-2 tracking-[2px]">Ezzel az összeggel rakd meg:</p>
-                    <p class="text-3xl font-black text-green-500 italic"><%= recommendedStake.toLocaleString() %> Ft</p>
-                    <p class="text-[9px] text-zinc-600 mt-4 uppercase font-black">Hol keresd? <span class="text-white"><%= dailyTip.bookmaker %></span></p>
+                <div class="bg-zinc-900/80 p-5 rounded-3xl text-center shadow-xl border border-white/5">
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Ezt tedd meg:</p>
+                    <p class="text-2xl font-black text-green-500 italic"><%= recommendedStake.toLocaleString() %> Ft</p>
+                    <p class="text-[9px] text-zinc-600 mt-2">Iroda: <span class="text-white font-bold"><%= dailyTip.bookmaker %></span></p>
                 </div>
             <% } else { %>
-                <div class="py-20 text-center text-zinc-600 text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">A Róka épp számol...</div>
+                <div class="py-20 text-center text-zinc-600 text-[10px] font-black uppercase animate-pulse italic">A Róka épp a statisztikákat elemzi...</div>
             <% } %>
-        </div>
-
-        <div class="px-6 flex justify-between items-center opacity-40">
-            <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest italic">Tőkéd: <%= user.startingCapital.toLocaleString() %> Ft</p>
-            <a href="/logout" class="text-[10px] text-zinc-500 uppercase font-bold hover:text-white transition">Kilépés</a>
         </div>
     </div>
 </body>
