@@ -1,28 +1,86 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin HQ | Skyhigh</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
+        .fox-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 1.5rem; }
+        .chat-box::-webkit-scrollbar { width: 3px; }
+        .chat-box::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-[#050505] text-white p-4 font-sans">
-    <div class="max-w-md mx-auto">
-        <header class="flex justify-between items-center mb-8"><h1 class="text-xl font-bold text-purple-500 uppercase italic">Admin HQ</h1><a href="/dashboard" class="text-[10px] text-zinc-400">Dashboard</a></header>
-        <div class="bg-zinc-900 p-6 rounded-3xl mb-8 text-center">
-            <% if (tipExists) { %><h2 class="text-xs text-purple-400 animate-pulse font-black uppercase tracking-widest">A Napi Fix élesítve!</h2><% } else { %>
-            <form action="/admin/run-robot" method="POST"><button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black text-xs uppercase">Elemzés Indítása (08:00)</button></form><% } %>
+<body class="p-4 flex justify-center min-h-screen">
+    <div class="w-full max-w-md pb-12">
+        <header class="flex justify-between items-center mb-6 pt-2">
+            <h1 style="font-family: 'Orbitron';" class="text-lg font-bold text-purple-500 uppercase italic">Admin HQ</h1>
+            <a href="/dashboard" class="bg-zinc-900 px-4 py-1 rounded-full text-[9px] font-bold uppercase text-zinc-400">Dash</a>
+        </header>
+
+        <div class="fox-card p-5 mb-6 text-center">
+            <% if (tipExists) { %>
+                <h2 class="text-[10px] font-black text-purple-400 uppercase tracking-widest animate-pulse">A Napi Fix élesítve! 🦊</h2>
+            <% } else { %>
+                <form action="/admin/run-robot" method="POST">
+                    <button type="submit" class="w-full bg-purple-600 py-4 rounded-xl font-black uppercase text-[10px]">Elemzés Indítása</button>
+                </form>
+            <% } %>
         </div>
-        <div class="bg-zinc-900 p-6 rounded-3xl mb-8 border border-purple-500/20">
-            <h3 class="text-[10px] text-purple-500 mb-4 text-center font-black">Havi Profit Kalkulátor</h3>
-            <table class="w-full text-[9px] text-left">
-                <thead><tr><th>Nap</th><th>Meccs</th><th class="text-right">+/-</th><th class="text-right">Össz.</th></tr></thead>
-                <tbody><% calculatorData.forEach(row => { %><tr><td><%= row.date.split('-')[2] %>.</td><td class="truncate max-w-[80px]"><%= row.match %></td><td class="text-right <%= row.dailyProfit >= 0 ? 'text-green-500' : 'text-red-500' %>"><%= row.dailyProfit %>%</td><td class="text-right font-black"><%= row.totalRunning.toFixed(1) %>%</td></tr><% }) %></tbody>
-            </table>
+
+        <div class="fox-card p-5 mb-6">
+            <h3 class="text-[9px] font-black uppercase text-purple-500 mb-4 text-center tracking-[2px]">Profit Kalkulátor</h3>
+            <div class="space-y-2 max-h-40 overflow-y-auto chat-box pr-2">
+                <% calculatorData.forEach(row => { %>
+                    <div class="flex justify-between text-[9px] border-b border-white/5 pb-1">
+                        <span class="text-zinc-500 font-mono"><%= row.date.split('-')[2] %>.</span>
+                        <span class="truncate w-24 text-left"><%= row.match %></span>
+                        <span class="<%= row.dailyProfit >= 0 ? 'text-green-500' : 'text-red-500' %> font-bold"><%= row.dailyProfit %>%</span>
+                        <span class="font-black text-white"><%= row.totalRunning.toFixed(1) %>%</span>
+                    </div>
+                <% }) %>
+            </div>
         </div>
-        <div class="bg-zinc-900 p-6 rounded-3xl mb-8">
-            <h3 class="text-[10px] text-zinc-500 mb-4 text-center font-black">Tagok Aktiválása</h3>
-            <% users.forEach(u => { %><div class="flex justify-between items-center py-2 border-b border-white/5"><span class="text-[10px] truncate w-32"><%= u.fullname %></span><% if (!u.hasLicense) { %><form action="/admin/activate-user" method="POST"><input type="hidden" name="userId" value="<%= u._id %>"><button class="bg-green-600 text-[8px] px-2 py-1 rounded">Aktivál</button></form><% } else { %><span class="text-green-500 text-[8px] font-bold">TAG</span><% } %></div><% }) %>
+
+        <div class="fox-card p-5 mb-6 border border-purple-500/20">
+            <div id="chat-window" class="chat-box h-32 overflow-y-auto mb-4 space-y-2 text-[9px] p-2 bg-black rounded-lg">
+                <% chatHistory.forEach(msg => { %>
+                    <div class="<%= msg.sender === 'Admin' ? 'text-right' : 'text-left' %>">
+                        <p class="text-zinc-400"><%= msg.text %></p>
+                    </div>
+                <% }) %>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="chat-msg" class="flex-1 bg-zinc-900 rounded-lg p-3 text-[10px] text-white outline-none border-none" placeholder="Üzenet...">
+                <button onclick="send()" class="bg-purple-600 px-4 rounded-lg font-bold text-[10px]">KÜLD</button>
+            </div>
+        </div>
+
+        <div class="fox-card p-5">
+            <h3 class="text-[9px] font-black uppercase text-zinc-500 mb-4 text-center">Tagságok</h3>
+            <div class="space-y-3">
+                <% users.forEach(u => { %>
+                    <div class="flex justify-between items-center text-[10px] border-b border-white/5 pb-2">
+                        <div class="truncate w-32 font-bold"><%= u.fullname %></div>
+                        <% if (!u.hasLicense) { %>
+                            <form action="/admin/activate-user" method="POST"><input type="hidden" name="userId" value="<%= u._id %>"><button class="bg-green-600 text-[8px] px-3 py-1 rounded font-black">AKTIVÁL</button></form>
+                        <% } else { %><span class="text-green-500 text-[8px] font-black uppercase">Aktív</span><% } %>
+                    </div>
+                <% }) %>
+            </div>
         </div>
     </div>
+    <script>
+        const win = document.getElementById('chat-window'); win.scrollTop = win.scrollHeight;
+        async function send() {
+            const input = document.getElementById('chat-msg'); if(!input.value) return;
+            win.innerHTML += `<div class="text-right text-zinc-500">${input.value}</div>`;
+            const res = await fetch('/admin/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:input.value})});
+            const data = await res.json();
+            win.innerHTML += `<div class="text-left text-purple-400 italic font-bold">${data.reply}</div>`;
+            input.value = ''; win.scrollTop = win.scrollHeight;
+        }
+    </script>
 </body>
 </html>
