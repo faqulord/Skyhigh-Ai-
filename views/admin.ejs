@@ -2,82 +2,58 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin HQ | Skyhigh Lila Róka</title>
+    <title>Admin HQ | Skyhigh</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
-        .fox-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 2rem; }
-        .purple-neon { border-color: #8b5cf6; box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&display=swap" rel="stylesheet">
 </head>
-<body class="p-4 md:p-8 flex justify-center">
-    <div class="max-w-md w-full">
-        <header class="flex justify-between items-center mb-8 pt-4">
+<body class="bg-[#050505] text-white p-4 font-sans">
+    <div class="max-w-md mx-auto">
+        <header class="flex justify-between items-center mb-10 pt-4">
             <h1 style="font-family: 'Orbitron';" class="text-xl font-bold text-purple-500 italic uppercase">Admin HQ</h1>
-            <a href="/dashboard" class="bg-zinc-900 px-4 py-1 rounded-full text-[10px] font-bold uppercase text-zinc-400">Vissza</a>
+            <a href="/dashboard" class="bg-zinc-800 px-4 py-1 rounded-full text-[10px] font-bold uppercase text-zinc-400">Dashboard</a>
         </header>
 
-        <div class="fox-card p-6 mb-8 text-center <%= tipExists ? 'purple-neon border-2' : '' %>">
-            <% if (tipExists) { %>
-                <div class="text-3xl mb-2">🦊💜</div>
-                <h2 class="text-sm font-black text-purple-400 uppercase tracking-widest animate-pulse">A Napi Fix kint van minden elofizetonek!</h2>
-            <% } else { %>
-                <p class="text-[10px] text-zinc-500 uppercase font-black mb-4">Mára még nincs aktív elemzés.</p>
-                <form action="/admin/run-robot" method="POST">
-                    <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs shadow-lg">Elemzés Indítása</button>
-                </form>
-            <% } %>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-purple-500/30 mb-8 text-center">
+            <form action="/admin/run-robot" method="POST">
+                <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs">Elemzés Indítása (Reggel 8:00)</button>
+            </form>
+            <% if (status === 'success') { %><p class="text-green-500 text-[10px] mt-4 font-black uppercase">✅ A mai tipp kint van!</p><% } %>
         </div>
 
-        <div class="fox-card p-6 mb-8">
-            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-4 tracking-widest italic text-center">Csevegés a Rókával</h3>
-            <div id="chat-box" class="h-40 overflow-y-auto mb-4 space-y-2 text-[11px] p-2 bg-black/50 rounded-xl">
-                <p class="text-purple-400 font-bold italic">Róka: Üdvözlöm, Főnök. Miben segíthetek a mai stratégiával kapcsolatban?</p>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-8">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center italic">Ügyfelek Kezelése</h3>
+            <div class="space-y-4">
+                <% users.forEach(u => { %>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                        <div class="flex-1">
+                            <p class="text-xs font-bold"><%= u.fullname %></p>
+                            <p class="text-[9px] text-zinc-500 font-mono"><%= u.email %></p>
+                            <p class="text-[9px] <%= u.hasLicense ? 'text-green-500' : 'text-red-500' %> font-bold uppercase mt-1">
+                                <%= u.hasLicense ? 'Aktív' : 'Nincs licenc' %>
+                            </p>
+                        </div>
+                        <% if (!u.hasLicense) { %>
+                            <form action="/admin/activate-user" method="POST">
+                                <input type="hidden" name="userId" value="<%= u._id %>">
+                                <button type="submit" class="bg-green-600 text-[9px] px-3 py-1 rounded-lg font-black uppercase">Aktiválás</button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }) %>
             </div>
-            <div class="flex gap-2">
-                <input type="text" id="chat-input" class="flex-1 bg-zinc-900 border-none rounded-xl p-3 text-xs" placeholder="Kérdezz a Rókától...">
-                <button onclick="sendMessage()" class="bg-purple-600 px-4 rounded-xl font-bold text-xs">Küldés</button>
-            </div>
         </div>
 
-        <div class="fox-card p-6 mb-8 text-[10px]">
-            <h3 class="text-center font-black uppercase text-purple-500 mb-4 tracking-widest">Havi Napló</h3>
-            <% stats.forEach(s => { %>
-                <div class="flex justify-between border-b border-white/5 py-2">
-                    <span class="font-mono text-zinc-500"><%= s.month %></span>
-                    <span class="text-green-500 font-black">+<%= s.totalProfit %>%</span>
-                </div>
-            <% }) %>
-        </div>
-
-        <div class="fox-card p-6 text-[10px]">
-            <h3 class="text-center font-black uppercase text-zinc-500 mb-4 tracking-widest italic">Ügyfelek</h3>
-            <% users.forEach(u => { %>
-                <div class="flex justify-between mb-2">
-                    <span><%= u.fullname %></span>
-                    <span class="text-purple-400 font-bold"><%= u.startingCapital.toLocaleString() %> Ft</span>
-                </div>
-            <% }) %>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
+            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-6 tracking-widest text-center">Havi Profit Napló</h3>
+            <table class="w-full text-[10px] text-left">
+                <thead class="text-zinc-600 uppercase"><tr><th class="pb-2">Hónap</th><th class="pb-2 text-center">Tipp</th><th class="pb-2 text-right">Profit</th></tr></thead>
+                <tbody class="divide-y divide-white/5">
+                    <% stats.forEach(s => { %>
+                        <tr><td class="py-3 font-mono"><%= s.month %></td><td class="py-3 text-center"><%= s.totalTips %></td><td class="py-3 text-right text-green-400 font-black">+<%= s.totalProfit %>%</td></tr>
+                    <% }) %>
+                </tbody>
+            </table>
         </div>
     </div>
-
-    <script>
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const chatBox = document.getElementById('chat-box');
-            if(!input.value) return;
-            chatBox.innerHTML += `<p class="text-zinc-500">Te: ${input.value}</p>`;
-            const res = await fetch('/admin/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: input.value })
-            });
-            const data = await res.json();
-            chatBox.innerHTML += `<p class="text-purple-400 font-bold italic">Róka: ${data.reply}</p>`;
-            input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
 </body>
 </html>
