@@ -9,12 +9,12 @@ const { OpenAI } = require('openai');
 const path = require('path');
 const app = express();
 
-// --- KONFIGURÁCIÓ (RAILWAY VÁLTOZÓK HASZNÁLATA) ---
+// --- KONFIGURÁCIÓ (RAILWAY VÁLTOZÓK) ---
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const SPORT_API_KEY = process.env.SPORT_API_KEY;
+const SPORT_API_KEY = process.env.SPORT_API_KEY; // Ellenőrizd a Railway-en a nevet!
 const MONGO_CONNECTION = process.env.MONGO_URL;
 
-mongoose.connect(MONGO_CONNECTION).then(() => console.log("🚀 Neural Engine Active"));
+mongoose.connect(MONGO_CONNECTION).then(() => console.log("🚀 Skyhigh Neural Engine Online"));
 
 // --- MODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -35,29 +35,31 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'skyhigh_force_2026',
+    secret: 'skyhigh_neural_2026',
     resave: false, saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: MONGO_CONNECTION })
 }));
 
-// --- 🤖 PROFI AI ELEMZŐ (API-FOOTBALL + OPENAI) ---
-async function runDailyAI() {
+// --- 🤖 AI MASTER TIP GENERÁTOR ---
+async function runAiAnalysis() {
     try {
         const today = new Date().toISOString().split('T')[0];
-        console.log("📊 Adatgyűjtés: " + today);
+        console.log("📊 API Adatgyűjtés: " + today);
 
+        // Mai top meccsek lekérése (PL, La Liga, stb.)
         const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
             headers: { 'x-apisports-key': SPORT_API_KEY }
         });
 
         const fixtures = response.data.response.slice(0, 15);
-        const matchData = fixtures.map(f => `${f.teams.home.name} vs ${f.teams.away.name} (Odds: 1.5-2.5)`).join(", ");
+        const matchData = fixtures.map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(", ");
 
+        // OpenAI GPT-4 elemzés
         const aiResponse = await openai.chat.completions.create({
             model: "gpt-4",
             messages: [{
                 role: "system",
-                content: "Profi sportfogadási matematikus vagy. Válaszd ki a legbiztosabb Master Tippet. Adj JSON választ: {match, prediction, odds, reasoning}"
+                content: "Profi sportfogadási matematikus vagy. Válassz egy Master Tippet. Válasz csak JSON: {match, prediction, odds, reasoning}"
             }, {
                 role: "user",
                 content: `Meccsek: ${matchData}`
@@ -66,17 +68,19 @@ async function runDailyAI() {
 
         const result = JSON.parse(aiResponse.choices[0].message.content);
         await Tip.findOneAndUpdate({ date: today }, result, { upsert: true });
-        console.log("✅ AI Master Tipp kész!");
-    } catch (err) { console.error("AI Hiba:", err); }
+        console.log("✅ AI Master Tipp Mentve: " + result.match);
+    } catch (err) { console.error("❌ AI Hiba:", err.message); }
 }
 
-cron.schedule('0 8 * * *', runDailyAI);
+// Futattás minden reggel 8-kor
+cron.schedule('0 8 * * *', runAiAnalysis);
 
 // --- ÚTVONALAK ---
 
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
+    
     if (!user.hasLicense && !user.isAdmin) return res.render('buy-license', { user });
 
     const today = new Date().toISOString().split('T')[0];
@@ -87,21 +91,21 @@ app.get('/dashboard', async (req, res) => {
 app.get('/admin', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (!user || !user.isAdmin) return res.send("Nincs jogosultságod!");
+    if (!user || !user.isAdmin) return res.send("Hozzáférés megtagadva!");
     const allUsers = await User.find().sort({ createdAt: -1 });
     res.render('admin', { user, allUsers });
 });
 
-// AI kényszerített indítása adminról
+// Admin gomb: AI indítása manuálisan
 app.post('/admin/run-ai', async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (user.isAdmin) {
-        await runDailyAI();
+        await runAiAnalysis();
         res.redirect('/admin');
     }
 });
 
-// Licenc váltás
+// Admin gomb: Licenc ki/bekapcsolás
 app.post('/admin/toggle-license/:id', async (req, res) => {
     const user = await User.findById(req.session.userId);
     if (user.isAdmin) {
@@ -112,13 +116,24 @@ app.post('/admin/toggle-license/:id', async (req, res) => {
     }
 });
 
+// AUTH LOGIKA
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.userId = user._id;
         req.session.save(() => res.redirect('/dashboard'));
-    } else { res.send("Hiba"); }
+    } else { res.send("Hibás belépés!"); }
+});
+
+app.post('/auth/register', async (req, res) => {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashedPassword }).save();
+    res.redirect('/login');
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => res.redirect('/'));
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, "0.0.0.0");
+app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Skyhigh Master Engine Online`));
