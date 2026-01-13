@@ -1,41 +1,54 @@
-<body class="bg-black text-white p-6">
-    <h1 class="text-purple-500 font-bold italic">SKYHIGH NEURAL</h1>
-    
-    <div class="bg-zinc-900 p-6 rounded-3xl mt-6 border border-purple-500/30">
-        <p class="text-[10px] uppercase text-zinc-500 tracking-widest">Mai Master Tipp (08:00)</p>
-        <% if (dailyTip) { %>
-            <h2 class="text-3xl font-black italic uppercase"><%= dailyTip.match %></h2>
-            <p class="text-green-500 font-bold">Tipp: <%= dailyTip.prediction %> | Odds: <%= dailyTip.odds %></p>
-            <p class="text-xs text-zinc-400 mt-2"><%= dailyTip.reasoning %></p>
-        <% } else { %>
-            <p class="italic text-zinc-600">Az AI hamarosan elemzi a kínálatot...</p>
-        <% } %>
-    </div>
+<body class="bg-black text-white p-4">
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center py-6">
+            <h1 class="text-2xl font-black italic text-purple-600">SKYHIGH NEURAL</h1>
+            <div id="countdown" class="text-xs font-mono bg-zinc-900 px-4 py-2 rounded-full border border-white/10">
+                KÖVETKEZŐ TIPP: 00:00:00
+            </div>
+        </header>
 
-    <div class="fixed bottom-6 right-6 w-80 bg-zinc-900 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-        <div class="bg-purple-600 p-3 text-xs font-bold uppercase">Skyhigh AI Assistant</div>
-        <div id="chat-box" class="h-64 p-4 overflow-y-auto text-xs space-y-2"></div>
-        <div class="p-2 flex border-t border-white/5">
-            <input id="chat-input" class="bg-transparent flex-1 text-xs outline-none" placeholder="Kérdezz valamit...">
-            <button onclick="sendChat()" class="text-purple-500 font-bold">Küldés</button>
+        <div class="bg-zinc-900 p-8 rounded-[2rem] border border-purple-500/30 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl italic font-black">AI</div>
+            <p class="text-[10px] uppercase tracking-[5px] text-zinc-500 mb-4 font-bold">Today's Master Prediction</p>
+            
+            <% if (dailyTip) { %>
+                <h2 class="text-4xl font-black italic uppercase mb-2"><%= dailyTip.match %></h2>
+                <div class="flex gap-4 mb-6">
+                    <span class="bg-purple-600 px-4 py-1 rounded-lg font-black italic text-xl tracking-tighter"><%= dailyTip.odds %></span>
+                    <span class="text-xl font-bold italic py-1"><%= dailyTip.prediction %></span>
+                </div>
+                <p class="text-sm text-zinc-400 italic border-l-2 border-purple-500 pl-4"><%= dailyTip.reasoning %></p>
+            <% } else { %>
+                <p class="text-zinc-600 italic">A robot jelenleg elemzi a meccseket... Várd meg a reggel 8:00-at!</p>
+            <% } %>
+        </div>
+
+        <div class="mt-12">
+            <h3 class="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-6">History Log (Last 30 Days)</h3>
+            <div class="grid grid-cols-1 gap-2">
+                <% history.forEach(item => { %>
+                    <div class="bg-zinc-900/50 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                        <span class="text-xs font-bold"><%= item.date %></span>
+                        <span class="text-xs italic text-zinc-400"><%= item.match %></span>
+                        <span class="text-xs font-black text-purple-500"><%= item.prediction %></span>
+                    </div>
+                <% }) %>
+            </div>
         </div>
     </div>
 
     <script>
-        async function sendChat() {
-            const input = document.getElementById('chat-input');
-            const box = document.getElementById('chat-box');
-            if(!input.value) return;
-            box.innerHTML += `<div class="text-zinc-500">Te: ${input.value}</div>`;
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: input.value})
-            });
-            const data = await res.json();
-            box.innerHTML += `<div class="text-purple-400">AI: ${data.reply}</div>`;
-            input.value = '';
-            box.scrollTop = box.scrollHeight;
+        function updateTimer() {
+            const now = new Date();
+            const target = new Date();
+            target.setHours(8, 0, 0, 0);
+            if (now > target) target.setDate(target.getDate() + 1);
+            const diff = target - now;
+            const h = Math.floor(diff/3600000).toString().padStart(2,'0');
+            const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+            const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+            document.getElementById('countdown').innerText = `KÖVETKEZŐ TIPP: ${h}:${m}:${s}`;
         }
+        setInterval(updateTimer, 1000); updateTimer();
     </script>
 </body>
