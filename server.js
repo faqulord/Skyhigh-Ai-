@@ -10,9 +10,8 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Engine Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Motor v8.0 Online"));
 
-// ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -22,7 +21,7 @@ const User = mongoose.model('User', new mongoose.Schema({
 const Tip = mongoose.model('Tip', new mongoose.Schema({
     match: String, prediction: String, odds: String, reasoning: String,
     profitPercent: { type: Number, default: 0 }, 
-    date: { type: String, index: true } // Egységesített dátum index
+    date: { type: String, index: true }
 }));
 
 app.set('view engine', 'ejs');
@@ -32,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_neural_v6_final',
+    secret: 'skyhigh_v8_final',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -40,41 +39,31 @@ app.use(session({
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// DÁTUM SEGÉDFÜGGVÉNY (A biztos találat érdekében)
-const getTodayStr = () => {
-    return new Date().toLocaleDateString('hu-HU').replace(/\s/g, '');
-};
+const getDbDate = () => new Date().toISOString().split('T')[0];
 
-// ROBOT LOGIKA
-async function runAiRobot(forceAll = false) {
+async function runAiRobot() {
     try {
-        const todayStr = getTodayStr();
-        const apiDate = new Date().toISOString().split('T')[0];
-        
-        const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${apiDate}`, {
+        const dbDate = getDbDate();
+        const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${dbDate}`, {
             headers: { 'x-apisports-key': process.env.SPORT_API_KEY }
         });
 
-        let fixtures = response.data.response;
-        if (!forceAll) {
-            fixtures = fixtures.filter(f => (new Date(f.fixture.date) - new Date()) > (3 * 60 * 60 * 1000));
-        }
+        const fixtures = response.data.response;
+        if (!fixtures || fixtures.length === 0) return false;
 
-        if (fixtures.length === 0) return false;
-
-        const matchData = fixtures.slice(0, 15).map(f => `${f.teams.home.name} vs ${f.teams.away.name}`).join(", ");
+        const matchData = fixtures.slice(0, 20).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(", ");
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Profi sportfogadó vagy. MAGYAR nyelven válaszolj. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" },
-                       { role: "user", content: `Válaszd ki a nap legjobb tippjét: ${matchData}` }],
+            messages: [{ role: "system", content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" },
+                       { role: "user", content: `Végezz 10 éves mélyanalízist és válassz egy MASTER TIPPET: ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
-        await Tip.findOneAndUpdate({ date: todayStr }, { ...result, date: todayStr }, { upsert: true });
+        await Tip.findOneAndUpdate({ date: dbDate }, { ...result, date: dbDate }, { upsert: true });
         return true;
-    } catch (e) { console.error(e); return false; }
+    } catch (e) { return false; }
 }
 
 const checkAdmin = async (req, res, next) => {
@@ -84,41 +73,37 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
-// ÚTVONALAK
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     if (user.email === OWNER_EMAIL && !user.isAdmin) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
-    
-    const todayStr = getTodayStr();
-    const dailyTip = await Tip.findOne({ date: todayStr });
+    const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find().sort({ _id: -1 }).limit(10);
-    res.render('dashboard', { user, dailyTip, history });
+    res.render('dashboard', { user, dailyTip, history, displayDate: new Date().toLocaleDateString('hu-HU') });
 });
 
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const licensedCount = await User.countDocuments({ hasLicense: true });
-    const todayStr = getTodayStr();
-    const currentTip = await Tip.findOne({ date: todayStr });
+    const currentTip = await Tip.findOne({ date: getDbDate() });
     res.render('admin', { users, currentTip, totalRevenue: licensedCount * 19900, licensedCount, status: req.query.status });
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
-    const success = await runAiRobot(true);
+    req.setTimeout(180000); // 3 percre növelt várakozási idő
+    const success = await runAiRobot();
     res.redirect(`/admin?status=${success ? 'success' : 'error'}`);
 });
 
+// Többi útvonal változatlan...
+app.get('/login', (req, res) => res.render('login'));
+app.get('/register', (req, res) => res.render('register'));
+app.get('/', (req, res) => res.render('index'));
 app.post('/user/set-capital', async (req, res) => {
     await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
     res.redirect('/dashboard');
 });
-
-// AUTH... (Login/Register)
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/', (req, res) => res.render('index'));
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
