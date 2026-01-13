@@ -3,131 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh.AI | Az Algoritmikus Vagyonépítés</title>
+    <title>Skyhigh.AI | Algoritmikus Vagyonkezelés</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #000; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .hero-gradient { background: radial-gradient(circle at 50% 50%, #1e0b36 0%, #000 100%); }
-        .feature-card { background: #0a0a0a; border: 1px solid #1a1a1a; transition: 0.4s; }
-        .feature-card:hover { border-color: #7c3aed; transform: translateY(-10px); box-shadow: 0 20px 40px -20px rgba(124, 58, 237, 0.4); }
-        .text-glow { text-shadow: 0 0 20px rgba(167, 139, 250, 0.5); }
-        .btn-shadow { box-shadow: 0 0 30px rgba(124, 58, 237, 0.5); }
+        body { background-color: #000; color: white; font-family: 'Inter', sans-serif; }
+        .hero-bg { background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #000 100%); }
+        .legal-text { font-size: 10px; color: #3f3f46; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-            <div class="text-2xl font-black italic tracking-tighter">Skyhigh<span class="text-purple-600">.AI</span></div>
-            <div class="hidden md:flex gap-10 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                <a href="#tech" class="hover:text-white transition">Technológia</a>
-                <a href="#strat" class="hover:text-white transition">6 Hónapos Terv</a>
-                <a href="#licence" class="hover:text-white transition">Licenc</a>
-            </div>
-            <a href="/login" class="bg-white text-black px-6 py-2 rounded-full font-bold text-[10px] uppercase hover:bg-purple-600 hover:text-white transition">Belépés</a>
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-black italic tracking-tighter uppercase">Skyhigh<span class="text-purple-600">.AI</span></div>
+            <a href="/login" class="bg-purple-600 text-white px-5 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition">
+                Bejelentkezés <i class="fas fa-sign-in-alt ml-2"></i>
+            </a>
         </div>
     </nav>
 
-    <section class="hero-gradient min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
-        <div class="inline-block px-4 py-1 border border-purple-500/30 rounded-full text-[9px] font-bold tracking-[4px] text-purple-400 mb-8 uppercase animate-pulse">
-            Neural Engine v4.0 Active
-        </div>
-        <h1 class="text-5xl md:text-8xl font-black mb-8 leading-tight tracking-tighter">
-            HAGYJA ABBA A <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 text-glow text-8xl">SZERENCSEJÁTÉKOT.</span>
+    <section class="hero-bg min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
+        <h1 class="text-4xl md:text-7xl font-black mb-6 tracking-tighter leading-none">
+            MATEMATIKAI FÖLÉNY <br> <span class="text-purple-500 italic">AZ ADATOK EREJÉVEL</span>
         </h1>
-        <p class="text-zinc-400 max-w-2xl text-sm md:text-lg mb-12 leading-relaxed">
-            A Skyhigh.AI nem tippeket ad. Egy kvantum-alapú matematikai modell, amely kiszűri az emberi hibafaktort és fix, 30 napos ciklusokban építi fel az Ön tőkéjét.
+        <p class="text-zinc-400 max-w-2xl text-sm md:text-lg mb-10 italic">
+            A Skyhigh.AI egy zárt körű, prediktív elemző szoftver. Algoritmusunk a piaci anomáliákat azonosítja, segítve az operátorokat a fegyelmezett tőkegyarapításban.
         </p>
-        <div class="flex flex-col md:flex-row gap-6">
-            <a href="/regisztracio" class="bg-purple-600 text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest btn-shadow hover:scale-105 transition">
-                Rendszer Aktiválása
-            </a>
-            <a href="#tech" class="border border-zinc-800 text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white hover:text-black transition">
-                Hogyan működik?
-            </a>
+        <div class="flex flex-col md:flex-row gap-4">
+            <a href="/regisztracio" class="bg-white text-black px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-purple-600 hover:text-white transition">Hozzáférés Kérése</a>
         </div>
     </section>
 
-    <section id="tech" class="py-32 px-6 bg-black relative">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                
-                <div class="feature-card p-10 rounded-[32px]">
-                    <i class="fas fa-brain text-purple-500 text-3xl mb-8"></i>
-                    <h3 class="text-xl font-black mb-4 uppercase">Kvantum Elemzés</h3>
-                    <p class="text-zinc-500 text-sm leading-relaxed italic">
-                        Minden reggel 8:00-kor a rendszerünk 15.000 adatpontot elemez (xG mutatók, ázsiai odds-mozgások és sérülések), hogy megtalálja az egyetlen matematikai hibát a piacon.
-                    </p>
-                </div>
-
-                <div class="feature-card p-10 rounded-[32px] border-purple-500/30">
-                    <i class="fas fa-shield-alt text-purple-500 text-3xl mb-8"></i>
-                    <h3 class="text-xl font-black mb-4 uppercase">Tőkevédelem</h3>
-                    <p class="text-zinc-500 text-sm leading-relaxed italic">
-                        A titok nem a tippben, hanem a pénzkezelésben van. A Skyhigh Core szigorú 5%-os bankroll menedzsmenttel dolgozik, így a csőd matematikailag lehetetlen.
-                    </p>
-                </div>
-
-                <div class="feature-card p-10 rounded-[32px]">
-                    <i class="fas fa-chart-line text-purple-500 text-3xl mb-8"></i>
-                    <h3 class="text-xl font-black mb-4 uppercase">Fix Profit Ciklus</h3>
-                    <p class="text-zinc-500 text-sm leading-relaxed italic">
-                        Mi nem napokban, hanem 6 hónapos távlatokban gondolkodunk. A szoftver célja a stabil, havi növekedés, amely kamatos kamattal építi újjá az Ön pénzügyi jövőjét.
-                    </p>
-                </div>
-
+    <section class="py-24 bg-black px-6">
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+                <h3 class="text-purple-500 font-bold uppercase text-xs tracking-widest mb-4">01. Kockázatkezelés</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed">Szoftverünk elsődleges célja a tőkevédelem. A beépített 5%-os variancia-szűrő matematikailag optimalizálja a kitettséget, így minimalizálva a piaci volatilitás hatásait.</p>
+            </div>
+            <div>
+                <h3 class="text-purple-500 font-bold uppercase text-xs tracking-widest mb-4">02. Stratégiai Elemzés</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed">Nem tippeket, hanem adatokat szolgáltatunk. A szoftver licencdíja a Neural Core™ elemzési eredményeinek használatára jogosít fel egy 6 hónapos profit-ciklus keretében.</p>
             </div>
         </div>
-    </section>
 
-    <section id="strat" class="py-32 bg-zinc-950 border-y border-white/5">
-        <div class="max-w-5xl mx-auto px-6 text-center">
-            <h2 class="text-3xl md:text-5xl font-black mb-16 uppercase italic">A Skyhigh <span class="text-purple-600">Protokoll</span></h2>
-            <div class="space-y-12">
-                <div class="flex flex-col md:flex-row items-center gap-8 text-left p-8 bg-black/50 rounded-3xl border border-zinc-800">
-                    <div class="text-5xl font-black text-purple-900">01</div>
-                    <div>
-                        <h4 class="font-bold text-xl mb-2">Licenc Aktiválás</h4>
-                        <p class="text-zinc-500 text-sm italic">Szigorúan korlátozott keretszám. Csak olyan operátorokat fogadunk, akik értik: ez nem játék, hanem befektetés.</p>
-                    </div>
-                </div>
-                <div class="flex flex-col md:flex-row items-center gap-8 text-left p-8 bg-black/50 rounded-3xl border border-zinc-800">
-                    <div class="text-5xl font-black text-purple-900">02</div>
-                    <div>
-                        <h4 class="font-bold text-xl mb-2">Napi 1 Utasítás</h4>
-                        <p class="text-zinc-500 text-sm italic">Minden reggel 8:00-kor megkapja a Master Tippet. Nincs gondolkodás, nincs érzelem. Csak végrehajtás.</p>
-                    </div>
-                </div>
-                <div class="flex flex-col md:flex-row items-center gap-8 text-left p-8 bg-black/50 rounded-3xl border border-zinc-800">
-                    <div class="text-5xl font-black text-purple-900">03</div>
-                    <div>
-                        <h4 class="font-bold text-xl mb-2">Garantált Egyenleg</h4>
-                        <p class="text-zinc-500 text-sm italic">A matematikai variancia miatt lehetnek vesztes napok, de a 30 napos ciklus végén a mérleg minden esetben pozitív.</p>
-                    </div>
-                </div>
-            </div>
+        <div class="max-w-4xl mx-auto mt-20 p-8 border border-zinc-900 rounded-3xl">
+            <p class="legal-text uppercase font-bold mb-4 text-zinc-500">Jogi Nyilatkozat és Felelősségkizárás:</p>
+            <p class="legal-text italic">
+                A Skyhigh.AI egy informatikai elemző szoftver. Az általunk közölt adatok és elemzések statisztikai valószínűségszámításon alapulnak, és nem minősülnek pénzügyi tanácsadásnak vagy garantált hozam ígéretének. A sportfogadás kockázattal jár, a múltbéli eredmények nem garantálják a jövőbeli sikert. A szoftver használatával Ön elismeri, hogy saját felelősségére dönt, és a Skyhigh.AI üzemeltetőit nem terheli felelősség az esetleges tőkekiesésért. A licencdíj a szoftver használati jogát tartalmazza, nem pedig befektetési jegyet.
+            </p>
         </div>
     </section>
 
-    <section id="licence" class="py-32 bg-black text-center px-6">
-        <h2 class="text-4xl font-black mb-8 uppercase italic">Kezdje el a <span class="text-purple-600">Termelést</span></h2>
-        <p class="text-zinc-500 mb-16 max-w-xl mx-auto">Váltson licencet és férjen hozzá a Skyhigh Core AI teljes elemzési adatbázisához.</p>
-        
-        <div class="max-w-md mx-auto p-12 rounded-[40px] border border-purple-500/50 bg-purple-500/5 btn-shadow">
-            <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Standard Operátor</h3>
-            <div class="text-6xl font-black mb-8">20k<span class="text-sm text-zinc-600">/hó</span></div>
-            <ul class="text-left text-xs text-zinc-400 space-y-4 mb-12 italic">
-                <li><i class="fas fa-check text-purple-500 mr-3"></i> Napi Master Elemzés (08:00)</li>
-                <li><i class="fas fa-check text-purple-500 mr-3"></i> Személyes AI Asszisztens (Core)</li>
-                <li><i class="fas fa-check text-purple-500 mr-3"></i> 6 Hónapos Profit Garancia</li>
-            </ul>
-            <a href="/regisztracio" class="block w-full bg-white text-black py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-purple-600 hover:text-white transition">Hajrá</a>
-        </div>
-    </section>
-
-    <footer class="py-10 text-center border-t border-white/5 text-[10px] text-zinc-600 tracking-[3px] uppercase">
-        Skyhigh.AI &copy; 2026 - Minden jog fenntartva.
+    <footer class="py-10 text-center text-[9px] text-zinc-700 uppercase tracking-[3px]">
+        Skyhigh Intellectual Property &copy; 2026
     </footer>
 
 </body>
