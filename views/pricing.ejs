@@ -1,15 +1,65 @@
 <!DOCTYPE html>
 <html lang="hu">
-<head><meta charset="UTF-8"><title>Sikeres Regisztráció</title><script src="https://cdn.tailwindcss.com"></script></head>
-<body class="bg-[#050505] text-white flex items-center justify-center min-h-screen">
-    <div class="max-w-sm w-full bg-[#0a0a0a] border-2 border-purple-600 p-10 rounded-[3rem] text-center">
-        <p class="text-[10px] text-purple-500 uppercase tracking-widest mb-6 font-black">Master 30 Napos Ciklus</p>
-        <h2 class="text-4xl font-black mb-8 italic uppercase">19.900 Ft</h2>
-        <div class="bg-black/50 p-6 rounded-2xl mb-8">
-            <a href="https://revolut.me/csaba6da3" target="_blank" class="block bg-white text-black py-4 rounded-2xl font-black uppercase text-xs">Fizetés Revoluttal</a>
-            <p class="text-[9px] text-zinc-500 mt-4 font-bold">Közleménybe írd az email címed!</p>
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Üdv a Falkában! | Skyhigh AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; }
+        .welcome-card { background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%); border: 1px solid #1a1a1a; border-top: 4px solid #8b5cf6; }
+        .revolut-btn { background: #ffffff; color: #000; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2); }
+        .revolut-btn:hover { transform: scale(1.02); background: #f0f7ff; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center justify-center min-h-[100dvh]">
+    <div class="w-full max-w-md">
+        
+        <div class="text-center mb-8">
+            <div class="text-6xl mb-4 animate-bounce">🦊👔</div>
+            <h1 style="font-family: 'Orbitron';" class="text-xl text-white font-black uppercase tracking-tighter italic">Szia, <%= user.fullname.split(' ')[0] %>!</h1>
+            <p class="text-[11px] text-purple-400 font-bold uppercase tracking-widest mt-2">A regisztrációd sikeres, üdv a falkában!</p>
         </div>
-        <p class="text-[9px] text-zinc-600 italic leading-relaxed">A fizetés után az Admin manuálisan aktiválja a hozzáférést (max 1 óra).</p>
+
+        <div class="welcome-card p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-purple-600/10 blur-3xl"></div>
+            
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <h2 class="text-[10px] font-black uppercase text-zinc-500 tracking-[3px] mb-1">VIP Csomag</h2>
+                    <p class="text-2xl font-black italic uppercase">30 Napos <br>Profit-Túra</p>
+                </div>
+                <div class="text-4xl">🦊💰</div>
+            </div>
+
+            <div class="space-y-4 mb-10">
+                <div class="flex items-center gap-3 text-xs text-zinc-400">
+                    <span class="text-purple-500 font-bold">●</span> <span>Napi 1 Master Tipp reggel 8-kor 🕗</span>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-zinc-400">
+                    <span class="text-purple-500 font-bold">●</span> <span>Nincs több találgatás, csak matek 📈</span>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-zinc-400">
+                    <span class="text-purple-500 font-bold">●</span> <span>A Róka éjjel-nappal figyel rád 🦊</span>
+                </div>
+            </div>
+
+            <div class="text-center mb-10">
+                <span class="text-4xl font-black italic">19.900 Ft</span>
+                <p class="text-[9px] text-zinc-600 uppercase font-bold mt-2 tracking-widest italic">A szabadságod ennyibe kerül.</p>
+            </div>
+
+            <a href="https://revolut.me/csaba6da3" target="_blank" class="revolut-btn w-full py-5 rounded-[2rem] font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3">
+                <span class="text-blue-600 text-xl font-black italic">R</span> Fizetés Revoluttal
+            </a>
+
+            <div class="mt-6 p-4 bg-zinc-900/50 rounded-2xl border border-white/5 text-center text-[9px] text-zinc-500 italic">
+                A közleménybe írd be: <span class="text-white font-bold"><%= user.email %></span><br>
+                Aktiválás: maximum 1 órán belül! 🦊🚀
+            </div>
+        </div>
+
+        <a href="/logout" class="block text-center mt-8 text-zinc-700 text-[10px] font-black uppercase tracking-[3px] hover:text-white transition">Inkább később</a>
     </div>
 </body>
 </html>
