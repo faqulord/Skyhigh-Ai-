@@ -3,67 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | Dashboard</title>
+    <title>Skyhigh AI | Neural Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; }
-        .terminal-card { background: rgba(20, 20, 20, 0.8); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 24px; }
-        .purple-glow { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); }
-    </style>
-</head>
-<body class="p-4 md:p-8">
-
-    <div class="max-w-4xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-xl font-black tracking-tighter italic text-purple-500">SKYHIGH AI</h1>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold">Neural Trading Interface</p>
-            </div>
-            <div class="text-right">
-                <p class="text-[9px] text-zinc-600 uppercase">Üdvözöljük</p>
-                <p class="font-bold text-sm"><%= user.fullname %></p>
-            </div>
-        </header>
-
-        <div class="terminal-card p-6 mb-6 purple-glow">
-            <p class="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Aktuális Bankroll</p>
-            <h2 class="text-3xl font-black tabular-nums"><%= user.startingCapital.toLocaleString() %> Ft</h2>
-            <div class="mt-4 flex gap-2">
-                <span class="text-[10px] bg-green-500/10 text-green-500 px-2 py-1 rounded border border-green-500/20">STRATÉGIA: 5% TÉT</span>
-                <span class="text-[10px] bg-purple-500/10 text-purple-500 px-2 py-1 rounded border border-purple-500/20">AJÁNLOTT TÉT: <%= (user.startingCapital * 0.05).toLocaleString() %> Ft</span>
-            </div>
-        </div>
-
-        <div class="terminal-card p-6 mb-8">
-            <% if (user.hasLicense && dailyTip) { %>
-                <h3 class="text-[10px] font-black text-purple-500 uppercase tracking-[5px] mb-4">LIVE MASTER TIP</h3>
-                <div class="flex justify-between items-center mb-6">
-                    <p class="text-2xl font-black italic uppercase"><%= dailyTip.match %></p>
-                    <span class="bg-purple-600 text-white px-4 py-1 rounded-full text-xs font-bold tracking-tighter"><%= dailyTip.odds %></span>
-                </div>
-                <div class="bg-zinc-900/50 p-4 rounded-xl border border-white/5 mb-6">
-                    <p class="text-[10px] text-zinc-500 uppercase mb-2 italic">AI Reasoning (Profi Elemzés)</p>
-                    <p class="text-sm italic text-zinc-300 leading-relaxed">"<%= dailyTip.reasoning %>"</p>
-                </div>
-                <div class="text-[9px] text-zinc-600 uppercase text-center font-bold tracking-[3px]">TIPP ÁLLAPOTA: AKTÍV</div>
-            <% } else if (!user.hasLicense) { %>
-                <div class="text-center py-10">
-                    <i class="fas fa-lock text-3xl text-zinc-700 mb-4"></i>
-                    <p class="text-sm font-bold uppercase tracking-widest text-zinc-500">A Master Tipp eléréséhez aktív licenc szükséges</p>
-                    <button class="mt-6 bg-white text-black px-10 py-3 rounded-full font-black uppercase text-[10px] tracking-widest hover:bg-purple-600 hover:text-white transition">Licenc Aktiválása</button>
-                </div>
-            <% } else { %>
-                <div class="text-center py-10">
-                    <p class="text-zinc-500 italic uppercase text-[10px] animate-pulse">A robot elemzi a mai piacot... Várj türelemmel (08:00)</p>
-                </div>
-            <% } %>
-        </div>
-
-        <div class="text-center">
-            <a href="/logout" class="text-[10px] text-zinc-700 uppercase font-bold hover:text-red-500 transition tracking-widest">Kijelentkezés a rendszerből</a>
-        </div>
-    </div>
-
-</body>
-</html>
+        :root { --neon-purple: #8b5cf6; --neon-blue: #06b6d4; }
+        body { background-color: #020202; color: #e2e8f0; font-family
