@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v5.0 Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v6.0 Engine Online"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_ultra_secure_2026',
+    secret: 'skyhigh_master_ultra_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -40,8 +40,8 @@ app.use(session({
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ROBOT LOGIKA - STRATÉGIAI ELEMZÉS
-async function runAiRobot() {
+// ROBOT LOGIKA - TESZTELHETŐ ÉS BIZTOS TIPPADÁS
+async function runAiRobot(isTest = false) {
     try {
         const todayStr = new Date().toLocaleDateString('hu-HU').replace(/\s/g, '');
         const apiDate = new Date().toISOString().split('T')[0];
@@ -50,23 +50,27 @@ async function runAiRobot() {
             headers: { 'x-apisports-key': process.env.SPORT_API_KEY }
         });
 
-        const fixtures = response.data.response.filter(f => {
-            const matchTime = new Date(f.fixture.date);
-            const now = new Date();
-            return (matchTime - now) > (3 * 60 * 60 * 1000); // Minimum 3 óra múlva kezdődjön
-        }).slice(0, 15);
+        let fixtures = response.data.response;
+
+        // Ha nem teszt, akkor szűrünk a 3 órás szabályra
+        if (!isTest) {
+            fixtures = fixtures.filter(f => {
+                const matchTime = new Date(f.fixture.date);
+                return (matchTime - new Date()) > (3 * 60 * 60 * 1000);
+            });
+        }
 
         if (fixtures.length === 0) return false;
 
-        const matchData = fixtures.map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(", ");
+        const matchData = fixtures.slice(0, 20).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(", ");
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [{ 
                 role: "system", 
-                content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válassz egyetlen NAP FIX TIPPÉT. Indoklásodban elemezd az utolsó 10 évet és a matematikai esélyeket. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" 
+                content: "Profi sportfogadó matematikus vagy. Kizárólag MAGYAR nyelven válaszolj. Válaszod egy szigorú JSON: {match, prediction, odds, reasoning, profitPercent}" 
             },
-            { role: "user", content: `Elemezd ki és adj egy stratégiát: ${matchData}` }],
+            { role: "user", content: `Válaszd ki a nap abszolút legjobb fix tippjét 10 éves statisztika alapján: ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -84,10 +88,6 @@ const checkAdmin = async (req, res, next) => {
 };
 
 // ÚTVONALAK
-app.get('/', (req, res) => res.render('index'));
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
@@ -102,20 +102,20 @@ app.get('/dashboard', async (req, res) => {
 
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
-    const tips = await Tip.find().sort({ _id: -1 }).limit(30);
     const licensedCount = await User.countDocuments({ hasLicense: true });
-    res.render('admin', { users, tips, totalRevenue: licensedCount * 19900, licensedCount, status: req.query.status });
+    const todayStr = new Date().toLocaleDateString('hu-HU').replace(/\s/g, '');
+    const currentTip = await Tip.findOne({ date: todayStr });
+    res.render('admin', { users, currentTip, totalRevenue: licensedCount * 19900, licensedCount, status: req.query.status });
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
-    const success = await runAiRobot();
+    const success = await runAiRobot(true); // TESZT MÓD BEKAPCSOLVA
     res.redirect(`/admin?status=${success ? 'success' : 'error'}`);
 });
 
 app.post('/user/set-capital', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
-    const capital = parseInt(req.body.capital);
-    await User.findByIdAndUpdate(req.session.userId, { startingCapital: capital, hasLicense: true });
+    await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
     res.redirect('/dashboard');
 });
 
@@ -124,7 +124,7 @@ app.post('/auth/login', async (req, res) => {
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.userId = user._id;
         req.session.save(() => res.redirect('/dashboard'));
-    } else res.send("Hibás adatok!");
+    } else res.send("Belépési hiba!");
 });
 
 app.post('/auth/register', async (req, res) => {
