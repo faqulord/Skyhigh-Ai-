@@ -2,33 +2,59 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyhigh Admin | Mobile</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white p-8">
-    <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-center">
-            <div class="bg-zinc-900 p-6 rounded-3xl border border-purple-500/30">
-                <p class="text-xs text-zinc-500 uppercase">Bevétel</p>
-                <h3 class="text-2xl font-black text-green-500 italic">€<%= totalRevenue %></h3>
+<body class="bg-[#050505] text-white p-4 font-sans">
+    <div class="max-w-md mx-auto">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-black italic text-purple-500 uppercase">Admin HQ</h1>
+            <a href="/logout" class="text-[10px] text-zinc-500 font-bold uppercase">Kijelentkezés</a>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-zinc-900 p-4 rounded-2xl border border-purple-500/30">
+                <p class="text-[9px] text-zinc-500 uppercase font-bold">Bevétel</p>
+                <p class="text-xl font-black text-green-500">€<%= totalRevenue %></p>
             </div>
-            <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
-                <p class="text-xs text-zinc-500 uppercase">Tagok</p>
-                <h3 class="text-2xl font-black"><%= licensedCount %></h3>
-            </div>
-            <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
-                <form action="/admin/run-robot" method="POST">
-                    <button type="submit" class="bg-purple-600 px-6 py-2 rounded-full text-xs font-black uppercase">Robot Indítása</button>
-                </form>
+            <div class="bg-zinc-900 p-4 rounded-2xl border border-white/5">
+                <p class="text-[9px] text-zinc-500 uppercase font-bold">Tagok</p>
+                <p class="text-xl font-black"><%= licensedCount %></p>
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-zinc-900/50 p-6 rounded-3xl">
-                <h3 class="mb-4 font-bold text-purple-500">Users</h3>
-                <% users.forEach(u => { %> <p class="text-sm border-b border-white/5 py-1"><%= u.fullname %> - <%= u.startingCapital %> EUR</p> <% }) %>
+
+        <div class="bg-zinc-900 p-5 rounded-2xl border border-white/5 mb-6 text-center">
+            <p class="text-[10px] text-zinc-400 uppercase mb-3">Neural Robot Control</p>
+            <form action="/admin/run-robot" method="POST">
+                <button type="submit" class="w-full bg-purple-600 py-3 rounded-xl font-black uppercase text-xs active:scale-95 transition">Robot Kényszerített Indítása</button>
+            </form>
+            <% if (status === 'success') { %>
+                <p class="text-purple-400 text-[10px] mt-2 font-bold animate-pulse">✅ Robot sikeresen lefutott!</p>
+            <% } %>
+        </div>
+
+        <div class="bg-zinc-900 p-5 rounded-2xl border border-white/5 mb-6">
+            <h3 class="text-xs font-black uppercase text-purple-500 mb-4">Felhasználók</h3>
+            <div class="space-y-3">
+                <% users.forEach(u => { %>
+                    <div class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                        <span class="font-bold truncate w-32"><%= u.fullname %></span>
+                        <span class="text-zinc-500 text-xs"><%= u.startingCapital %> €</span>
+                    </div>
+                <% }) %>
             </div>
-            <div class="bg-zinc-900/50 p-6 rounded-3xl">
-                <h3 class="mb-4 font-bold text-purple-500">Profit 30 Days</h3>
-                <% tips.forEach(t => { %> <p class="text-[10px]"><%= t.date %>: +<%= t.profitPercent %>%</p> <% }) %>
+        </div>
+
+        <div class="bg-zinc-900 p-5 rounded-2xl border border-white/5">
+            <h3 class="text-xs font-black uppercase text-purple-500 mb-4">Profit Napló</h3>
+            <div class="space-y-2 text-[10px]">
+                <% tips.forEach(t => { %>
+                    <div class="flex justify-between">
+                        <span class="text-zinc-600"><%= t.date %></span>
+                        <span class="font-bold text-purple-400">+<%= t.profitPercent %>%</span>
+                    </div>
+                <% }) %>
             </div>
         </div>
     </div>
