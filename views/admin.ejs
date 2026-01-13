@@ -2,30 +2,55 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyhigh Admin HQ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
 </head>
-<body class="bg-black text-white p-6 font-sans">
+<body class="bg-black text-white p-4 font-sans">
     <div class="max-w-md mx-auto">
-        <h1 class="text-xl font-black italic text-purple-500 uppercase mb-8 tracking-tighter">Skyhigh HQ</h1>
+        <div class="flex justify-between items-center mb-8 pt-4">
+            <h1 style="font-family: 'Orbitron';" class="text-xl text-purple-500 italic">ADMIN HQ</h1>
+            <a href="/dashboard" class="bg-zinc-800 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Vissza</a>
+        </div>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-6">
-            <p class="text-[9px] uppercase text-zinc-500 font-bold mb-1 tracking-widest">Összes Bevétel</p>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-6 shadow-2xl">
+            <p class="text-[9px] uppercase text-zinc-500 font-black mb-1 tracking-widest">Összesített Bevétel</p>
             <h2 class="text-3xl font-black text-green-500 italic"><%= totalRevenue.toLocaleString() %> Ft</h2>
+            <p class="text-[10px] text-zinc-600 mt-2 font-bold uppercase"><%= licensedCount %> Aktív Előfizető</p>
         </div>
 
         <div class="bg-zinc-900 p-6 rounded-3xl border border-purple-500/30 mb-8 text-center">
-            <h3 class="text-[10px] font-black uppercase mb-4 text-zinc-400">Elemzés Kényszerítése</h3>
+            <h3 class="text-[10px] font-black uppercase mb-4 text-purple-400 tracking-widest">Robot Szimuláció</h3>
             <form action="/admin/run-robot" method="POST">
-                <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest">Robot Indítása</button>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl font-black uppercase text-xs transition shadow-lg shadow-purple-600/20 active:scale-95">
+                    Elemzés Futtatása Most
+                </button>
             </form>
-            <% if (status === 'success') { %><p class="text-purple-400 text-[10px] mt-4 font-bold animate-pulse">✅ TIPP SIKERESEN GENERÁLVA!</p><% } %>
+            <% if (status === 'success') { %><p class="text-purple-400 text-[10px] mt-4 font-black animate-pulse">✅ ELEMZÉS SIKERES!</p><% } %>
+        </div>
+
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-8">
+            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-6 tracking-widest text-center">Mai Tipp Előnézet</h3>
+            <% if (currentTip) { %>
+                <div class="bg-black/60 p-4 rounded-2xl border border-white/5 border-dashed">
+                    <p class="text-xs font-black uppercase text-white mb-1"><%= currentTip.match %></p>
+                    <p class="text-purple-500 text-[11px] font-bold italic mb-3"><%= currentTip.prediction %></p>
+                    <div class="flex gap-4 mb-3">
+                        <span class="text-[10px] text-zinc-500">Odds: <b><%= currentTip.odds %></b></span>
+                        <span class="text-[10px] text-zinc-500">Profit: <b>+<%= currentTip.profitPercent %>%</b></span>
+                    </div>
+                    <p class="text-[9px] text-zinc-400 leading-tight italic">"<%= currentTip.reasoning %>"</p>
+                </div>
+            <% } else { %>
+                <p class="text-center text-zinc-700 text-[10px] font-black uppercase italic">Nincs még aktív elemzés mára.</p>
+            <% } %>
         </div>
 
         <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
-            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center">Előfizetők</h3>
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center">Ügyfél Adatbázis</h3>
             <div class="space-y-4">
                 <% users.forEach(u => { %>
-                <div class="flex justify-between border-b border-white/5 pb-2">
+                <div class="flex justify-between items-center border-b border-white/5 pb-2">
                     <div class="text-[11px] font-bold"><%= u.fullname %></div>
                     <div class="text-[11px] text-purple-400 font-mono"><%= u.startingCapital.toLocaleString() %> Ft</div>
                 </div>
