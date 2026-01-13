@@ -8,19 +8,19 @@
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .purple-gradient { background: linear-gradient(135deg, #8b5cf6 0%, #4c1d95 100%); }
+        .telegram-float { position: fixed; bottom: 30px; right: 30px; background: #229ED9; color: white; width: 60px; height: 60px; border-radius: 50px; display: flex; align-items: center; justify-content: center; z-index: 1000; animation: pulse-blue 2s infinite; }
+        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(34, 158, 217, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(34, 158, 217, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 158, 217, 0); } }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-6 text-center">
-    <div class="mb-8 text-7xl animate-pulse">🦊💜</div>
-    <h1 style="font-family: 'Orbitron';" class="text-4xl md:text-6xl font-black mb-6 uppercase italic leading-none">
-        NINCS TÖBB <span class="text-purple-500">TIPPMIX</span><br>BUKÓ. CSAK MATEK.
-    </h1>
-    <p class="max-w-md text-zinc-500 text-sm mb-12 italic leading-relaxed">
-        "Üdvözöllek. A Rafinált Robot Róka vagyok. 10 év statisztikáját pörgetem le 1 másodperc alatt. 30 napos növekedési stratégiával dolgozom. Hozzáférést kérsz?"
-    </p>
+    <a href="https://t.me/SHANNA444" target="_blank" class="telegram-float">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+    </a>
+    <div class="mb-8 text-7xl">🦊💜</div>
+    <h1 style="font-family: 'Orbitron';" class="text-4xl md:text-6xl font-black mb-6 uppercase italic">A Profit Nem Szerencse. Hanem Matek.</h1>
     <div class="flex flex-col gap-4 w-full max-w-xs">
-        <a href="/register" class="purple-gradient py-5 rounded-3xl font-black uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(139,92,246,0.4)]">Hozzáférés Kérése</a>
-        <a href="/login" class="text-zinc-600 text-[10px] uppercase font-bold tracking-widest hover:text-white transition">Már van fiókom</a>
+        <a href="/register" class="purple-gradient py-5 rounded-[2rem] font-black uppercase text-sm">Hozzáférés Kérése</a>
+        <a href="/login" class="text-zinc-600 text-[10px] uppercase font-bold">Már van fiókom</a>
     </div>
 </body>
 </html>
