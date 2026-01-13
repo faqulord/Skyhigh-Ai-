@@ -4,27 +4,20 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
 const cron = require('node-cron');
+const path = require('path');
 const app = express();
 
-// --- KONFIGURÁCIÓ (PONTOSAN A TE RAILWAY VÁLTOZÓDHOZ IGAZÍTVA) ---
-const MONGO_CONNECTION = process.env.MONGO_URL; // Frissítve MONGO_URL-re!
-
-// --- ADATBÁZIS CSATLAKOZÁS ---
-if (!MONGO_CONNECTION) {
-    console.error("❌ HIBA: A MONGO_URL változó nem található a Railway-en!");
-}
+// --- KONFIGURÁCIÓ ---
+const MONGO_CONNECTION = process.env.MONGO_URL;
 
 mongoose.connect(MONGO_CONNECTION)
-.then(() => console.log("✅ Skyhigh DB Csatlakoztatva (MONGO_URL)"))
-.catch(err => console.error("❌ DB Hiba:", err));
+.then(() => console.log("✅ Skyhigh DB Active"))
+.catch(err => console.error("❌ DB Error:", err));
 
 // --- MODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
-    fullname: String, 
-    email: { type: String, unique: true, required: true }, 
-    password: { type: String, required: true },
-    startingCapital: { type: Number, default: 0 }, 
-    hasLicense: { type: Boolean, default: true },
+    fullname: String, email: { type: String, unique: true }, password: String,
+    startingCapital: { type: Number, default: 0 }, hasLicense: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false }
 }));
 
@@ -35,19 +28,20 @@ const Tip = mongoose.model('Tip', new mongoose.Schema({
 
 // --- MIDDLEWARES ---
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); // Biztosítjuk a nézetek helyét
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(session({
-    secret: 'skyhigh_quantum_safe_key_2026',
+    secret: 'skyhigh_ultra_secret_2026',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ 
-        mongoUrl: MONGO_CONNECTION // Most már ez is látja az adatbázist!
-    }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
+    store: MongoStore.create({ mongoUrl: MONGO_CONNECTION }),
+    cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- 🤖 AUTOMATA ROBOT (Napi Master Tipp) ---
+// --- 🤖 ROBOT (Napi 08:00) ---
 cron.schedule('0 8 * * *', async () => {
     const today = new Date().toISOString().split('T')[0];
     const existing = await Tip.findOne({ date: today });
@@ -56,12 +50,13 @@ cron.schedule('0 8 * * *', async () => {
             match: "Newcastle vs. Manchester City",
             prediction: "Manchester City Győzelem",
             odds: "1.65",
-            reasoning: "AI PROTOKOLL: 89.4% valószínűség. Az xG mutató 2.45 a City javára. A Newcastle védelme kulcsjátékosok nélkül statisztikailag instabil."
+            reasoning: "AI PROTOKOLL: 89.4% valószínűség. Az xG mutató 2.45 a City javára."
         }).save();
     }
 });
 
 // --- ÚTVONALAK ---
+
 app.get('/', (req, res) => res.render('index'));
 app.get('/login', (req, res) => res.render('login'));
 app.get('/regisztracio', (req, res) => res.render('register'));
@@ -79,20 +74,13 @@ app.get('/dashboard', async (req, res) => {
                 reasoning: "A Skyhigh Core AI elemzése alapján a City dominanciája várható." 
             };
         }
+
+        // FONTOS: Itt a render-nek KELL futnia
         res.render('dashboard', { user, dailyTip, isAdmin: user.isAdmin });
     } catch (err) { res.redirect('/login'); }
 });
 
 // --- AUTH LOGIKA ---
-app.post('/auth/register', async (req, res) => {
-    try {
-        const { fullname, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await new User({ fullname, email: email.toLowerCase(), password: hashedPassword }).save();
-        res.redirect('/login');
-    } catch (err) { res.send("Hiba a regisztrációnál!"); }
-});
-
 app.post('/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -101,19 +89,21 @@ app.post('/auth/login', async (req, res) => {
             req.session.userId = user._id;
             req.session.save(() => res.redirect('/dashboard'));
         } else {
-            res.send("Hibás email vagy jelszó!");
+            res.send("Hibás adatok!");
         }
     } catch (err) { res.redirect('/login'); }
 });
 
-app.get('/logout', (req, res) => {
-    req.session.destroy(() => res.redirect('/'));
+app.post('/auth/register', async (req, res) => {
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashedPassword }).save();
+        res.redirect('/login');
+    } catch (err) { res.send("Hiba a regisztrációkor!"); }
 });
 
-app.post('/api/set-capital', async (req, res) => {
-    if (!req.session.userId) return res.status(403).json({success: false});
-    await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital });
-    res.json({ success: true });
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => res.redirect('/'));
 });
 
 const PORT = process.env.PORT || 8080;
