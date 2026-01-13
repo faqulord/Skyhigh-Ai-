@@ -8,19 +8,19 @@
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .purple-gradient { background: linear-gradient(135deg, #8b5cf6 0%, #4c1d95 100%); }
-        .telegram-float { position: fixed; bottom: 20px; right: 20px; background: #229ED9; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1000; box-shadow: 0 0 20px rgba(34, 158, 217, 0.4); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .telegram-float { position: fixed; bottom: 30px; right: 30px; background: #229ED9; color: white; width: 60px; height: 60px; border-radius: 50px; display: flex; align-items: center; justify-content: center; z-index: 1000; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(34, 158, 217, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(34, 158, 217, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 158, 217, 0); } }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-[100dvh] p-6 text-center">
     <a href="https://t.me/SHANNA444" target="_blank" class="telegram-float">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
     </a>
-    <div class="mb-6 text-6xl drop-shadow-[0_0_15px_rgba(139,92,246,0.6)]">🦊💜</div>
-    <h1 style="font-family: 'Orbitron';" class="text-3xl md:text-5xl font-black mb-4 uppercase italic leading-tight">A Profit Nem <span class="text-purple-500">Szerencse.</span></h1>
-    <p class="max-w-xs text-zinc-500 text-xs mb-10 italic">"Üdvözöllek. A Rafinált Robot Róka vagyok. 30 napos stratégia, érzelmek nélkül."</p>
-    <div class="flex flex-col gap-4 w-full max-w-[280px]">
-        <a href="/register" class="purple-gradient py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl">Hozzáférés Kérése</a>
+    <div class="mb-8 text-7xl drop-shadow-[0_0_20px_rgba(139,92,246,0.6)]">🦊💜</div>
+    <h1 style="font-family: 'Orbitron';" class="text-4xl md:text-6xl font-black mb-6 uppercase italic leading-none">A Profit Nem <span class="text-purple-500">Szerencse.</span></h1>
+    <p class="max-w-md text-zinc-500 text-sm mb-12 italic">"10 év statisztikája 1 másodperc alatt. 30 napos növekedési stratégia."</p>
+    <div class="flex flex-col gap-4 w-full max-w-xs">
+        <a href="/register" class="purple-gradient py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(139,92,246,0.4)] transition hover:scale-105">Hozzáférés Kérése</a>
         <a href="/login" class="text-zinc-600 text-[10px] uppercase font-bold tracking-widest">Már van fiókom</a>
     </div>
 </body>
