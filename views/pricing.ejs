@@ -3,70 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh AI | License Activation</title>
+    <title>Skyhigh AI | Tőke Beállítása</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #050505; color: white; font-family: 'Inter', sans-serif; }
-        .pricing-card { background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 32px; backdrop-filter: blur(10px); }
-        .neon-border { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); }
+        body { background: #050505; color: white; font-family: sans-serif; }
+        .glass { background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 24px; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md w-full glass p-8 shadow-2xl shadow-purple-500/20 text-center">
+        <h1 class="text-3xl font-black italic text-purple-500 mb-2 tracking-tighter">SKYHIGH AI</h1>
+        <p class="text-zinc-500 text-[10px] uppercase tracking-widest mb-8 font-bold font-mono">Neural Trading Activation</p>
 
-    <div class="max-w-xl w-full">
-        <div class="text-center mb-10">
-            <h1 class="text-3xl font-black italic tracking-tighter text-purple-500">SKYHIGH AI</h1>
-            <p class="text-[10px] uppercase tracking-[5px] text-zinc-500 font-bold mt-2">Neural License Required</p>
-        </div>
+        <h2 class="text-xl font-bold mb-4">Üdvözöljük a fedélzeten!</h2>
+        <p class="text-zinc-400 text-sm mb-8">A robotnak tudnia kell a kezdőtőkéd mértékét, hogy precízen tudja skálázni a napi profitot és a téteket.</p>
 
-        <div class="pricing-card p-8 md:p-12 neon-border">
-            <h2 class="text-2xl font-bold mb-2 text-center">Aktiválja a hozzáférését</h2>
-            <p class="text-zinc-400 text-sm text-center mb-10">A robot használatához érvényes licencre és a kezdőtőke megadására van szükség.</p>
-
-            <form action="/user/set-capital" method="POST" class="space-y-6">
-                
-                <div class="space-y-2">
-                    <label class="text-[10px] uppercase font-black text-purple-500 tracking-widest ml-2">Kezdeti tőke (EUR / HUF)</label>
-                    <div class="relative">
-                        <i class="fas fa-wallet absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600"></i>
-                        <input type="number" name="capital" required 
-                               class="w-full bg-black border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold focus:border-purple-500 outline-none transition"
-                               placeholder="Pl. 1000">
-                    </div>
-                    <p class="text-[9px] text-zinc-600 italic ml-2">* A robot ezen összeg alapján számolja a napi profitot.</p>
-                </div>
-
-                <div class="bg-purple-600/10 border border-purple-500/20 rounded-2xl p-6 mb-8">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-black italic text-lg uppercase">Full Neural Access</p>
-                            <p class="text-xs text-purple-400">30 napos korlátlan hozzáférés</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-2xl font-black">€49</p>
-                            <p class="text-[9px] text-zinc-500 uppercase">Per Month</p>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-5 rounded-2xl uppercase tracking-widest shadow-lg shadow-purple-600/30 transition transform hover:scale-[1.02] active:scale-95">
-                    Licenc Aktiválása és Belépés
-                </button>
-
-            </form>
-
-            <div class="mt-8 text-center">
-                <p class="text-[10px] text-zinc-600 uppercase tracking-widest">
-                    Biztonságos fizetés és titkosított adatok
-                </p>
+        <form action="/user/set-capital" method="POST" class="space-y-6 text-left">
+            <div>
+                <label class="text-[10px] uppercase text-purple-500 font-black tracking-widest ml-1">Kezdőtőke összege (EUR)</label>
+                <input type="number" name="capital" required placeholder="Pl: 1000" 
+                    class="w-full bg-black border border-white/10 rounded-xl py-4 px-5 mt-2 text-white font-bold outline-none focus:border-purple-500 transition">
             </div>
-        </div>
-
-        <div class="mt-8 text-center">
-            <a href="/logout" class="text-xs text-zinc-700 hover:text-white transition uppercase font-bold tracking-widest">Kijelentkezés</a>
-        </div>
+            
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-4 rounded-xl uppercase tracking-widest transition transform hover:scale-[1.02]">
+                Aktiválás és Belépés
+            </button>
+        </form>
     </div>
-
 </body>
 </html>
