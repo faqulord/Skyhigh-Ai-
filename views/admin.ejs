@@ -1,51 +1,30 @@
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Panel | Skyhigh AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-black text-white p-10 font-sans">
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
-            <h1 class="text-2xl font-black italic text-red-500 uppercase tracking-widest">Skyhigh Admin</h1>
-            <form action="/admin/run-ai" method="POST">
-                <button class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition">
-                    <i class="fas fa-robot mr-2"></i> AI Kényszerített Indítása
-                </button>
-            </form>
-        </header>
+<body class="bg-black text-white p-8">
+    <h1 class="text-3xl font-black text-purple-500 mb-8 uppercase">Neural Admin Control</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
+            <h2 class="text-xl font-bold mb-4">Users & Capital</h2>
+            <% users.forEach(u => { %>
+                <div class="flex justify-between p-2 border-b border-white/5">
+                    <span><%= u.fullname %></span>
+                    <span class="text-green-500 font-mono"><%= u.startingCapital %> EUR</span>
+                </div>
+            <% }) %>
+        </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-8 border border-white/5">
-            <h2 class="text-xl font-bold mb-6 italic">Tagok Kezelése (<%= allUsers.length %>)</h2>
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="text-[10px] text-zinc-500 uppercase tracking-[3px] border-b border-white/5">
-                        <th class="pb-4">Felhasználó</th>
-                        <th class="pb-4">Licenc</th>
-                        <th class="pb-4 text-right">Művelet</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% allUsers.forEach(u => { %>
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition">
-                        <td class="py-4 font-bold text-sm"><%= u.fullname %><br><span class="text-[10px] text-zinc-600 font-normal"><%= u.email %></span></td>
-                        <td class="py-4">
-                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase <%= u.hasLicense ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500' %>">
-                                <%= u.hasLicense ? 'Aktív' : 'Inaktív' %>
-                            </span>
-                        </td>
-                        <td class="py-4 text-right">
-                            <form action="/admin/toggle-license/<%= u._id %>" method="POST">
-                                <button class="text-[10px] font-black uppercase text-purple-500 hover:text-white transition">Licenc Váltás</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
+            <h2 class="text-xl font-bold mb-4">30 Days Profit Scale (%)</h2>
+            <div class="space-y-2">
+                <% tips.forEach(t => { %>
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs text-zinc-500"><%= t.date %></span>
+                        <div class="flex-1 bg-zinc-800 h-4 rounded-full overflow-hidden">
+                            <div class="bg-purple-600 h-full" style="width: <%= t.profitPercent %>%"></div>
+                        </div>
+                        <span class="text-xs font-bold">+<%= t.profitPercent %>%</span>
+                    </div>
+                <% }) %>
+            </div>
         </div>
     </div>
 </body>
-</html>
