@@ -10,7 +10,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural v10.0 Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Az Öreg Róka megérkezett a szerverre"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_neural_message_2026',
+    secret: 'skyhigh_oldfox_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -43,6 +43,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const getDbDate = () => new Date().toISOString().split('T')[0];
 
+// ROBOT LOGIKA - AZ ÖREG RÓKA SZEMÉLYISÉGE
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -61,9 +62,9 @@ async function runAiRobot() {
             model: "gpt-4-turbo-preview",
             messages: [{ 
                 role: "system", 
-                content: "Te egy exkluzív sportfogadó tanácsadó vagy. Csak MAGYARUL válaszolj. Válaszod egy profi, érvelő üzenet legyen. JSON formátum: {match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" 
+                content: "Te egy dörzsölt, több évtizedes tapasztalattal rendelkező profi sportfogadó és matematikus vagy, egy igazi 'öreg róka'. Csak MAGYARUL válaszolj. A stílusod legyen határozott, magabiztos, néhol kicsit nyers, de mindig tűpontos és szakmai. Használj olyan kifejezéseket, amiket egy veterán fogadó használna. Az indoklásodban ne csak számokat mondj, hanem magyarázd el a 'játék képét' is az utolsó 10 év statisztikái alapján, mintha egy fiatalabb kollégának adnál tanácsot. Válasz JSON formátum: {match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" 
             },
-            { role: "user", content: `Válaszd ki a nap Master Tippjét 10 éves statisztika alapján: ${matchData}` }],
+            { role: "user", content: `Válaszd ki a nap Master Tippjét: ${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -88,8 +89,6 @@ app.get('/dashboard', async (req, res) => {
     
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find().sort({ _id: -1 }).limit(5);
-    
-    // TÉT SZÁMÍTÁS: A Bankroll 10%-a
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
 
     res.render('dashboard', { user, dailyTip, history, recommendedStake });
@@ -108,15 +107,14 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
     res.redirect(`/admin?status=${success ? 'success' : 'error'}`);
 });
 
-app.post('/user/set-capital', async (req, res) => {
-    await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
-    res.redirect('/dashboard');
-});
-
 // AUTH...
 app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
 app.get('/', (req, res) => res.render('index'));
+app.post('/user/set-capital', async (req, res) => {
+    await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
+    res.redirect('/dashboard');
+});
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
