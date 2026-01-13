@@ -5,20 +5,18 @@ const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const { OpenAI } = require('openai');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Stripe integráció
 const path = require('path');
 const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v23.0 - STRIPE & LEGAL READY"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v25.0 - ONLINE"));
 
 // ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
-    isAdmin: { type: Boolean, default: false }, startingCapital: { type: Number, default: 0 },
-    stripeCustomerId: String
+    isAdmin: { type: Boolean, default: false }, startingCapital: { type: Number, default: 0 }
 }));
 
 const Tip = mongoose.model('Tip', new mongoose.Schema({
@@ -42,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_purple_fox_v23_final',
+    secret: 'skyhigh_purple_fox_final_v25',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -52,41 +50,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 const getHuFullDate = () => new Date().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// --- STRIPE FIZETÉSI FOLYAMAT ---
-
-app.post('/create-checkout-session', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [{
-            price_data: {
-                currency: 'huf',
-                product_data: {
-                    name: 'Rafinált Robot Róka - 30 napos VIP hozzáférés',
-                    description: 'Matematikai elemzések és Master Tippek',
-                },
-                unit_amount: 1990000, // 19.900 Ft
-            },
-            quantity: 1,
-        }],
-        mode: 'payment',
-        success_url: `${req.protocol}://${req.get('host')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
-        customer_email: user.email,
-    });
-    res.redirect(303, session.url);
-});
-
-app.get('/payment-success', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    // Itt a Stripe sessionId-t is ellenőrizhetnénk, de a biztonság kedvéért aktiváljuk
-    await User.findByIdAndUpdate(req.session.userId, { hasLicense: true });
-    res.redirect('/dashboard');
-});
-
-// --- ROBOT MOTOR (Jelentés küldéssel) ---
+// ROBOT MOTOR
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -97,17 +61,17 @@ async function runAiRobot() {
         const fixtures = response.data.response.filter(f => (new Date(f.fixture.date) - now) > (3 * 60 * 60 * 1000));
         if (fixtures.length === 0) return false;
         
-        const matchData = fixtures.slice(0, 15).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(" | ");
+        const matchData = fixtures.slice(0, 15).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (Liga: ${f.league.name})`).join(" | ");
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
+            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. Cyber-sportfogadó zseni. JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
                        { role: "user", content: `Add meg a nap Master Tippjét: ${matchData}` }],
             response_format: { type: "json_object" }
         });
         const result = JSON.parse(aiRes.choices[0].message.content);
         await Tip.findOneAndUpdate({ date: dbDate }, { ...result, date: dbDate, status: 'pending' }, { upsert: true });
-
-        await new ChatMessage({ sender: 'Róka', text: `Főnök, a mai Master Tipp kiment: ${result.match}. A stratégia 100%-os.` }).save();
+        
+        await new ChatMessage({ sender: 'Róka', text: `Főnök, az elemzés kész! Master Tipp: ${result.match}. Stratégia: 30 napos profit.` }).save();
         return true;
     } catch (e) { return false; }
 }
@@ -130,7 +94,9 @@ app.get('/dashboard', async (req, res) => {
 
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find({ status: { $ne: 'pending' } }).sort({ _id: -1 }).limit(5);
-    res.render('dashboard', { user, dailyTip, history, displayDate: getHuFullDate(), nextTipText: "Ma 08:00", recommendedStake: Math.floor(user.startingCapital * 0.10) });
+    const recommendedStake = Math.floor(user.startingCapital * 0.10);
+    const nextTipText = (new Date().getHours() < 8) ? "Ma 08:00" : "Holnap 08:00";
+    res.render('dashboard', { user, dailyTip, history, recommendedStake, displayDate: getHuFullDate(), nextTipText });
 });
 
 app.get('/admin', checkAdmin, async (req, res) => {
@@ -138,6 +104,7 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(50);
+    
     const currentMonthPrefix = getDbDate().substring(0, 7);
     const monthlyTips = await Tip.find({ date: { $regex: new RegExp('^' + currentMonthPrefix) } }).sort({ date: 1 });
     let runningProfit = 0;
@@ -146,29 +113,13 @@ app.get('/admin', checkAdmin, async (req, res) => {
         runningProfit += dailyRes;
         return { date: t.date, match: t.match, status: t.status, dailyProfit: dailyRes, totalRunning: runningProfit };
     });
+
     res.render('admin', { users, currentTip, stats, calculatorData, chatHistory, dbDate: getDbDate(), status: req.query.status, tipExists: !!currentTip, currentMonthName: new Date().toLocaleDateString('hu-HU', { month: 'long', year: 'numeric' }) });
 });
 
-// EGYÉB POST ÚTVONALAK...
-app.post('/auth/register', async (req, res) => {
-    if (!req.body.terms) return res.send("El kell fogadnod a feltételeket!");
-    const hashed = await bcrypt.hash(req.body.password, 10);
-    const user = await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
-    req.session.userId = user._id;
-    res.redirect('/pricing');
-});
-
-app.post('/auth/login', async (req, res) => {
-    const user = await User.findOne({ email: req.body.email.toLowerCase() });
-    if (user && await bcrypt.compare(req.body.password, user.password)) {
-        req.session.userId = user._id; req.session.save(() => res.redirect('/dashboard'));
-    } else res.send("Hiba!");
-});
-
-app.get('/pricing', (req, res) => res.render('pricing'));
-app.get('/terms', (req, res) => res.render('terms'));
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/', (req, res) => res.render('index'));
-app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
-app.listen(process.env.PORT || 8080);
+app.post('/admin/chat', checkAdmin, async (req, res) => {
+    try {
+        await new ChatMessage({ sender: 'Admin', text: req.body.message }).save();
+        const aiRes = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [{ role: "system", content: "Te vagy a Rafinált Robot Róka. Főnökkel beszélsz."
