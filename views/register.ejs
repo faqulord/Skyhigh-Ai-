@@ -1,61 +1,30 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh AI | Regisztráció</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regisztráció | Skyhigh AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #000; color: white; -webkit-tap-highlight-color: transparent; }
-        input { font-size: 16px !important; }
-        .custom-checkbox:checked { background-color: #7c3aed; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&display=swap" rel="stylesheet">
 </head>
-<body class="flex items-center justify-center min-h-screen p-6 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
-
-    <div class="w-full max-w-sm space-y-8 bg-zinc-950/50 p-8 rounded-[32px] border border-zinc-900 backdrop-blur-xl">
-        <div class="text-center">
-            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Skyhigh<span class="text-purple-600">.AI</span></h1>
-            <p class="text-[9px] text-zinc-500 uppercase tracking-[4px] mt-2 font-bold italic">Operátor Jelentkezés</p>
-        </div>
-
+<body class="bg-black text-white flex items-center justify-center min-h-screen p-6">
+    <div class="max-w-xs w-full text-center">
+        <div class="text-5xl mb-6">🦊</div>
+        <h2 style="font-family: 'Orbitron';" class="text-xl text-purple-500 uppercase italic mb-8">Új Hozzáférés</h2>
+        
         <form action="/auth/register" method="POST" class="space-y-4">
-            <div>
-                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Teljes Név</label>
-                <input type="text" name="fullname" required placeholder="Gipsz Jakab" 
-                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
-            </div>
+            <input type="text" name="fullname" placeholder="Teljes Név" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm" required>
+            <input type="email" name="email" placeholder="Email cím" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm" required>
+            <input type="password" name="password" placeholder="Jelszó" class="w-full bg-zinc-900 rounded-2xl p-4 text-sm" required>
             
-            <div>
-                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Email Cím</label>
-                <input type="email" name="email" required placeholder="pelda@skyhigh.ai" 
-                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
+            <div class="flex items-center gap-2 text-left px-2">
+                <input type="checkbox" name="terms" id="terms" class="accent-purple-600" required>
+                <label for="terms" class="text-[10px] text-zinc-500 font-bold uppercase">
+                    Elfogadom a <a href="/terms" class="text-purple-500 underline">Felhasználási feltételeket</a>
+                </label>
             </div>
 
-            <div>
-                <label class="text-[10px] text-zinc-600 uppercase font-black ml-2 mb-1 block">Jelszó</label>
-                <input type="password" name="password" required placeholder="••••••••" 
-                    class="w-full bg-black border border-zinc-800 rounded-2xl p-4 text-sm focus:border-purple-600 outline-none transition duration-300">
-            </div>
-
-            <div class="flex items-start gap-3 px-2 py-2">
-                <input type="checkbox" required class="mt-1 w-4 h-4 rounded border-zinc-800 bg-black custom-checkbox">
-                <p class="text-[10px] text-zinc-500 leading-tight italic">
-                    Elfogadom a <span class="text-zinc-300">Felhasználói Feltételeket</span> és tudomásul veszem, hogy a szoftver használata saját felelősségre történik.
-                </p>
-            </div>
-
-            <button type="submit" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white hover:text-black transition duration-500 active:scale-95 shadow-lg shadow-purple-900/20">
-                Fiók Létrehozása
-            </button>
+            <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-purple-600/20">Regisztráció</button>
         </form>
-
-        <div class="text-center pt-2">
-            <a href="/login" class="text-[10px] text-zinc-500 hover:text-purple-400 transition uppercase font-bold tracking-widest">
-                Van már fiókom. Belépek.
-            </a>
-        </div>
     </div>
-
 </body>
 </html>
