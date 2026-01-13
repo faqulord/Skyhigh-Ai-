@@ -2,49 +2,37 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Csomagválasztás | Skyhigh</title>
+    <title>Sikeres Regisztráció | Skyhigh</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
-        .price-card { background: #0a0a0a; border: 2px solid #8b5cf6; box-shadow: 0 0 30px rgba(139, 92, 246, 0.2); }
+        .fox-card { background: #0a0a0a; border: 2px solid #8b5cf6; box-shadow: 0 0 40px rgba(139,92,246,0.2); }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-6">
     <div class="max-w-sm w-full">
-        <div class="price-card p-10 rounded-[3rem] text-center relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/10 blur-3xl rounded-full"></div>
+        <div class="fox-card p-10 rounded-[3rem] text-center">
+            <p class="text-[10px] text-purple-500 font-black uppercase tracking-[4px] mb-6">Master 30 Napos Ciklus</p>
+            <h2 class="text-3xl font-black mb-8 italic uppercase">Tagsági Díj: <br>19.900 Ft</h2>
             
-            <p class="text-[10px] text-purple-500 font-black uppercase tracking-[4px] mb-4">Master Hozzáférés</p>
-            <h2 class="text-4xl font-black mb-8 italic">30 NAPOS <br>PROFIT</h2>
-            
-            <div class="space-y-4 mb-10 text-left">
-                <div class="flex items-center gap-3 text-xs text-zinc-300">
-                    <span class="text-purple-500 text-lg">✓</span> <span>Napi 1 Master Tipp (Reggel 8:00)</span>
-                </div>
-                <div class="flex items-center gap-3 text-xs text-zinc-300">
-                    <span class="text-purple-500 text-lg">✓</span> <span>Flashscore szinkronizált ligák</span>
-                </div>
-                <div class="flex items-center gap-3 text-xs text-zinc-300">
-                    <span class="text-purple-500 text-lg">✓</span> <span>Bankroll-alapú tét számítás</span>
-                </div>
+            <div class="space-y-4 mb-10 text-left text-xs text-zinc-400 italic">
+                <p>✓ Napi 1 Master Tipp (Reggel 8:00)</p>
+                <p>✓ Rafinált Róka Analízis</p>
+                <p>✓ Automata Bankroll-kezelés</p>
             </div>
 
-            <div class="mb-10">
-                <p class="text-4xl font-black">19.900 Ft</p>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold mt-2">Nincs apróbetű. Csak matek.</p>
+            <div class="bg-purple-600/10 border border-purple-500/30 p-6 rounded-2xl mb-6">
+                <p class="text-[10px] font-black text-purple-400 uppercase mb-2">Hozzáférés Állapota:</p>
+                <p class="text-sm font-bold text-white italic">"A Robot Róka jelenleg csak meghívásos alapon fogad új tagokat."</p>
             </div>
 
-            <form action="/create-checkout-session" method="POST">
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl font-black uppercase text-sm tracking-widest transition shadow-lg shadow-purple-600/20 active:scale-95">
-                    Fizetés Card-al
-                </button>
-            </form>
-            
-            <p class="mt-6 text-[9px] text-zinc-600 uppercase font-bold">Biztonságos Stripe fizetés</p>
+            <p class="text-[11px] text-zinc-500 leading-relaxed mb-8">
+                A regisztrációd sikeres volt. A belépéshez vedd fel a kapcsolatot a tulajdonossal a licenc aktiválásához!
+            </p>
+
+            <a href="/logout" class="text-zinc-700 text-[10px] font-black uppercase hover:text-white transition tracking-widest">Kijelentkezés</a>
         </div>
-        
-        <a href="/logout" class="block text-center mt-8 text-zinc-700 text-[10px] font-black uppercase hover:text-white transition">Inkább később</a>
     </div>
 </body>
 </html>
