@@ -12,27 +12,34 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-6">
     <div class="max-w-sm w-full">
-        <div class="fox-card p-10 rounded-[3rem] text-center">
-            <p class="text-[10px] text-purple-500 font-black uppercase tracking-[4px] mb-6">Master 30 Napos Ciklus</p>
-            <h2 class="text-3xl font-black mb-8 italic uppercase">Tagsági Díj: <br>19.900 Ft</h2>
+        <div class="fox-card p-10 rounded-[3rem] text-center relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/10 blur-3xl rounded-full"></div>
+            <p class="text-[10px] text-purple-500 font-black uppercase tracking-[4px] mb-6 italic">Master 30 Napos Stratégia</p>
+            <h2 class="text-4xl font-black mb-8 italic uppercase">19.900 Ft</h2>
             
             <div class="space-y-4 mb-10 text-left text-xs text-zinc-400 italic">
-                <p>✓ Napi 1 Master Tipp (Reggel 8:00)</p>
-                <p>✓ Rafinált Róka Analízis</p>
-                <p>✓ Automata Bankroll-kezelés</p>
+                <p>✓ Napi 1 Master Tipp a Rókától</p>
+                <p>✓ Személyre szabott tőke-számítás</p>
+                <p>✓ 30 napos profit garancia</p>
             </div>
 
-            <div class="bg-purple-600/10 border border-purple-500/30 p-6 rounded-2xl mb-6">
-                <p class="text-[10px] font-black text-purple-400 uppercase mb-2">Hozzáférés Állapota:</p>
-                <p class="text-sm font-bold text-white italic">"A Robot Róka jelenleg csak meghívásos alapon fogad új tagokat."</p>
+            <div class="bg-black/50 border border-white/10 p-6 rounded-2xl mb-8">
+                <p class="text-[10px] font-black text-zinc-500 uppercase mb-4 tracking-widest">Fizetési Mód: CARD</p>
+                <div class="flex justify-center gap-4 text-3xl opacity-50 mb-6">
+                    <span>💳</span><span>🏦</span><span>📱</span>
+                </div>
+                <form action="/create-checkout-session" method="POST">
+                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition shadow-lg shadow-purple-600/20 active:scale-95">
+                        Fizetés Most
+                    </button>
+                </form>
             </div>
 
-            <p class="text-[11px] text-zinc-500 leading-relaxed mb-8">
-                A regisztrációd sikeres volt. A belépéshez vedd fel a kapcsolatot a tulajdonossal a licenc aktiválásához!
+            <p class="text-[9px] text-zinc-600 italic leading-relaxed">
+                A tranzakció után a Rafinált Robot Róka azonnal megnyitja neked a napi elemzéseket.
             </p>
-
-            <a href="/logout" class="text-zinc-700 text-[10px] font-black uppercase hover:text-white transition tracking-widest">Kijelentkezés</a>
         </div>
+        <a href="/logout" class="block text-center mt-8 text-zinc-700 text-[10px] font-black uppercase hover:text-white transition tracking-widest">Kijelentkezés</a>
     </div>
 </body>
 </html>
