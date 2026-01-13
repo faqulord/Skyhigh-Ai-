@@ -2,32 +2,34 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyhigh Admin | HQ</title>
+    <title>Skyhigh Admin | Lila HQ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&display=swap" rel="stylesheet">
 </head>
 <body class="bg-[#050505] text-white p-4 font-sans">
     <div class="max-w-md mx-auto">
         <header class="flex justify-between items-center mb-10 pt-4">
             <div>
-                <h1 class="text-xl font-bold text-orange-500 italic uppercase tracking-tighter">Admin HQ</h1>
-                <p class="text-[9px] text-zinc-500 font-mono uppercase tracking-widest">Szerver: <%= dbDate %></p>
+                <h1 style="font-family: 'Orbitron';" class="text-xl font-bold text-purple-500 italic uppercase tracking-tighter">Admin HQ</h1>
+                <p class="text-[9px] text-zinc-600 font-mono uppercase tracking-widest"><%= dbDate %></p>
             </div>
-            <a href="/dashboard" class="bg-zinc-800 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-zinc-400">Dashboard</a>
+            <a href="/dashboard" class="bg-zinc-800 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:bg-zinc-700 transition">Dashboard</a>
         </header>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-orange-500/30 mb-8 text-center shadow-xl">
-            <form action="/admin/run-robot" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerText='Öreg Róka számol...';">
-                <button type="submit" class="w-full bg-orange-600 py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-orange-600/30">Elemzés Indítása (Reggel 8:00)</button>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-purple-500/30 mb-8 text-center shadow-xl">
+            <h3 class="text-[10px] font-black uppercase mb-4 text-purple-500 tracking-[3px]">A Róka Ébresztése</h3>
+            <form action="/admin/run-robot" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerText='A Róka számol...';">
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-purple-600/30 transition active:scale-95">30 napos elemzés indítása</button>
             </form>
-            <% if (status === 'success') { %><p class="text-green-500 text-[10px] mt-4 font-black uppercase animate-pulse">✅ A mai tipp sikeresen legenerálva!</p><% } %>
+            <% if (status === 'success') { %><p class="text-green-500 text-[10px] mt-4 font-black uppercase animate-pulse">✅ A mai tipp aktív!</p><% } %>
         </div>
 
         <% if (currentTip && currentTip.status === 'pending') { %>
             <div class="bg-zinc-900 p-6 rounded-3xl border border-white/10 mb-8 shadow-inner">
-                <h3 class="text-[10px] font-black uppercase text-zinc-400 mb-6 tracking-widest text-center">Tipp Lezárása</h3>
-                <div class="bg-black/50 p-4 rounded-xl mb-6 border border-white/5">
+                <h3 class="text-[10px] font-black uppercase text-zinc-400 mb-6 tracking-widest text-center">Eredmény rögzítése</h3>
+                <div class="bg-black/50 p-4 rounded-xl mb-6 border border-white/5 text-center">
+                    <p class="text-[10px] text-purple-500 font-black uppercase mb-1"><%= currentTip.league %></p>
                     <p class="text-xs font-bold uppercase text-white"><%= currentTip.match %></p>
-                    <p class="text-[10px] text-orange-500 font-black uppercase"><%= currentTip.league %></p>
                 </div>
                 <div class="flex gap-3">
                     <form action="/admin/settle-tip" method="POST" class="flex-1">
@@ -44,16 +46,26 @@
             </div>
         <% } %>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
-            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center">Havi Elszámolás</h3>
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-8">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center italic">Havi Profit Napló</h3>
             <table class="w-full text-[10px] text-left">
-                <thead class="text-zinc-600 uppercase border-b border-white/5"><tr class="border-b border-white/5"><th class="pb-2">Hónap</th><th class="pb-2 text-center">Tipp</th><th class="pb-2 text-right">Profit</th></tr></thead>
+                <thead class="text-zinc-600 uppercase border-b border-white/5"><tr><th class="pb-2">Hónap</th><th class="pb-2 text-center">Tipp</th><th class="pb-2 text-right">Profit</th></tr></thead>
                 <tbody class="divide-y divide-white/5">
                     <% stats.forEach(s => { %>
                         <tr><td class="py-3 font-mono"><%= s.month %></td><td class="py-3 text-center"><%= s.totalTips %> db</td><td class="py-3 text-right text-green-400 font-black">+<%= s.totalProfit %>%</td></tr>
                     <% }) %>
                 </tbody>
             </table>
+        </div>
+
+        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
+            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-4 tracking-widest text-center italic">Ügyfelek</h3>
+            <% users.forEach(u => { %>
+                <div class="flex justify-between border-b border-white/5 pb-2 mb-2 text-[10px]">
+                    <span class="font-bold"><%= u.fullname %></span>
+                    <span class="text-purple-500 font-mono font-bold"><%= u.startingCapital.toLocaleString() %> Ft</span>
+                </div>
+            <% }) %>
         </div>
     </div>
 </body>
