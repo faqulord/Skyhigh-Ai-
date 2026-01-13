@@ -2,57 +2,19 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Rafinált Robot Róka</title>
+    <title>Dashboard | Skyhigh AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
-        .fox-card { background: #0a0a0a; border-radius: 2.5rem; border-top: 4px solid #8b5cf6; }
-    </style>
+    <style>body { background: #050505; color: #fff; } .fox-card { background: #0a0a0a; border-radius: 2rem; border-top: 4px solid #8b5cf6; }</style>
 </head>
-<body class="p-4 md:p-8 flex justify-center min-h-screen text-center">
+<body class="p-4 md:p-8 flex justify-center">
     <div class="max-w-md w-full">
-        <header class="flex justify-between items-center mb-8 pt-4 border-b border-white/5 pb-6">
-            <div>
-                <p style="font-family: 'Orbitron';" class="text-[9px] text-purple-500 uppercase tracking-[4px]">Neural Access</p>
-                <h1 class="text-lg font-bold"><%= displayDate %></h1>
-            </div>
-            <% if (user.isAdmin) { %><a href="/admin" class="bg-purple-600 px-3 py-1.5 rounded-full text-[9px] font-black uppercase">Admin HQ</a><% } %>
-        </header>
-
-        <div class="bg-purple-600/10 p-3 rounded-2xl mb-8 text-[10px] font-black uppercase text-purple-400 tracking-widest">
-            Várható következő elemzés: <%= nextTipText %>
-        </div>
-
-        <div class="fox-card p-10 shadow-2xl relative mb-10 border-b border-white/5">
-            <div class="flex items-center gap-4 mb-8 text-left">
-                <div class="text-4xl">🦊💜</div>
-                <div><h2 class="text-[10px] font-black uppercase text-purple-400 tracking-[2px]">Rafinált Robot Róka</h2><p class="text-[9px] text-zinc-500 italic uppercase">30 napos profit stratégia aktív</p></div>
-            </div>
-
-            <% if (dailyTip) { %>
-                <p class="text-zinc-400 text-xs italic mb-8 leading-relaxed text-left font-medium">"<%= dailyTip.reasoning %>"</p>
-                <div class="bg-purple-600/10 border-l-4 border-purple-500 p-6 mb-8 text-left rounded-r-xl">
-                    <p class="text-[10px] text-purple-400 font-black uppercase mb-1 tracking-widest"><%= dailyTip.league %></p>
-                    <h3 class="text-2xl font-black uppercase text-white mb-2 leading-tight tracking-tighter"><%= dailyTip.match %></h3>
-                    <p class="text-xl font-black italic text-purple-300 uppercase tracking-tighter underline underline-offset-8 decoration-purple-500/50"><%= dailyTip.prediction %></p>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-10">
-                    <div class="bg-white/5 p-5 rounded-3xl border border-white/5"><p class="text-[8px] text-zinc-500 uppercase font-bold mb-1">Mikor?</p><p class="text-lg font-black italic"><%= dailyTip.matchTime %></p></div>
-                    <div class="bg-white/5 p-5 rounded-3xl border border-white/5"><p class="text-[8px] text-zinc-500 uppercase font-bold mb-1">Szorzó</p><p class="text-lg font-black text-purple-400 italic">@<%= dailyTip.odds %></p></div>
-                </div>
-                <div class="bg-zinc-900/80 p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
-                    <p class="text-[11px] text-zinc-500 font-bold uppercase mb-2 tracking-[2px]">Tétjavaslat a bankrollodhoz:</p>
-                    <p class="text-4xl font-black text-green-500 italic"><%= recommendedStake.toLocaleString() %> Ft</p>
-                </div>
-            <% } else { %>
-                <div class="py-24 animate-pulse text-[10px] uppercase font-black text-zinc-600 tracking-[0.4em] italic leading-relaxed">A Róka épp a statisztikákat elemzi a holnapi profithoz...</div>
-            <% } %>
-        </div>
-        
-        <div class="px-6 flex justify-between items-center opacity-40 text-[9px] font-bold uppercase tracking-widest italic">
-            <p>Tőkéd: <%= user.startingCapital.toLocaleString() %> Ft</p>
-            <a href="/logout">Kijelentkezés</a>
+        <header class="flex justify-between mb-8 pb-4 border-b border-white/5"><div><p class="text-[9px] text-purple-500 font-bold uppercase tracking-widest">Neural Access</p><h1 class="text-lg font-bold italic"><%= displayDate %></h1></div><% if (user.isAdmin) { %><a href="/admin" class="bg-purple-600 px-3 py-1.5 rounded-full text-[9px] font-black uppercase">Admin HQ</a><% } %></header>
+        <div class="bg-purple-600/10 p-3 rounded-2xl mb-8 text-[10px] text-purple-400 font-black text-center uppercase">Várható következő elemzés: <%= nextTipText %></div>
+        <div class="fox-card p-10 shadow-2xl relative">
+            <% if (dailyTip) { %><p class="text-zinc-400 text-xs italic mb-6 leading-relaxed">"<%= dailyTip.reasoning %>"</p>
+            <div class="bg-purple-600/10 border-l-4 border-purple-500 p-5 mb-6"><h3 class="text-xl font-black uppercase"><%= dailyTip.match %></h3><p class="text-lg text-purple-300 italic"><%= dailyTip.prediction %></p></div>
+            <div class="bg-zinc-900 p-6 rounded-[2rem] text-center"><p class="text-[10px] text-zinc-500 uppercase">Tétjavaslat:</p><p class="text-3xl font-black text-green-500 italic"><%= recommendedStake.toLocaleString() %> Ft</p></div><% } else { %>
+            <div class="py-20 text-center text-zinc-600 text-[10px] animate-pulse italic uppercase tracking-widest">A Róka elemzi az adatokat...</div><% } %>
         </div>
     </div>
 </body>
