@@ -2,40 +2,82 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin HQ | Skyhigh</title>
+    <title>Admin HQ | Skyhigh Lila Róka</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
+        .fox-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 2rem; }
+        .purple-neon { border-color: #8b5cf6; box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); }
+        .chat-box::-webkit-scrollbar { width: 4px; }
+        .chat-box::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-[#050505] text-white p-4 font-sans">
-    <div class="max-w-md mx-auto">
+<body class="p-4 md:p-8 flex justify-center min-h-screen">
+    <div class="max-w-md w-full pb-12">
         <header class="flex justify-between items-center mb-10 pt-4">
             <h1 style="font-family: 'Orbitron';" class="text-xl font-bold text-purple-500 italic uppercase">Admin HQ</h1>
-            <a href="/dashboard" class="bg-zinc-800 px-4 py-1 rounded-full text-[10px] font-bold uppercase text-zinc-400">Dashboard</a>
+            <a href="/dashboard" class="bg-zinc-900 px-4 py-1 rounded-full text-[10px] font-bold uppercase text-zinc-400">Dashboard</a>
         </header>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-purple-500/30 mb-8 text-center">
-            <form action="/admin/run-robot" method="POST">
-                <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs">Elemzés Indítása (Reggel 8:00)</button>
-            </form>
-            <% if (status === 'success') { %><p class="text-green-500 text-[10px] mt-4 font-black uppercase">✅ A mai tipp kint van!</p><% } %>
+        <div class="fox-card p-6 mb-8 text-center <%= tipExists ? 'purple-neon border-2' : '' %>">
+            <% if (tipExists) { %>
+                <div class="text-3xl mb-2">🦊💜</div>
+                <h2 class="text-xs font-black text-purple-400 uppercase tracking-widest animate-pulse">A Napi Fix kint van minden elofizetonek!</h2>
+            <% } else { %>
+                <p class="text-[10px] text-zinc-500 uppercase font-black mb-4">Elemzésre vár...</p>
+                <form action="/admin/run-robot" method="POST">
+                    <button type="submit" class="w-full bg-purple-600 py-4 rounded-2xl font-black uppercase text-xs shadow-lg">Elemzés Indítása</button>
+                </form>
+            <% } %>
         </div>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 mb-8">
-            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center italic">Ügyfelek Kezelése</h3>
+        <div class="fox-card p-6 mb-8 border border-purple-500/20 shadow-[0_0_20px_rgba(139,92,246,0.05)]">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-4 tracking-widest italic text-center">Csevegés a Sportfogadó Rókával</h3>
+            <div id="chat-window" class="chat-box h-48 overflow-y-auto mb-4 space-y-3 text-[11px] p-3 bg-black/40 rounded-xl border border-white/5">
+                <p class="text-purple-400 font-bold italic">Róka: Üdvözlöm, Főnök. Kész vagyok átnézni a stratégiát. Miben segíthetek?</p>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="chat-msg" class="flex-1 bg-zinc-900 border-none rounded-xl p-3 text-xs text-white" placeholder="Kérdezz a Rókától...">
+                <button onclick="sendToFox()" class="bg-purple-600 px-4 rounded-xl font-bold text-xs hover:bg-purple-500 transition">Küldés</button>
+            </div>
+        </div>
+
+        <% if (currentTip && currentTip.status === 'pending') { %>
+            <div class="fox-card p-6 mb-8 shadow-inner">
+                <h3 class="text-[10px] font-black uppercase text-zinc-400 mb-6 tracking-widest text-center">Tipp Eredménye</h3>
+                <div class="bg-black/50 p-4 rounded-xl mb-6 border border-white/5 text-center">
+                    <p class="text-[10px] text-purple-500 font-black mb-1 uppercase"><%= currentTip.league %></p>
+                    <p class="text-xs font-bold uppercase"><%= currentTip.match %></p>
+                </div>
+                <div class="flex gap-3">
+                    <form action="/admin/settle-tip" method="POST" class="flex-1">
+                        <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                        <input type="hidden" name="status" value="win"><button class="w-full bg-green-600 py-3 rounded-xl text-[10px] font-black uppercase">NYERT ✅</button>
+                    </form>
+                    <form action="/admin/settle-tip" method="POST" class="flex-1">
+                        <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                        <input type="hidden" name="status" value="loss"><button class="w-full bg-red-600 py-3 rounded-xl text-[10px] font-black uppercase">VESZTETT ❌</button>
+                    </form>
+                </div>
+            </div>
+        <% } %>
+
+        <div class="fox-card p-6 mb-8">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-6 tracking-widest text-center">Tagok Aktiválása</h3>
             <div class="space-y-4">
                 <% users.forEach(u => { %>
-                    <div class="flex justify-between items-center border-b border-white/5 pb-3">
-                        <div class="flex-1">
-                            <p class="text-xs font-bold"><%= u.fullname %></p>
-                            <p class="text-[9px] text-zinc-500 font-mono"><%= u.email %></p>
-                            <p class="text-[9px] <%= u.hasLicense ? 'text-green-500' : 'text-red-500' %> font-bold uppercase mt-1">
-                                <%= u.hasLicense ? 'Aktív' : 'Nincs licenc' %>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-3 last:border-0">
+                        <div class="flex-1 pr-2">
+                            <p class="text-[11px] font-bold truncate w-32"><%= u.fullname %></p>
+                            <p class="text-[9px] <%= u.hasLicense ? 'text-green-500' : 'text-red-500' %> font-bold uppercase">
+                                <%= u.hasLicense ? 'Aktív tag' : 'Nincs licenc' %>
                             </p>
                         </div>
                         <% if (!u.hasLicense) { %>
                             <form action="/admin/activate-user" method="POST">
                                 <input type="hidden" name="userId" value="<%= u._id %>">
-                                <button type="submit" class="bg-green-600 text-[9px] px-3 py-1 rounded-lg font-black uppercase">Aktiválás</button>
+                                <button type="submit" class="bg-green-600 text-[9px] px-3 py-1.5 rounded-lg font-black uppercase shadow-lg shadow-green-600/10">Aktiválás</button>
                             </form>
                         <% } %>
                     </div>
@@ -43,17 +85,35 @@
             </div>
         </div>
 
-        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5">
-            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-6 tracking-widest text-center">Havi Profit Napló</h3>
+        <div class="fox-card p-6">
+            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-6 tracking-widest text-center italic">Havi Profit Napló</h3>
             <table class="w-full text-[10px] text-left">
-                <thead class="text-zinc-600 uppercase"><tr><th class="pb-2">Hónap</th><th class="pb-2 text-center">Tipp</th><th class="pb-2 text-right">Profit</th></tr></thead>
-                <tbody class="divide-y divide-white/5">
+                <thead class="text-zinc-600 uppercase border-b border-white/5"><tr><th class="pb-2">Hónap</th><th class="pb-2 text-center">Tipp</th><th class="pb-2 text-right text-purple-500">Hozam</th></tr></thead>
+                <tbody class="divide-y divide-white/5 text-zinc-300">
                     <% stats.forEach(s => { %>
-                        <tr><td class="py-3 font-mono"><%= s.month %></td><td class="py-3 text-center"><%= s.totalTips %></td><td class="py-3 text-right text-green-400 font-black">+<%= s.totalProfit %>%</td></tr>
+                        <tr><td class="py-3 font-mono"><%= s.month %></td><td class="py-3 text-center"><%= s.totalTips %> db</td><td class="py-3 text-right text-green-400 font-black">+<%= s.totalProfit %>%</td></tr>
                     <% }) %>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        async function sendToFox() {
+            const input = document.getElementById('chat-msg');
+            const window = document.getElementById('chat-window');
+            if(!input.value) return;
+            window.innerHTML += `<p class="text-zinc-500 text-right">Te: ${input.value}</p>`;
+            const res = await fetch('/admin/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: input.value })
+            });
+            const data = await res.json();
+            window.innerHTML += `<p class="text-purple-400 font-bold italic">Róka: ${data.reply}</p>`;
+            input.value = '';
+            window.scrollTop = window.scrollHeight;
+        }
+    </script>
 </body>
 </html>
