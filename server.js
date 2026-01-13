@@ -10,10 +10,9 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-// Adatbázis Kapcsolat
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Neural Engine Active"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Skyhigh Neural Engine Online"));
 
-// Modellek
+// ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -33,41 +32,33 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_vfinal_2026',
+    secret: 'skyhigh_vfinal_magyar_2026',
     resave: false, saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
-// ROBOT FUNKCIÓ - EXTRA HIBAKERESÉSSEL
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// ROBOT: MAGYAR NYELV + 10 ÉVES ANALÍZIS
 async function runAiRobot() {
     const today = new Date().toISOString().split('T')[0];
-    
-    if (!process.env.SPORT_API_KEY || !process.env.OPENAI_API_KEY) {
-        throw new Error("HIÁNYZÓ API KULCSOK A RAILWAY-EN!");
-    }
-
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    // 1. Sport Adatok Lekérése
-    const sportRes = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
+    const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
         headers: { 'x-apisports-key': process.env.SPORT_API_KEY }
     });
 
-    if (!sportRes.data.response || sportRes.data.response.length === 0) {
-        throw new Error("Nincs meccs adat az API-ban mára.");
-    }
-
-    const matches = sportRes.data.response.slice(0, 15).map(m => 
+    const matches = response.data.response.slice(0, 15).map(m => 
         `${m.teams.home.name} vs ${m.teams.away.name} (${m.league.name})`
     ).join(", ");
 
-    // 2. AI Elemzés
     const aiRes = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
         messages: [
-            { role: "system", content: "Profi sportfogadó matematikus vagy. Válaszd ki a nap Master Tippjét. Válasz JSON: {match, prediction, odds, reasoning, profitPercent}" },
-            { role: "user", content: `Meccsek: ${matches}` }
+            { 
+                role: "system", 
+                content: "Te egy profi sportfogadó matematikus vagy. Csak MAGYAR nyelven válaszolhatsz. Elemezz 10 évre visszamenőleg minden statisztikát (H2H, forma, sérültek). A válaszod egy szigorú JSON legyen: {match, prediction, odds, reasoning, profitPercent}" 
+            },
+            { role: "user", content: `Elemezd ki a mai kínálatot és adj egy Master Tippet indoklással: ${matches}` }
         ],
         response_format: { type: "json_object" }
     });
@@ -76,14 +67,6 @@ async function runAiRobot() {
     await Tip.findOneAndUpdate({ date: today }, result, { upsert: true });
     return true;
 }
-
-// BIZTONSÁG
-const checkAdmin = async (req, res, next) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-    if (user && user.isAdmin) return next();
-    res.status(403).send("STOP! Csak Admin!");
-};
 
 // ÚTVONALAK
 app.get('/dashboard', async (req, res) => {
@@ -102,42 +85,24 @@ app.get('/dashboard', async (req, res) => {
     res.render('dashboard', { user, dailyTip, history });
 });
 
-app.get('/admin', checkAdmin, async (req, res) => {
+app.get('/admin', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    if (!user.isAdmin) return res.redirect('/dashboard');
     const users = await User.find().sort({ createdAt: -1 });
-    const tips = await Tip.find().sort({ date: -1 }).limit(30);
+    const tips = await Tip.find().sort({ date: -1 });
     const licensedCount = await User.countDocuments({ hasLicense: true });
-    res.render('admin', { 
-        users, tips, licensedCount, 
-        totalRevenue: licensedCount * 49,
-        error: req.query.error,
-        success: req.query.success 
-    });
+    res.render('admin', { users, tips, totalRevenue: licensedCount * 49, licensedCount, status: req.query.status });
 });
 
-app.post('/admin/run-robot', checkAdmin, async (req, res) => {
-    try {
-        await runAiRobot();
-        res.redirect('/admin?success=1');
-    } catch (e) {
-        console.error(e);
-        res.redirect(`/admin?error=${encodeURIComponent(e.message)}`);
-    }
+app.post('/admin/run-robot', async (req, res) => {
+    try { await runAiRobot(); res.redirect('/admin?status=success'); } 
+    catch (e) { res.redirect('/admin?status=error'); }
 });
-
-// Alap útvonalak (Register/Login marad a régi)
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/', (req, res) => res.render('index'));
 
 app.post('/user/set-capital', async (req, res) => {
     await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital, hasLicense: true });
     res.redirect('/dashboard');
-});
-
-app.post('/auth/register', async (req, res) => {
-    const hashed = await bcrypt.hash(req.body.password, 10);
-    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
-    res.redirect('/login');
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -145,7 +110,13 @@ app.post('/auth/login', async (req, res) => {
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.userId = user._id;
         req.session.save(() => res.redirect('/dashboard'));
-    } else res.send("Hiba!");
+    } else res.send("Hibás belépési adatok!");
+});
+
+app.post('/auth/register', async (req, res) => {
+    const hashed = await bcrypt.hash(req.body.password, 10);
+    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
+    res.redirect('/login');
 });
 
 app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
