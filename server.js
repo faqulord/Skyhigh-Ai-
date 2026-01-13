@@ -10,9 +10,8 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v17.0 Online"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("🚀 Rafinált Robot Róka v18.0 Online"));
 
-// ADATMODELLEK
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -38,18 +37,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_purple_fox_final_2026',
+    secret: 'skyhigh_purple_fox_exclusive_2026',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 const getHuFullDate = () => new Date().toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// ROBOT FUNKCIÓ
+// ROBOT ENGINE
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -59,13 +57,11 @@ async function runAiRobot() {
         const now = new Date();
         const fixtures = response.data.response.filter(f => (new Date(f.fixture.date) - now) > (3 * 60 * 60 * 1000));
         if (fixtures.length === 0) return false;
-
-        const matchData = fixtures.slice(0, 20).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (Liga: ${f.league.name}, Idő: ${new Date(f.fixture.date).toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'})})`).join(" | ");
-
+        const matchData = fixtures.slice(0, 15).map(f => `${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join(" | ");
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. Cyber-sportfogadó zseni. 30 napos profitra hajtasz. JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
-                       { role: "user", content: `Add meg a nap legbiztosabb tippjét: ${matchData}` }],
+            messages: [{ role: "system", content: "Te vagy a 'Rafinált Robot Róka'. Cyber-sportfogadó zseni. JSON: {league, match, prediction, odds, reasoning, profitPercent, matchTime, bookmaker}" },
+                       { role: "user", content: `Add meg a nap Master Tippjét: ${matchData}` }],
             response_format: { type: "json_object" }
         });
         const result = JSON.parse(aiRes.choices[0].message.content);
@@ -81,23 +77,12 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
-// ADMIN CHAT ENDPOINT
-app.post('/admin/chat', checkAdmin, async (req, res) => {
-    try {
-        const aiRes = await openai.chat.completions.create({
-            model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a Rafinált Robot Róka. Most az Adminnal (a főnökkel) beszélsz. Legyél tisztelettudó, de rafinált és céltudatos a stratégiát illetően." },
-                       { role: "user", content: req.body.message }]
-        });
-        res.json({ reply: aiRes.choices[0].message.content });
-    } catch (e) { res.status(500).json({ error: "Hiba a chat során." }); }
-});
-
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     if (user.email === OWNER_EMAIL) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
-    if (!user.hasLicense || user.startingCapital === 0) return res.render('pricing', { user });
+    if (!user.hasLicense) return res.redirect('/pricing');
+    if (user.startingCapital === 0) return res.render('set-capital', { user });
     const dailyTip = await Tip.findOne({ date: getDbDate() });
     const history = await Tip.find({ status: { $ne: 'pending' } }).sort({ _id: -1 }).limit(5);
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
@@ -108,29 +93,30 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
-    const licensedCount = await User.countDocuments({ hasLicense: true });
-    res.render('admin', { users, currentTip, stats, totalRevenue: licensedCount * 19900, licensedCount, status: req.query.status, dbDate: getDbDate(), tipExists: !!currentTip });
+    res.render('admin', { users, currentTip, stats, totalRevenue: (await User.countDocuments({hasLicense:true})) * 19900, status: req.query.status, dbDate: getDbDate(), tipExists: !!currentTip });
+});
+
+app.post('/admin/activate-user', checkAdmin, async (req, res) => {
+    await User.findByIdAndUpdate(req.body.userId, { hasLicense: true });
+    res.redirect('/admin');
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
-    req.setTimeout(180000);
-    const success = await runAiRobot();
-    res.redirect(`/admin?status=${success ? 'success' : 'error'}`);
+    req.setTimeout(180000); await runAiRobot();
+    res.redirect('/admin?status=success');
 });
 
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     const { tipId, status } = req.body;
     const tip = await Tip.findById(tipId);
-    if (!tip) return res.redirect('/admin');
     tip.status = status; await tip.save();
     const month = tip.date.substring(0, 7);
-    let monthlyStat = await MonthlyStat.findOne({ month });
-    if (!monthlyStat) monthlyStat = new MonthlyStat({ month });
-    monthlyStat.totalTips += 1;
-    if (status === 'win') { monthlyStat.winCount += 1; monthlyStat.totalProfit += tip.profitPercent; }
-    else { monthlyStat.totalProfit -= 10; }
-    await monthlyStat.save();
-    res.redirect('/admin?status=settled');
+    let ms = await MonthlyStat.findOne({ month }) || new MonthlyStat({ month });
+    ms.totalTips += 1;
+    if (status === 'win') { ms.winCount += 1; ms.totalProfit += tip.profitPercent; }
+    else { ms.totalProfit -= 10; }
+    await ms.save();
+    res.redirect('/admin');
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -143,8 +129,20 @@ app.post('/auth/login', async (req, res) => {
 
 app.post('/auth/register', async (req, res) => {
     const hashed = await bcrypt.hash(req.body.password, 10);
-    await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
-    res.redirect('/login');
+    const user = await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
+    req.session.userId = user._id;
+    res.redirect('/pricing');
+});
+
+app.post('/user/set-capital', async (req, res) => {
+    await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital });
+    res.redirect('/dashboard');
+});
+
+app.get('/pricing', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    res.render('pricing', { user });
 });
 
 app.get('/login', (req, res) => res.render('login'));
