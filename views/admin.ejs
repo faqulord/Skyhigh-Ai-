@@ -1,26 +1,227 @@
-<div class="startup-card p-6 mb-8 border-t-2 border-t-yellow-500">
-    <h3 class="text-white font-bold mb-4">Mérkőzés Eredményezése</h3>
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Owner HQ | <%= brandName %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <% activeTips.forEach(tip => { %>
-        <div class="bg-zinc-900 p-4 rounded-xl mb-3 border border-zinc-800">
-            <p class="text-xs font-bold text-zinc-400 mb-2"><%= tip.match %></p>
-            <div class="grid grid-cols-2 gap-2">
-                <form action="/admin/settle-tip/<%= tip._id %>" method="POST">
-                    <input type="hidden" name="status" value="win">
-                    <button class="w-full bg-green-600/20 hover:bg-green-600 text-green-500 hover:text-white py-2 rounded-lg text-[10px] font-bold transition">NYERT</button>
-                </form>
-                <form action="/admin/settle-tip/<%= tip._id %>" method="POST">
-                    <input type="hidden" name="status" value="loss">
-                    <button class="w-full bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white py-2 rounded-lg text-[10px] font-bold transition">VESZTETT</button>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar.style.transform === 'translateX(0px)') {
+                sidebar.style.transform = 'translateX(-100%)';
+                overlay.style.display = 'none';
+            } else {
+                sidebar.style.transform = 'translateX(0px)';
+                overlay.style.display = 'block';
+            }
+        }
+
+        function switchTab(tabId) {
+            // Elrejtünk minden tartalmat
+            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('text-purple-400', 'border-l-4', 'border-purple-500'));
+            
+            // Megjelenítjük a kiválasztottat
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('text-purple-400', 'border-l-4', 'border-purple-500');
+            
+            // Bezárjuk a menüt mobilon
+            toggleSidebar();
+            window.scrollTo(0, 0);
+        }
+    </script>
+
+    <style>
+        body { background: #000000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .tech-card { background: #111111; border: 1px solid #333; border-radius: 16px; margin-bottom: 20px; }
+        .hidden { display: none !important; }
+        
+        /* SIDEBAR STÍLUS */
+        #sidebar {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+            background: #09090b; border-right: 1px solid #333;
+            z-index: 999999; /* LEGFELSŐ RÉTEG */
+            padding-top: 80px;
+            transform: translateX(-100%); transition: transform 0.3s ease-in-out;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.8);
+        }
+        
+        #sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(3px);
+            z-index: 999998; display: none;
+        }
+
+        .menu-btn {
+            display: flex; align-items: center; gap: 12px;
+            width: 100%; padding: 16px 24px;
+            color: #888; font-weight: bold; text-transform: uppercase; font-size: 11px;
+            border-bottom: 1px solid #1a1a1a; transition: 0.2s;
+        }
+        .menu-btn:hover { background: #18181b; color: white; }
+        
+        .pulse-btn { animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); } 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); } }
+        .gold-text { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <nav id="sidebar">
+        <div class="absolute top-5 left-6">
+            <h2 class="text-white font-bold text-xl tracking-wider" style="font-family: 'Orbitron'">MENÜ</h2>
+        </div>
+        
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-btn text-purple-400 border-l-4 border-purple-500">
+            <span>📊</span> VEZÉRLŐPULT
+        </button>
+        
+        <button onclick="switchTab('chat')" id="btn-chat" class="menu-btn">
+            <span>💬</span> STRATÉGIA CHAT
+        </button>
+        
+        <button onclick="switchTab('marketing')" id="btn-marketing" class="menu-btn">
+            <span>🚀</span> MARKETING & EMAIL
+        </button>
+        
+        <button onclick="switchTab('users')" id="btn-users" class="menu-btn">
+            <span>👥</span> TAGOK KEZELÉSE
+        </button>
+        
+        <button onclick="switchTab('finance')" id="btn-finance" class="menu-btn">
+            <span>💰</span> PÉNZÜGYI ZÁRÁS
+        </button>
+
+        <div class="absolute bottom-10 left-0 w-full text-center">
+            <a href="/logout" class="text-red-500 text-xs font-bold uppercase border border-red-900/30 px-6 py-3 rounded-xl bg-red-900/10">Kijelentkezés</a>
+        </div>
+    </nav>
+
+    <header class="fixed top-0 left-0 w-full bg-black/95 border-b border-zinc-800 p-3 z-[5000] flex justify-between items-center h-[70px]">
+        
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-white bg-zinc-900 border border-zinc-700 p-3 rounded-xl active:scale-95" style="cursor: pointer; z-index: 100000;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
+            
+            <span class="text-2xl">🦊</span>
+        </div>
+
+        <div class="bg-yellow-900/20 px-3 py-1.5 rounded-full border border-yellow-500/60 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+            <span class="text-[9px] font-black text-yellow-400 uppercase tracking-widest gold-text">SYSTEM OWNER</span>
+        </div>
+        
+        <a href="/dashboard" class="bg-zinc-800 text-white text-[10px] font-bold px-3 py-2 rounded-lg border border-zinc-600">DASH</a>
+    </header>
+
+    <main class="pt-[90px] px-4 pb-10 w-full max-w-3xl mx-auto">
+
+        <div id="tab-dashboard" class="page-section">
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-purple-500 pl-3">Vezérlőpult</h2>
+            <div class="tech-card p-5 mb-6 border-t-2 border-t-purple-500">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-bold text-zinc-500 uppercase">Mai Elemzés</span>
+                    <span class="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-0.5 rounded border border-zinc-700"><%= dbDate %></span>
+                </div>
+                <% if (currentTip) { %>
+                    <h3 class="text-xl font-black text-white mb-1"><%= currentTip.match %></h3>
+                    <p class="text-xs text-purple-400 font-mono mb-4 font-bold"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
+                    <div class="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 mb-6">
+                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Jelentés:</p>
+                        <p class="text-xs text-zinc-300 italic">"<%= currentTip.reasoning %>"</p>
+                    </div>
+                    <% if (!currentTip.isPublished) { %>
+                        <div class="border border-yellow-500/30 bg-yellow-500/10 p-4 rounded-xl text-center mb-4">
+                            <p class="text-xs text-yellow-500 font-bold uppercase mb-3">⚠️ JÓVÁHAGYÁSRA VÁR</p>
+                            <form action="/admin/publish-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><button class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs pulse-btn">📢 PUBLIKÁLÁS</button></form>
+                            <form action="/admin/run-robot" method="POST" class="mt-2"><button class="text-[9px] text-zinc-500 hover:text-white uppercase font-bold underline">Újraelemzés</button></form>
+                        </div>
+                    <% } else { %>
+                        <div class="bg-green-500/10 border border-green-500/30 p-2 rounded mb-4 text-center"><p class="text-[10px] text-green-500 font-bold uppercase">✅ ÉLESÍTVE</p></div>
+                        <form action="/admin/publish-tip" method="POST" class="mb-4"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><button class="w-full bg-zinc-800 text-zinc-400 border border-zinc-700 py-2 rounded-xl font-bold text-[10px] uppercase hover:bg-zinc-700 hover:text-white transition">🔄 Szöveg Javítása</button></form>
+                        <div class="grid grid-cols-2 gap-3">
+                            <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="win"><button class="w-full bg-zinc-800 border border-zinc-700 text-green-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-green-900/30 transition">WIN ✅</button></form>
+                            <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="loss"><button class="w-full bg-zinc-800 border border-zinc-700 text-red-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-900/30 transition">LOSS ❌</button></form>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="text-center py-10"><div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-pulse text-purple-500">🧠</div><p class="text-xs text-zinc-500 mb-6">Nincs aktív elemzés.</p><form action="/admin/run-robot" method="POST"><button class="bg-white text-black px-8 py-4 rounded-xl font-black uppercase text-xs shadow-xl hover:scale-105 transition">🚀 Elemzés Indítása</button></form></div>
+                <% } %>
+            </div>
+        </div>
+
+        <div id="tab-chat" class="page-section hidden">
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-fuchsia-500 pl-3">Stratégia & Chat</h2>
+            <div class="tech-card p-4">
+                <div id="chat-win" class="chat-container overflow-y-auto mb-4 custom-scrollbar" style="height: 400px; display:flex; flex-direction:column;">
+                    <% chatHistory.forEach(msg => { %> <div class="msg <%= msg.sender === 'Főnök' ? 'msg-me' : 'msg-ai' %>"><strong><%= msg.sender %>:</strong> <%= msg.text %></div> <% }) %>
+                </div>
+                <div class="flex gap-2 mt-4"><input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Írj a Rókának..."><button onclick="talk()" class="bg-purple-600 text-white px-4 py-3 rounded-xl font-bold">➤</button></div>
+            </div>
+        </div>
+
+        <div id="tab-marketing" class="page-section hidden">
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-pink-500 pl-3">Marketing Központ</h2>
+            
+            <div class="tech-card p-5 mb-6 border border-pink-900/30">
+                <div class="flex items-center gap-2 mb-4"><span class="text-xl">📱</span><h3 class="text-xs font-bold text-white uppercase">Insta/FB Poszt Generátor</h3></div>
+                <div class="flex gap-2 mb-4">
+                    <button onclick="generateSocial('win')" class="flex-1 bg-zinc-800 text-green-400 border border-green-900/30 py-3 rounded-lg text-[10px] font-bold uppercase">🏆 Mai Nyerő</button>
+                    <button onclick="generateSocial('motivation')" class="flex-1 bg-zinc-800 text-pink-400 border border-pink-900/30 py-3 rounded-lg text-[10px] font-bold uppercase">🔥 Motiváció</button>
+                </div>
+                <textarea id="social-result" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-xs text-white focus:border-pink-500 outline-none" placeholder="Generált szöveg..."></textarea>
+                <button onclick="copySocial()" class="w-full bg-pink-600 text-white mt-2 py-3 rounded-lg text-[10px] font-bold uppercase hover:bg-pink-500">Másolás</button>
+            </div>
+
+            <div class="tech-card p-4 border border-blue-900/30">
+                <h3 class="text-xs font-bold text-white mb-2">📢 Hírlevél (Email)</h3>
+                <input type="text" id="email-topic" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="AI Vázlat Téma...">
+                <button onclick="draftEmail()" class="bg-zinc-800 text-zinc-300 w-full py-2 rounded-lg text-[10px] font-bold uppercase mb-4">AI Vázlat Írása</button>
+                <form method="POST">
+                    <input type="text" name="subject" id="email-subject" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Tárgy">
+                    <textarea name="messageBody" id="email-body" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-zinc-300 mb-2" placeholder="Levél szövege..."></textarea>
+                    <div class="flex gap-2 mt-2">
+                        <button type="submit" formaction="/admin/send-test-email" class="w-1/3 bg-yellow-600 text-white py-3 rounded-xl font-bold text-[10px] uppercase">🧪 TESZT</button>
+                        <button type="submit" formaction="/admin/send-email" onclick="return confirm('Mindenkinek kimegy. Biztos?')" class="w-2/3 bg-blue-600 text-white py-3 rounded-xl font-bold text-[10px] uppercase">🚀 KÜLDÉS</button>
+                    </div>
                 </form>
             </div>
         </div>
-    <% }) %>
 
-    <hr class="border-zinc-800 my-6">
+        <div id="tab-users" class="page-section hidden">
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-green-500 pl-3">Tagok</h2>
+            <div class="space-y-2">
+                <% users.forEach(u => { %>
+                    <div class="tech-card p-3 flex justify-between items-center">
+                        <div><p class="text-xs font-bold text-white"><%= u.fullname %></p><p class="text-[9px] text-zinc-500"><%= u.email %></p></div>
+                        <% if (!u.hasLicense) { %> <form action="/admin/activate-user" method="POST"><input type="hidden" name="userId" value="<%= u._id %>"><button class="bg-green-600 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold">Aktivál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold border border-green-500/30 px-2 py-1 rounded">Aktív</span> <% } %>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
 
-    <h3 class="text-white font-bold mb-2">Hónap végi zárás</h3>
-    <form action="/admin/close-month" method="POST">
-        <button class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl text-xs font-bold transition uppercase">Zárás és Publikálás</button>
-    </form>
-</div>
+        <div id="tab-finance" class="page-section hidden">
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3">Pénzügyi Zárás</h2>
+            <div class="tech-card p-4 mb-6 border border-purple-500/30 bg-purple-900/10">
+                <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-bold text-white uppercase">Havi Zárás</h3></div>
+                <% if(stats && stats.length > 0) { %> <% stats.forEach(stat => { %> <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl mb-2 border border-zinc-800"><div><p class="text-xs font-bold text-white"><%= stat.month %></p><p class="text-[9px] text-zinc-500"><%= stat.totalTips %> tipp</p></div><% if (!stat.isPublished) { %> <form action="/admin/publish-stat" method="POST"><input type="hidden" name="statId" value="<%= stat._id %>"><button class="bg-blue-600 text-white text-[9px] px-3 py-2 rounded-lg font-bold uppercase hover:bg-blue-500">Publikál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold">Publikálva ✅</span> <% } %></div> <% }) %> <% } else { %> <p class="text-[10px] text-zinc-500 italic">Nincs adat.</p> <% } %>
+            </div>
+            <div class="tech-card p-4"><div class="space-y-1 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"><% if(calculatorData && calculatorData.length > 0) { %> <% calculatorData.forEach(row => { %> <div class="flex justify-between items-center text-[10px] py-3 border-b border-zinc-800"><span class="text-zinc-500 font-mono"><%= row.date %></span><span class="truncate w-32 font-medium text-zinc-300"><%= row.match %></span><span class="font-bold <%= row.dailyProfit > 0 ? 'text-green-500' : 'text-red-500' %>"><%= row.dailyProfit %>%</span></div> <% }) %> <% } else { %> <p class="text-center text-[10px] text-zinc-600 italic py-4">Nincs adat.</p> <% } %></div></div>
+        </div>
+
+    </main>
+
+    <script>
+        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
+        async function talk() { const i = document.getElementById('chat-in'); if(!i.value) return; const msgText = i.value; i.value = ''; win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`; win.scrollTop = win.scrollHeight; try { const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})}); const d = await r.json(); win.innerHTML += `<div class="msg msg-ai"><strong>Róka:</strong> ${d.reply}</div>`; win.scrollTop = win.scrollHeight; } catch (err) { console.error(err); } }
+        async function generateSocial(type) { const btn = event.target; const originalText = btn.innerText; btn.innerText = "⏳ Generálás..."; try { const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); const data = await res.json(); document.getElementById('social-result').value = data.content; } catch(e) { alert('Hiba!'); } btn.innerText = originalText; }
+        function copySocial() { const copyText = document.getElementById("social-result"); copyText.select(); document.execCommand("copy"); alert("Szöveg másolva!"); }
+        async function draftEmail() { const topic = document.getElementById('email-topic').value; if(!topic) return alert("Írj témát!"); try { const res = await fetch('/admin/draft-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic }) }); const data = await res.json(); const lines = data.draft.split('\n'); let subject = "Hírlevél"; let body = data.draft; if(lines[0].toLowerCase().includes("tárgy")) { subject = lines[0].replace(/Tárgy:/i, '').trim(); body = lines.slice(1).join('\n').trim(); } document.getElementById('email-subject').value = subject; document.getElementById('email-body').value = body; } catch(e) { alert("AI Hiba"); } }
+    </script>
+</body>
+</html>
