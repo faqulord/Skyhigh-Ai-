@@ -12,6 +12,18 @@ const app = express();
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Rafinált Róka"; 
 
+// --- RÓKA SZLENGEK ÉS BÖLCSESSÉGEK (ÉLMÉNYADÁS) ---
+const foxQuotes = [
+    "A pénz nem boldogít, de a nyerő szelvény határozottan segít! 🦊💸",
+    "Mondtam a főnökömnek, hogy ma beteg vagyok. Tippmix-lázam van. 🤒📝",
+    "A fogadóirodák már remegnek, érzem a szagot... 😤",
+    "Ma nem dolgozni jöttünk, hanem kaszálni. 🌾💰",
+    "A statisztika a barátunk, az érzelmek az ellenségeink. Maradj hidegvérű! ❄️",
+    "Egy nap a tengerparton fogunk koktélozni ebből. Kitartás! 🍹🌴",
+    "A bankroll menedzsment nem szexi, de gazdaggá tesz. 📈",
+    "Csak a Zsiványok élik túl. A többiek elbukják a fizetésüket. 🦊👊"
+];
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -20,7 +32,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - PROD MODE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - EXPERIENCE MODE`));
 
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
@@ -28,11 +40,10 @@ const User = mongoose.model('User', new mongoose.Schema({
     isAdmin: { type: Boolean, default: false }, startingCapital: { type: Number, default: 0 }
 }));
 
-// FRISSÍTETT SÉMA: Bekerült a 'memberMessage' (Amit a tagok látnak)
 const Tip = mongoose.model('Tip', new mongoose.Schema({
     league: String, match: String, prediction: String, odds: String, 
-    reasoning: String, // EZ A NEKED SZÓLÓ JELENTÉS
-    memberMessage: String, // EZ A TAGOKNAK SZÓLÓ ÜZENET (ÚJ!)
+    reasoning: String, // Ezt csak TE látod
+    memberMessage: String, // Ezt látják a TAGOK
     profitPercent: { type: Number, default: 0 }, matchTime: String, bookmaker: String,
     status: { type: String, default: 'pending' }, 
     isPublished: { type: Boolean, default: false },
@@ -63,7 +74,7 @@ app.use(session({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 
-// ROBOT MOTOR (Belső Én - Katonás)
+// ROBOT MOTOR
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -76,19 +87,12 @@ async function runAiRobot() {
         
         if (fixtures.length === 0) return false;
 
-        const lastTips = await Tip.find({ status: { $in: ['win', 'loss'] } }).sort({ date: -1 }).limit(3);
-        let egoState = "Semleges állapot. Fókuszálj a matematikára."; 
-        if (lastTips.length > 0 && lastTips[0].status === 'win') egoState = "DIADAL! A tegnapi tipp NYERT! Légy büszke.";
-        if (lastTips.length > 0 && lastTips[0].status === 'loss') egoState = "KATONÁS FEGYELEM! Tegnap vesztettünk, ma nincs helye hibának.";
-
         const matchData = fixtures.slice(0, 40).map(f => `[${f.fixture.date}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join("\n");
 
         const systemPrompt = `
-            IDENTITY: Te vagy a "Rafinált Róka" Rendszer (v5.0). Egy mesterséges intelligencia.
-            CÉL: A Főnök (Owner) kiszolgálása profi elemzéssel.
-            MENTÁLIS ÁLLAPOT: ${egoState}
-            NYELV: MAGYAR. Stílus: Katonás, Szakmai, Tisztelettudó a Főnökkel.
-            FELADAT: Keress Value Betet.
+            IDENTITY: Te vagy a "Rafinált Róka". A matematika mestere.
+            NYELV: MAGYAR.
+            FELADAT: Keress Value Betet. Írj jelentést a Főnöknek.
             OUTPUT JSON: { "league": "...", "match": "...", "prediction": "...", "odds": "...", "reasoning": "Főnök! [Elemzés]...", "profitPercent": 5, "matchTime": "...", "bookmaker": "..." }
         `;
 
@@ -99,9 +103,7 @@ async function runAiRobot() {
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
-        
         await Tip.findOneAndUpdate({ date: dbDate }, { ...result, date: dbDate, status: 'pending', isPublished: false }, { upsert: true });
-        await new ChatMessage({ sender: 'System', text: `🧠 Stratégiai jelentés kész! Ellenőrzésre vár.` }).save();
         return true;
     } catch (e) { return false; }
 }
@@ -121,10 +123,13 @@ app.get('/dashboard', async (req, res) => {
     if (user.startingCapital === 0) return res.render('set-capital', { user });
 
     const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
-    const pastTips = await Tip.find({ status: { $in: ['win', 'loss'] } }).sort({ date: -1 }).limit(20); // Több előzmény
+    const pastTips = await Tip.find({ status: { $in: ['win', 'loss'] } }).sort({ date: -1 }).limit(20);
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
     
-    res.render('dashboard', { user, dailyTip, pastTips, recommendedStake, displayDate: new Date().toLocaleDateString('hu-HU') });
+    // VÉLETLENSZERŰ IDÉZET KIVÁLASZTÁSA
+    const randomQuote = foxQuotes[Math.floor(Math.random() * foxQuotes.length)];
+    
+    res.render('dashboard', { user, dailyTip, pastTips, recommendedStake, displayDate: new Date().toLocaleDateString('hu-HU'), randomQuote });
 });
 
 app.get('/pricing', async (req, res) => {
@@ -152,41 +157,32 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, recentTips, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
-// --- A NAGY FRISSÍTÉS: PUBLIKÁLÁSKOR ÁTÍRJA A SZÖVEGET ---
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => {
     const { tipId } = req.body;
     const tip = await Tip.findById(tipId);
 
-    // AI TRANSFORMER: Katonás -> Zsivány Róka
+    // AI TRANSFORMER: FŐNÖK -> HAVEROK
     const transformPrompt = `
-        Te vagy a "Zsivány Róka". A sportfogadók Robin Hoodja.
-        Kaptál egy száraz, szakmai elemzést a Stratégától.
+        Eredeti: "${tip.reasoning}"
         
-        FELADAT: Írd át ezt a szöveget a Tagoknak (a "Bandának").
-        STÍLUS:
-        - Laza, barátságos, lelkes.
-        - Utálod a munkát, imádod a pénzt.
-        - Használj emojikat (🦊, 💸, 🔥).
-        - NE mondd, hogy "Főnök". Szólítsd őket: "Srácok", "Sporttársak", "Banda".
-        - A lényeg maradjon benne (miért jó a tipp), de add el nekik!
-        
-        EREDETI SZÖVEG: "${tip.reasoning}"
+        Feladat: Írd át ezt a szöveget a Sportfogadó Csoport tagjainak.
+        Szerep: Te vagy a "Zsivány Róka", a csoport vezére.
+        Stílus: Laza, motiváló, haveri. "Srácok", "Banda". Használj emojikat.
+        TILOS: Ne használd a "Főnök" szót!
     `;
 
     const aiRes = await openai.chat.completions.create({ 
         model: "gpt-4-turbo-preview", 
-        messages: [{ role: "system", content: "Laza marketing zseni vagy." }, { role: "user", content: transformPrompt }] 
+        messages: [{ role: "system", content: "Laza szövegíró vagy." }, { role: "user", content: transformPrompt }] 
     });
     
     const memberText = aiRes.choices[0].message.content;
 
-    // Mentjük a 'memberMessage' mezőbe és publikáljuk
     await Tip.findByIdAndUpdate(tipId, { isPublished: true, memberMessage: memberText });
-    await new ChatMessage({ sender: 'System', text: `🚀 Tipp átalakítva és publikálva a Tagoknak!` }).save();
     res.redirect('/admin');
 });
 
-// TÖBBI ADMIN FUNKCIÓ (VÁLTOZATLAN)
+// MARADÉK LOGIKA VÁLTOZATLAN...
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save();
     const adminPrompt = `Te vagy a ${BRAND_NAME} (Belső Én). Katonás, profi stratéga vagy. Beszélj a Főnökkel.`;
@@ -198,8 +194,7 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
 
 app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     const topic = req.body.topic;
-    const emailPrompt = `Zsivány Róka vagy. Írj emailt a bandának erről: ${topic}. Stílus: Laza, motiváló.`;
-    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Marketing Expert." }, { role: "user", content: emailPrompt }] });
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Marketing Expert." }, { role: "user", content: `Téma: ${topic}` }] });
     res.json({ draft: aiRes.choices[0].message.content });
 });
 
