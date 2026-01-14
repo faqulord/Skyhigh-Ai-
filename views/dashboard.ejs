@@ -1,111 +1,111 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard | Rafinált Róka</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vezérlőpult | Rafinált Róka</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #000000; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; }
-        .startup-card { background: #111; border: 1px solid #333; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
-        .gradient-text { background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
-        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #2563eb; color: white; border: 1px solid #60a5fa; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.6); z-index: 100; transition: bottom 0.5s; display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
-        .toast.show { bottom: 30px; }
+        :root { --primary: #FFD700; --dark: #0a0a0a; --dark-card: #161616; }
+        body { background-color: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; }
+        .navbar { border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        .card-custom { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* --- ARANY BETŰ EFFEKT --- */
+        .golden-text {
+            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            line-height: 1.6;
+            text-shadow: 0px 0px 10px rgba(255, 215, 0, 0.2);
+        }
+        
+        .tip-card { border-left: 5px solid var(--primary); padding: 20px; background: rgba(255, 215, 0, 0.05); border-radius: 10px; margin-top: 20px; }
     </style>
 </head>
-<body class="p-5 max-w-lg mx-auto min-h-screen flex flex-col">
-
-    <header class="flex justify-between items-center mb-8 pt-2">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl shadow-lg fox-glow">🦊</div>
-            <div><h1 class="text-sm font-bold text-white tracking-wide" style="font-family: 'Orbitron'">RAFINÁLT RÓKA</h1><p class="text-[10px] text-zinc-400 font-medium">Prémium Csoport</p></div>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand text-warning fw-bold" href="#"><i class="fas fa-fox me-2"></i>Rafinált Róka</a>
+            <div class="d-flex">
+                <% if(user.isAdmin) { %> <a href="/admin" class="btn btn-sm btn-outline-warning me-2">ADMIN</a> <% } %>
+                <a href="/logout" class="btn btn-sm btn-outline-light">Kilépés</a>
+            </div>
         </div>
-        <div class="flex gap-2">
-            <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %> <a href="/admin" class="px-3 py-2 rounded-lg text-[10px] font-bold text-yellow-500 border border-yellow-500/30 bg-yellow-500/10">⚡ HQ</a> <% } %>
-            <a href="/stats" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border border-zinc-800 px-3 py-2 rounded-lg text-[10px] font-bold">📊 STATS</a>
-            <a href="/logout" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-3 py-2 rounded-full text-[10px] font-bold">EXIT</a>
-        </div>
-    </header>
+    </nav>
 
-    <div class="mb-8">
-        <div class="flex justify-between items-end mb-2">
-            <div><p class="text-zinc-500 text-xs font-bold uppercase mb-1"><%= displayDate %></p><h2 class="text-2xl font-bold text-white">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2></div>
-            <% if (typeof streak !== 'undefined' && streak > 1) { %>
-                <div class="bg-orange-500/10 text-orange-400 px-3 py-1 rounded-full border border-orange-500/30 flex items-center gap-1">
-                    <span class="animate-pulse">🔥</span> <span class="text-xs font-bold"><%= streak %> Napja Nyerünk!</span>
+    <div class="container" style="margin-top: 100px;">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2 class="fw-bold">Szia, <%= user.fullname.split(' ')[0] %>! 🦊</h2>
+                <p class="text-secondary"><%= randomQuote %></p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="badge bg-dark border border-warning p-2">
+                    <i class="fas fa-wallet text-warning me-2"></i>Bankroll: <%= user.startingCapital %> Ft
                 </div>
-            <% } %>
-        </div>
-        <div class="bg-zinc-900/50 p-3 rounded-xl border border-white/5 inline-block w-full"><p class="text-xs text-zinc-300 italic text-center">"<%= randomQuote %>"</p></div>
-    </div>
-
-    <% if (dailyTip && dailyTip.isPublished) { %>
-        <div class="startup-card p-6 mb-8 border-t-2 border-t-purple-500 hover:scale-[1.01] transition duration-300">
-            <div class="absolute top-0 right-0 bg-purple-600/20 text-purple-300 text-[9px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-purple-500/30">MAI FIX</div>
-            <div class="text-center mb-6 mt-4">
-                <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2"><%= dailyTip.league %></p>
-                <h3 class="text-xl font-black text-white leading-tight mb-4"><%= dailyTip.match %></h3>
-                <div class="bg-zinc-900/80 inline-block px-8 py-4 rounded-2xl border border-zinc-800 w-full relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-pink-500"></div>
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold mb-1">A Róka Tippje</p>
-                    <p class="text-2xl font-black gradient-text"><%= dailyTip.prediction %></p>
-                    <div class="mt-2 inline-flex items-center gap-2 bg-black/50 px-3 py-1 rounded-lg border border-white/10"><span class="text-[10px] text-zinc-400 uppercase">Odds</span><span class="text-sm font-bold text-white"><%= dailyTip.odds %></span></div>
+                <div class="mt-2 text-warning small">
+                    <% if(streak > 0) { %> 🔥 Jelenlegi Széria: <%= streak %> WIN <% } %>
                 </div>
-                <% if(dailyTip.matchTime) { %>
-                    <p class="text-[9px] text-zinc-500 mt-2">Kezdés: <%= dailyTip.matchTime %> (Hamarosan!)</p>
+            </div>
+        </div>
+
+        <div class="card card-custom mb-5">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="text-uppercase text-secondary letter-spacing-2">Mai Zsákmány (<%= displayDate %>)</h5>
+                    <% if(dailyTip && dailyTip.isReal) { %>
+                        <span class="badge bg-success">✅ ÉLŐ API ADAT</span>
+                    <% } else { %>
+                        <span class="badge bg-warning text-dark">⚠️ DEMÓ</span>
+                    <% } %>
+                </div>
+
+                <% if (dailyTip && dailyTip.isPublished) { %>
+                    <div class="text-center py-3">
+                        <h1 class="display-4 fw-bold text-white mb-0"><%= dailyTip.match %></h1>
+                        <h3 class="text-warning mt-2"><%= dailyTip.prediction %> (@<%= dailyTip.odds %>)</h3>
+                        <p class="text-secondary small"><%= dailyTip.league %> | <%= dailyTip.bookmaker %></p>
+                    </div>
+
+                    <div class="tip-card">
+                        <p class="golden-text mb-0" style="font-size: 1.1rem; white-space: pre-line;">
+                            <%= dailyTip.memberMessage %>
+                        </p>
+                    </div>
+
+                    <div class="row mt-4 text-center">
+                        <div class="col-6">
+                            <div class="p-3 bg-dark rounded border border-secondary">
+                                <small class="text-secondary text-uppercase">Kezdés</small>
+                                <h4 class="text-white mb-0"><%= dailyTip.matchTime %></h4>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-dark rounded border border-warning">
+                                <small class="text-warning text-uppercase">Ajánlott Tét</small>
+                                <h4 class="text-white mb-0"><%= dailyTip.recommendedStake %></h4>
+                                <small class="text-secondary">(Kb. <%= Math.floor(user.startingCapital * (parseInt(dailyTip.recommendedStake)/100)) %> Ft)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                <% } else { %>
+                    <div class="text-center py-5">
+                        <i class="fas fa-hourglass-half fa-3x text-secondary mb-3"></i>
+                        <h3>A Róka még számol...</h3>
+                        <p class="text-secondary">Nézz vissza később! Az elemzés hamarosan elkészül.</p>
+                    </div>
                 <% } %>
             </div>
-            <div class="bg-purple-900/10 border border-purple-500/20 p-4 rounded-xl relative mt-6">
-                <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl">🦊</span>
-                <p class="text-xs text-zinc-300 italic leading-relaxed mt-2 text-justify">"<%= dailyTip.memberMessage || 'A profit nem vár!' %>"</p>
-            </div>
-            <div class="mt-6 flex justify-between items-center border-t border-white/5 pt-4"><div class="flex flex-col"><span class="text-[9px] text-zinc-500 font-bold uppercase">Stratégia</span><span class="text-[10px] text-zinc-300">Fix Tét (10%)</span></div><span class="text-sm font-bold text-white bg-zinc-800 px-4 py-2 rounded-lg border border-zinc-700"><%= recommendedStake %> Ft</span></div>
         </div>
         
-        <div class="startup-card p-5 mb-8">
-            <h3 class="text-sm font-bold text-white mb-2">💰 Profit Szimulátor</h3>
-            <div class="flex justify-between text-[10px] text-zinc-400 mb-1"><span>Befektetés:</span><span id="investAmount">10.000 Ft</span></div>
-            <input type="range" min="1000" max="100000" step="1000" value="10000" class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500 mb-2" oninput="updateCalc(this.value)">
-            <div class="flex justify-between items-center bg-green-500/10 p-2 rounded-lg border border-green-500/20">
-                <span class="text-[10px] text-green-400 font-bold uppercase">Várható Nyeremény:</span>
-                <span id="potentialWin" class="text-sm font-black text-green-400"><%= Math.floor(10000 * dailyTip.odds) %> Ft</span>
-            </div>
+        <div class="text-center text-secondary small mb-5">
+            &copy; 2026 Rafinált Róka System.
         </div>
-        
-        <script>
-            function updateCalc(val) {
-                document.getElementById('investAmount').innerText = val + " Ft";
-                // Odds-ot a szerverről kapjuk, de itt JS-ben kell használni. Egyszerűsítve:
-                const odds = <%= dailyTip.odds %>;
-                document.getElementById('potentialWin').innerText = Math.floor(val * odds) + " Ft";
-            }
-        </script>
-
-    <% } else { %>
-        <div class="startup-card p-10 text-center mb-8 border-dashed border border-zinc-800 flex flex-col items-center justify-center min-h-[300px]">
-            <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6 text-4xl animate-pulse relative">🧠<div class="absolute inset-0 rounded-full border-2 border-purple-500/30 animate-ping"></div></div>
-            <h3 class="text-lg font-bold text-white mb-2">A Róka még számol...</h3>
-            <p class="text-xs text-zinc-500 leading-relaxed max-w-[250px]">Az AI éppen a mai kínálatot elemzi.<br><br><span class="text-purple-400 font-bold">Nézz vissza később!</span></p>
-        </div>
-    <% } %>
-
-    <div class="mt-auto text-center pt-8 border-t border-zinc-900">
-        <a href="/stats" class="text-xs font-bold text-zinc-600 hover:text-white transition uppercase tracking-widest mb-2 block">Eredmények Megtekintése -></a>
-        <p class="text-[9px] text-zinc-700">© 2024 Rafinált Róka AI</p>
     </div>
-
-    <div id="toast" class="toast">
-        <span class="text-xl">💎</span>
-        <span>Szevasz Sporttárs! Ma robbantunk? 🦊</span>
-    </div>
-
-    <script>
-        window.addEventListener('load', () => {
-            const toast = document.getElementById('toast');
-            setTimeout(() => { toast.classList.add('show'); }, 1000);
-            setTimeout(() => { toast.classList.remove('show'); }, 5000);
-        });
-    </script>
 </body>
 </html>
