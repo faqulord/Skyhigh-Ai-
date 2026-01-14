@@ -22,13 +22,14 @@
             transition: all 0.3s ease;
         }
         .input-field:focus {
-            border-color: #FF9F43; /* Narancs fókusz */
+            border-color: #FF9F43;
             box-shadow: 0 0 10px rgba(255, 159, 67, 0.2);
             outline: none;
         }
 
+        /* Finom lüktetés a Rókának */
         .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
-        @keyframes pulse-fox { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 159, 67, 0.2)); } 50% { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(255, 159, 67, 0.5)); } }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-6 relative">
@@ -37,15 +38,15 @@
         <div class="absolute top-[-20%] right-[-20%] w-[50%] h-[50%] bg-purple-900/10 blur-[100px] rounded-full"></div>
     </div>
 
-    <div class="mb-6 fox-pulse">
-        <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
-            <defs>
-                <linearGradient id="foxGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient>
-            </defs>
-            <path d="M50 10L20 30L30 80L50 90L70 80L80 30L50 10Z" fill="#111" stroke="url(#foxGrad)" stroke-width="2"/>
-            <path d="M35 45L50 65L65 45" stroke="#111" stroke-width="3" stroke-linecap="round"/>
-            <path d="M35 35H40M60 35H65" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-        </svg>
+    <div class="mb-8 relative inline-block text-center">
+        <div class="text-7xl fox-pulse cursor-default">🦊</div>
+
+        <div class="absolute top-0 right-0 -mr-1 -mt-1">
+            <span class="relative flex h-4 w-4">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-[#050505]"></span>
+            </span>
+        </div>
     </div>
 
     <h1 class="text-2xl font-bold mb-8 tracking-wide text-center uppercase" style="font-family: 'Orbitron'">Bázis <span class="text-purple-500">Belépés</span></h1>
