@@ -5,118 +5,61 @@
     <title>Owner HQ | <%= brandName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <script>
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            if (sidebar.style.transform === 'translateX(0px)') {
-                sidebar.style.transform = 'translateX(-100%)';
-                overlay.style.display = 'none';
-            } else {
-                sidebar.style.transform = 'translateX(0px)';
-                overlay.style.display = 'block';
-            }
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            if (sb.classList.contains('open')) { sb.classList.remove('open'); ov.classList.remove('show'); }
+            else { sb.classList.add('open'); ov.classList.add('show'); }
         }
-
-        function switchTab(tabId) {
-            // Elrejtünk minden tartalmat
-            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('text-purple-400', 'border-l-4', 'border-purple-500'));
-            
-            // Megjelenítjük a kiválasztottat
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            document.getElementById('btn-' + tabId).classList.add('text-purple-400', 'border-l-4', 'border-purple-500');
-            
-            // Bezárjuk a menüt mobilon
-            toggleSidebar();
-            window.scrollTo(0, 0);
+        function switchTab(id) {
+            document.querySelectorAll('.page-section').forEach(e => e.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-'+id).classList.remove('hidden');
+            document.getElementById('btn-'+id).classList.add('active');
+            toggleSidebar(); window.scrollTo(0,0);
         }
     </script>
-
     <style>
         body { background: #000000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .tech-card { background: #111111; border: 1px solid #333; border-radius: 16px; margin-bottom: 20px; }
+        .tech-card { background: #111; border: 1px solid #333; border-radius: 16px; margin-bottom: 20px; }
         .hidden { display: none !important; }
         
-        /* SIDEBAR STÍLUS */
-        #sidebar {
-            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
-            background: #09090b; border-right: 1px solid #333;
-            z-index: 999999; /* LEGFELSŐ RÉTEG */
-            padding-top: 80px;
-            transform: translateX(-100%); transition: transform 0.3s ease-in-out;
-            box-shadow: 5px 0 30px rgba(0,0,0,0.8);
-        }
+        /* SIDEBAR */
+        #sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #09090b; border-right: 1px solid #333; z-index: 99999; transform: translateX(-100%); transition: 0.3s; padding-top: 80px; box-shadow: 10px 0 50px rgba(0,0,0,0.8); }
+        #sidebar.open { transform: translateX(0); }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(3px); z-index: 99998; display: none; }
+        #overlay.show { display: block; }
         
-        #sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(3px);
-            z-index: 999998; display: none;
-        }
-
-        .menu-btn {
-            display: flex; align-items: center; gap: 12px;
-            width: 100%; padding: 16px 24px;
-            color: #888; font-weight: bold; text-transform: uppercase; font-size: 11px;
-            border-bottom: 1px solid #1a1a1a; transition: 0.2s;
-        }
-        .menu-btn:hover { background: #18181b; color: white; }
+        .menu-item { display: flex; align-items: center; gap: 15px; width: 100%; padding: 18px 25px; color: #888; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #1c1c1c; }
+        .menu-item.active { color: #c084fc; border-left: 4px solid #c084fc; background: #18181b; }
+        .menu-item svg { width: 18px; fill: currentColor; }
         
-        .pulse-btn { animation: pulse-border 2s infinite; }
-        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); } 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); } }
+        .pulse-btn { animation: pulse 2s infinite; } @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
         .gold-text { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="overlay" onclick="toggleSidebar()"></div>
 
     <nav id="sidebar">
-        <div class="absolute top-5 left-6">
-            <h2 class="text-white font-bold text-xl tracking-wider" style="font-family: 'Orbitron'">MENÜ</h2>
-        </div>
-        
-        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-btn text-purple-400 border-l-4 border-purple-500">
-            <span>📊</span> VEZÉRLŐPULT
-        </button>
-        
-        <button onclick="switchTab('chat')" id="btn-chat" class="menu-btn">
-            <span>💬</span> STRATÉGIA CHAT
-        </button>
-        
-        <button onclick="switchTab('marketing')" id="btn-marketing" class="menu-btn">
-            <span>🚀</span> MARKETING & EMAIL
-        </button>
-        
-        <button onclick="switchTab('users')" id="btn-users" class="menu-btn">
-            <span>👥</span> TAGOK KEZELÉSE
-        </button>
-        
-        <button onclick="switchTab('finance')" id="btn-finance" class="menu-btn">
-            <span>💰</span> PÉNZÜGYI ZÁRÁS
-        </button>
-
-        <div class="absolute bottom-10 left-0 w-full text-center">
-            <a href="/logout" class="text-red-500 text-xs font-bold uppercase border border-red-900/30 px-6 py-3 rounded-xl bg-red-900/10">Kijelentkezés</a>
-        </div>
+        <div class="absolute top-6 left-6"><h2 class="text-white font-bold orbitron">MENÜ</h2></div>
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg> VEZÉRLŐPULT</button>
+        <button onclick="switchTab('chat')" id="btn-chat" class="menu-item"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> STRATÉGIA CHAT</button>
+        <button onclick="switchTab('marketing')" id="btn-marketing" class="menu-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> MARKETING</button>
+        <button onclick="switchTab('users')" id="btn-users" class="menu-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> TAGOK</button>
+        <button onclick="switchTab('finance')" id="btn-finance" class="menu-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg> PÉNZÜGY</button>
+        <div class="absolute bottom-5 left-0 w-full text-center"><a href="/logout" class="text-red-500 text-xs font-bold uppercase border border-red-900/30 px-6 py-2 rounded bg-red-900/10">Kijelentkezés</a></div>
     </nav>
 
-    <header class="fixed top-0 left-0 w-full bg-black/95 border-b border-zinc-800 p-3 z-[5000] flex justify-between items-center h-[70px]">
-        
-        <div class="flex items-center gap-3">
-            <button onclick="toggleSidebar()" class="text-white bg-zinc-900 border border-zinc-700 p-3 rounded-xl active:scale-95" style="cursor: pointer; z-index: 100000;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-            </button>
-            
+    <header class="fixed top-0 left-0 w-full bg-black/90 backdrop-blur border-b border-zinc-900 p-3 z-[5000] flex justify-between items-center h-[70px]">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="text-white bg-zinc-900 border border-zinc-700 p-3 rounded-xl active:scale-95"><svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
             <span class="text-2xl">🦊</span>
         </div>
-
-        <div class="bg-yellow-900/20 px-3 py-1.5 rounded-full border border-yellow-500/60 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
-            <span class="text-[9px] font-black text-yellow-400 uppercase tracking-widest gold-text">SYSTEM OWNER</span>
-        </div>
-        
-        <a href="/dashboard" class="bg-zinc-800 text-white text-[10px] font-bold px-3 py-2 rounded-lg border border-zinc-600">DASH</a>
+        <div class="bg-yellow-900/20 px-3 py-1.5 rounded-full border border-yellow-500/60 shadow-[0_0_10px_rgba(234,179,8,0.3)]"><span class="text-[9px] font-black text-yellow-400 uppercase tracking-widest gold-text">SYSTEM OWNER</span></div>
+        <a href="/dashboard" class="bg-zinc-900 text-white text-[10px] font-bold px-3 py-2 rounded-lg border border-zinc-600">DASH</a>
     </header>
 
     <main class="pt-[90px] px-4 pb-10 w-full max-w-3xl mx-auto">
@@ -124,30 +67,27 @@
         <div id="tab-dashboard" class="page-section">
             <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-purple-500 pl-3">Vezérlőpult</h2>
             <div class="tech-card p-5 mb-6 border-t-2 border-t-purple-500">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-[10px] font-bold text-zinc-500 uppercase">Mai Elemzés</span>
-                    <span class="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-0.5 rounded border border-zinc-700"><%= dbDate %></span>
-                </div>
+                <div class="flex justify-between items-start mb-4"><span class="text-[10px] font-bold text-zinc-500 uppercase">Mai Elemzés</span><span class="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-0.5 rounded border border-zinc-700"><%= dbDate %></span></div>
+                
                 <% if (currentTip) { %>
                     <h3 class="text-xl font-black text-white mb-1"><%= currentTip.match %></h3>
                     <p class="text-xs text-purple-400 font-mono mb-4 font-bold"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
-                    <div class="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 mb-6">
-                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Jelentés:</p>
-                        <p class="text-xs text-zinc-300 italic">"<%= currentTip.reasoning %>"</p>
-                    </div>
+                    <div class="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 mb-6"><p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Jelentés:</p><p class="text-xs text-zinc-300 italic">"<%= currentTip.reasoning %>"</p></div>
+                    
                     <% if (!currentTip.isPublished) { %>
                         <div class="border border-yellow-500/30 bg-yellow-500/10 p-4 rounded-xl text-center mb-4">
                             <p class="text-xs text-yellow-500 font-bold uppercase mb-3">⚠️ JÓVÁHAGYÁSRA VÁR</p>
                             <form action="/admin/publish-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><button class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs pulse-btn">📢 PUBLIKÁLÁS</button></form>
-                            <form action="/admin/run-robot" method="POST" class="mt-2"><button class="text-[9px] text-zinc-500 hover:text-white uppercase font-bold underline">Újraelemzés</button></form>
+                            <form action="/admin/delete-today" method="POST" class="mt-4"><button class="text-[10px] text-red-500 hover:text-red-300 uppercase font-bold border-b border-red-500 pb-1" onclick="return confirm('Biztos törlöd? Újra kell elemezni mindent!')">🗑️ TIPP ELDOBÁSA & ÚJRAKEZDÉS</button></form>
                         </div>
                     <% } else { %>
                         <div class="bg-green-500/10 border border-green-500/30 p-2 rounded mb-4 text-center"><p class="text-[10px] text-green-500 font-bold uppercase">✅ ÉLESÍTVE</p></div>
                         <form action="/admin/publish-tip" method="POST" class="mb-4"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><button class="w-full bg-zinc-800 text-zinc-400 border border-zinc-700 py-2 rounded-xl font-bold text-[10px] uppercase hover:bg-zinc-700 hover:text-white transition">🔄 Szöveg Javítása</button></form>
                         <div class="grid grid-cols-2 gap-3">
-                            <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="win"><button class="w-full bg-zinc-800 border border-zinc-700 text-green-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-green-900/30 transition">WIN ✅</button></form>
-                            <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="loss"><button class="w-full bg-zinc-800 border border-zinc-700 text-red-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-900/30 transition">LOSS ❌</button></form>
+                            <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="win"><button class="w-full bg-zinc-800 border border-zinc-700 text-green-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-green-900/30">WIN ✅</button></form>
+                            <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="loss"><button class="w-full bg-zinc-800 border border-zinc-700 text-red-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-900/30">LOSS ❌</button></form>
                         </div>
+                        <form action="/admin/delete-today" method="POST" class="mt-6 text-center"><button class="text-[9px] text-red-500 hover:text-red-300 uppercase font-bold border-b border-red-500 pb-1" onclick="return confirm('Biztos? Leveszed a tippet a Dashboardról!')">🗑️ VÉSZHELYZET: MAI TIPP TÖRLÉSE</button></form>
                     <% } %>
                 <% } else { %>
                     <div class="text-center py-10"><div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-pulse text-purple-500">🧠</div><p class="text-xs text-zinc-500 mb-6">Nincs aktív elemzés.</p><form action="/admin/run-robot" method="POST"><button class="bg-white text-black px-8 py-4 rounded-xl font-black uppercase text-xs shadow-xl hover:scale-105 transition">🚀 Elemzés Indítása</button></form></div>
@@ -156,61 +96,37 @@
         </div>
 
         <div id="tab-chat" class="page-section hidden">
-            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-fuchsia-500 pl-3">Stratégia & Chat</h2>
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-fuchsia-500 pl-3">Stratégia</h2>
             <div class="tech-card p-4">
-                <div id="chat-win" class="chat-container overflow-y-auto mb-4 custom-scrollbar" style="height: 400px; display:flex; flex-direction:column;">
-                    <% chatHistory.forEach(msg => { %> <div class="msg <%= msg.sender === 'Főnök' ? 'msg-me' : 'msg-ai' %>"><strong><%= msg.sender %>:</strong> <%= msg.text %></div> <% }) %>
-                </div>
-                <div class="flex gap-2 mt-4"><input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Írj a Rókának..."><button onclick="talk()" class="bg-purple-600 text-white px-4 py-3 rounded-xl font-bold">➤</button></div>
+                <div id="chat-win" class="chat-container overflow-y-auto mb-4 custom-scrollbar" style="height:350px"><% chatHistory.forEach(msg => { %> <div class="msg <%= msg.sender === 'Főnök' ? 'msg-me' : 'msg-ai' %>"><strong><%= msg.sender %>:</strong> <%= msg.text %></div> <% }) %></div>
+                <div class="flex gap-2"><input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Írj..."><button onclick="talk()" class="bg-purple-600 text-white px-4 py-3 rounded-xl font-bold">➤</button></div>
             </div>
         </div>
 
         <div id="tab-marketing" class="page-section hidden">
-            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-pink-500 pl-3">Marketing Központ</h2>
-            
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-pink-500 pl-3">Marketing</h2>
             <div class="tech-card p-5 mb-6 border border-pink-900/30">
-                <div class="flex items-center gap-2 mb-4"><span class="text-xl">📱</span><h3 class="text-xs font-bold text-white uppercase">Insta/FB Poszt Generátor</h3></div>
-                <div class="flex gap-2 mb-4">
-                    <button onclick="generateSocial('win')" class="flex-1 bg-zinc-800 text-green-400 border border-green-900/30 py-3 rounded-lg text-[10px] font-bold uppercase">🏆 Mai Nyerő</button>
-                    <button onclick="generateSocial('motivation')" class="flex-1 bg-zinc-800 text-pink-400 border border-pink-900/30 py-3 rounded-lg text-[10px] font-bold uppercase">🔥 Motiváció</button>
-                </div>
+                <div class="flex items-center gap-2 mb-4"><span class="text-xl">📱</span><h3 class="text-xs font-bold text-white uppercase">Insta Poszt</h3></div>
+                <div class="flex gap-2 mb-4"><button onclick="generateSocial('win')" class="flex-1 bg-zinc-800 text-green-400 border border-green-900/30 py-3 rounded-lg text-[10px] font-bold uppercase">🏆 Nyerő</button><button onclick="generateSocial('motivation')" class="flex-1 bg-zinc-800 text-pink-400 border border-pink-900/30 py-3 rounded-lg text-[10px] font-bold uppercase">🔥 Motiváció</button></div>
                 <textarea id="social-result" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-xs text-white focus:border-pink-500 outline-none" placeholder="Generált szöveg..."></textarea>
                 <button onclick="copySocial()" class="w-full bg-pink-600 text-white mt-2 py-3 rounded-lg text-[10px] font-bold uppercase hover:bg-pink-500">Másolás</button>
             </div>
-
             <div class="tech-card p-4 border border-blue-900/30">
-                <h3 class="text-xs font-bold text-white mb-2">📢 Hírlevél (Email)</h3>
-                <input type="text" id="email-topic" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="AI Vázlat Téma...">
-                <button onclick="draftEmail()" class="bg-zinc-800 text-zinc-300 w-full py-2 rounded-lg text-[10px] font-bold uppercase mb-4">AI Vázlat Írása</button>
-                <form method="POST">
-                    <input type="text" name="subject" id="email-subject" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Tárgy">
-                    <textarea name="messageBody" id="email-body" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-zinc-300 mb-2" placeholder="Levél szövege..."></textarea>
-                    <div class="flex gap-2 mt-2">
-                        <button type="submit" formaction="/admin/send-test-email" class="w-1/3 bg-yellow-600 text-white py-3 rounded-xl font-bold text-[10px] uppercase">🧪 TESZT</button>
-                        <button type="submit" formaction="/admin/send-email" onclick="return confirm('Mindenkinek kimegy. Biztos?')" class="w-2/3 bg-blue-600 text-white py-3 rounded-xl font-bold text-[10px] uppercase">🚀 KÜLDÉS</button>
-                    </div>
-                </form>
+                <h3 class="text-xs font-bold text-white mb-2">📢 Hírlevél</h3>
+                <input type="text" id="email-topic" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Téma...">
+                <button onclick="draftEmail()" class="bg-zinc-800 text-zinc-300 w-full py-2 rounded-lg text-[10px] font-bold uppercase mb-4">AI Vázlat</button>
+                <form method="POST"><input type="text" name="subject" id="email-subject" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Tárgy"><textarea name="messageBody" id="email-body" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-zinc-300 mb-2" placeholder="Szöveg..."></textarea><div class="flex gap-2 mt-2"><button type="submit" formaction="/admin/send-test-email" class="w-1/3 bg-yellow-600 text-white py-3 rounded-xl font-bold text-[10px] uppercase">🧪 TESZT</button><button type="submit" formaction="/admin/send-email" onclick="return confirm('Biztos?')" class="w-2/3 bg-blue-600 text-white py-3 rounded-xl font-bold text-[10px] uppercase">🚀 KÜLDÉS</button></div></form>
             </div>
         </div>
 
         <div id="tab-users" class="page-section hidden">
             <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-green-500 pl-3">Tagok</h2>
-            <div class="space-y-2">
-                <% users.forEach(u => { %>
-                    <div class="tech-card p-3 flex justify-between items-center">
-                        <div><p class="text-xs font-bold text-white"><%= u.fullname %></p><p class="text-[9px] text-zinc-500"><%= u.email %></p></div>
-                        <% if (!u.hasLicense) { %> <form action="/admin/activate-user" method="POST"><input type="hidden" name="userId" value="<%= u._id %>"><button class="bg-green-600 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold">Aktivál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold border border-green-500/30 px-2 py-1 rounded">Aktív</span> <% } %>
-                    </div>
-                <% }) %>
-            </div>
+            <div class="space-y-2"><% users.forEach(u => { %> <div class="tech-card p-3 flex justify-between items-center"><div><p class="text-xs font-bold text-white"><%= u.fullname %></p><p class="text-[9px] text-zinc-500"><%= u.email %></p></div><% if (!u.hasLicense) { %> <form action="/admin/activate-user" method="POST"><input type="hidden" name="userId" value="<%= u._id %>"><button class="bg-green-600 text-white text-[9px] px-3 py-1.5 rounded-lg font-bold">Aktivál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold border border-green-500/30 px-2 py-1 rounded">Aktív</span> <% } %></div> <% }) %></div>
         </div>
 
         <div id="tab-finance" class="page-section hidden">
-            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3">Pénzügyi Zárás</h2>
-            <div class="tech-card p-4 mb-6 border border-purple-500/30 bg-purple-900/10">
-                <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-bold text-white uppercase">Havi Zárás</h3></div>
-                <% if(stats && stats.length > 0) { %> <% stats.forEach(stat => { %> <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl mb-2 border border-zinc-800"><div><p class="text-xs font-bold text-white"><%= stat.month %></p><p class="text-[9px] text-zinc-500"><%= stat.totalTips %> tipp</p></div><% if (!stat.isPublished) { %> <form action="/admin/publish-stat" method="POST"><input type="hidden" name="statId" value="<%= stat._id %>"><button class="bg-blue-600 text-white text-[9px] px-3 py-2 rounded-lg font-bold uppercase hover:bg-blue-500">Publikál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold">Publikálva ✅</span> <% } %></div> <% }) %> <% } else { %> <p class="text-[10px] text-zinc-500 italic">Nincs adat.</p> <% } %>
-            </div>
+            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3">Pénzügy</h2>
+            <div class="tech-card p-4 mb-6 border border-purple-500/30 bg-purple-900/10"><div class="flex justify-between items-center mb-3"><h3 class="text-xs font-bold text-white uppercase">Havi Zárás</h3></div><% if(stats && stats.length > 0) { %> <% stats.forEach(stat => { %> <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl mb-2 border border-zinc-800"><div><p class="text-xs font-bold text-white"><%= stat.month %></p><p class="text-[9px] text-zinc-500"><%= stat.totalTips %> tipp</p></div><% if (!stat.isPublished) { %> <form action="/admin/publish-stat" method="POST"><input type="hidden" name="statId" value="<%= stat._id %>"><button class="bg-blue-600 text-white text-[9px] px-3 py-2 rounded-lg font-bold uppercase hover:bg-blue-500">Publikál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold">Publikálva ✅</span> <% } %></div> <% }) %> <% } else { %> <p class="text-[10px] text-zinc-500 italic">Nincs adat.</p> <% } %></div>
             <div class="tech-card p-4"><div class="space-y-1 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"><% if(calculatorData && calculatorData.length > 0) { %> <% calculatorData.forEach(row => { %> <div class="flex justify-between items-center text-[10px] py-3 border-b border-zinc-800"><span class="text-zinc-500 font-mono"><%= row.date %></span><span class="truncate w-32 font-medium text-zinc-300"><%= row.match %></span><span class="font-bold <%= row.dailyProfit > 0 ? 'text-green-500' : 'text-red-500' %>"><%= row.dailyProfit %>%</span></div> <% }) %> <% } else { %> <p class="text-center text-[10px] text-zinc-600 italic py-4">Nincs adat.</p> <% } %></div></div>
         </div>
 
