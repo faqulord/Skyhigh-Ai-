@@ -14,8 +14,8 @@ const OWNER_EMAIL = "stylefaqu@gmail.com";
 const BRAND_NAME = "Rafinált Róka"; 
 
 const foxQuotes = [
-    "A piac változik, de a Róka mindig egy lépéssel előrébb jár. 🦊📈",
-    "Ma nem tippelünk. Ma befektetünk. 💰",
+    "A türelem profitot terem. Csak okosan. 🦊💸",
+    "Nem kapkodunk. A Róka kivárja a zsákmányt. ⏳",
     "A statisztika a mi fegyverünk a szerencse ellen. ⚔️",
     "Hideg fej, forró oddsok. Ez a siker titka. 🔥"
 ];
@@ -43,7 +43,7 @@ const Tip = mongoose.model('Tip', new mongoose.Schema({
     status: { type: String, default: 'pending' }, 
     isPublished: { type: Boolean, default: false },
     date: { type: String, index: true },
-    isReal: { type: Boolean, default: false }
+    isReal: { type: Boolean, default: false } // IGAZ/HAMIS jelző
 }));
 
 const MonthlyStat = mongoose.model('MonthlyStat', new mongoose.Schema({
