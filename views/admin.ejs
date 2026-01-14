@@ -51,7 +51,7 @@
                     <p class="text-xs text-purple-400 font-mono mb-4"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
 
                     <div class="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 mb-6">
-                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Jelentés:</p>
+                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Róka jelentése a Főnöknek:</p>
                         <p class="text-xs text-zinc-300 italic">"<%= currentTip.reasoning %>"</p>
                     </div>
 
@@ -60,16 +60,24 @@
                             <p class="text-xs text-yellow-500 font-bold uppercase mb-3">⚠️ JÓVÁHAGYÁSRA VÁR</p>
                             <form action="/admin/publish-tip" method="POST">
                                 <input type="hidden" name="tipId" value="<%= currentTip._id %>">
-                                <button class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs pulse-btn">📢 PUBLIKÁLÁS</button>
+                                <button class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs pulse-btn hover:scale-[1.02] transition">📢 PUBLIKÁLÁS A TAGOKNAK</button>
                             </form>
-                            <form action="/admin/run-robot" method="POST" class="mt-2">
+                             <form action="/admin/run-robot" method="POST" class="mt-2">
                                 <button class="text-[9px] text-zinc-500 hover:text-white uppercase font-bold underline">Újraelemzés (Felülírás)</button>
                             </form>
                         </div>
                     <% } else { %>
                         <div class="bg-green-500/10 border border-green-500/30 p-2 rounded mb-4 text-center">
-                            <p class="text-[10px] text-green-500 font-bold uppercase">✅ ÉLESÍTVE</p>
+                            <p class="text-[10px] text-green-500 font-bold uppercase">✅ ÉLESÍTVE (LÁTHATÓ)</p>
                         </div>
+
+                        <form action="/admin/publish-tip" method="POST" class="mb-4">
+                            <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                            <button class="w-full bg-zinc-800 text-zinc-400 border border-zinc-700 py-2 rounded-xl font-bold text-[10px] uppercase hover:bg-zinc-700 hover:text-white transition">
+                                🔄 Szöveg Újragenerálása (Ha még "Főnök" van ott)
+                            </button>
+                        </form>
+
                         <div class="grid grid-cols-2 gap-3">
                             <form action="/admin/settle-tip" method="POST">
                                 <input type="hidden" name="tipId" value="<%= currentTip._id %>">
@@ -87,7 +95,7 @@
                 <% } else { %>
                     <div class="text-center py-10">
                         <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-pulse">🧠</div>
-                        <p class="text-xs text-zinc-500 mb-6">Nincs aktív tipp mára.</p>
+                        <p class="text-xs text-zinc-500 mb-6">A mai stratégia még nem készült el.</p>
                         <form action="/admin/run-robot" method="POST">
                             <button class="bg-white text-black px-8 py-4 rounded-xl font-black uppercase text-xs shadow-xl hover:scale-105 transition">🚀 Elemzés Indítása</button>
                         </form>
@@ -95,29 +103,27 @@
                 <% } %>
             </div>
 
-            <h3 class="text-xs font-bold text-zinc-500 uppercase mb-3 ml-1">Legutóbbi Tippek</h3>
+            <h3 class="text-xs font-bold text-zinc-500 uppercase mb-3 ml-1">Előző Napok</h3>
             <div class="space-y-3 mb-6">
                 <% recentTips.forEach(tip => { %>
-                    <div class="tech-card p-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <div>
-                                <p class="text-[10px] text-zinc-500"><%= tip.date %></p>
-                                <p class="text-xs font-bold text-white"><%= tip.match %></p>
-                            </div>
-                            <span class="text-[9px] font-bold uppercase px-2 py-1 rounded border <%= tip.status === 'win' ? 'text-green-500 border-green-500/30 bg-green-500/10' : (tip.status === 'loss' ? 'text-red-500 border-red-500/30 bg-red-500/10' : 'text-zinc-500 border-zinc-700') %>">
+                    <div class="tech-card p-4 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] text-zinc-500"><%= tip.date %></p>
+                            <p class="text-xs font-bold text-white"><%= tip.match %></p>
+                            <p class="text-[9px] font-bold uppercase mt-1 <%= tip.status === 'win' ? 'text-green-500' : (tip.status === 'loss' ? 'text-red-500' : 'text-zinc-500') %>">
                                 <%= tip.status %>
-                            </span>
+                            </p>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                              <form action="/admin/settle-tip" method="POST">
                                 <input type="hidden" name="tipId" value="<%= tip._id %>">
                                 <input type="hidden" name="status" value="win">
-                                <button class="w-full bg-zinc-800 hover:bg-green-900/30 text-green-500 border border-zinc-700 hover:border-green-500/50 py-3 rounded-lg text-[10px] font-bold uppercase transition">NYERT (WIN)</button>
+                                <button class="bg-zinc-800 text-green-500 border border-zinc-700 px-3 py-2 rounded-lg text-[10px] font-bold hover:bg-green-900/20">W</button>
                             </form>
                             <form action="/admin/settle-tip" method="POST">
                                 <input type="hidden" name="tipId" value="<%= tip._id %>">
                                 <input type="hidden" name="status" value="loss">
-                                <button class="w-full bg-zinc-800 hover:bg-red-900/30 text-red-500 border border-zinc-700 hover:border-red-500/50 py-3 rounded-lg text-[10px] font-bold uppercase transition">VESZTETT (LOSS)</button>
+                                <button class="bg-zinc-800 text-red-500 border border-zinc-700 px-3 py-2 rounded-lg text-[10px] font-bold hover:bg-red-900/20">L</button>
                             </form>
                         </div>
                     </div>
