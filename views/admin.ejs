@@ -2,152 +2,289 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin HQ | <%= brandName %></title>
+    <title>Owner HQ | <%= brandName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 50px; }
-        .fox-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 1.5rem; }
-        .chat-bubble { padding: 10px 15px; border-radius: 15px; font-size: 11px; line-height: 1.4; max-width: 85%; }
-        .chat-boss { background: #7c3aed; color: white; border-bottom-right-radius: 2px; margin-left: auto; }
-        .chat-ai { background: #27272a; color: #d4d4d8; border-bottom-left-radius: 2px; margin-right: auto; }
-        .loading { opacity: 0.5; pointer-events: none; }
+        body { background: #09090b; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .glass-panel { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1.5rem; }
+        .nav-item.active { background: #7c3aed; color: white; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); }
+        .nav-item { transition: all 0.3s ease; color: #71717a; }
+        .nav-item:hover:not(.active) { background: rgba(255,255,255,0.05); color: #d4d4d8; }
+        
+        /* Chat stílus */
+        .chat-bubble { padding: 12px 16px; border-radius: 18px; font-size: 12px; line-height: 1.5; max-width: 85%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .chat-boss { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border-bottom-right-radius: 4px; margin-left: auto; }
+        .chat-ai { background: #27272a; color: #e4e4e7; border-bottom-left-radius: 4px; margin-right: auto; border: 1px solid #3f3f46; }
+        
+        /* Loading animáció */
+        .loading { opacity: 0.6; pointer-events: none; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        /* Mobile Bottom Nav fix */
+        .pb-safe { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     </style>
 </head>
-<body class="p-4 flex justify-center min-h-screen">
-    <div class="max-w-md w-full pb-20">
+<body class="flex flex-col md:flex-row min-h-screen">
 
-        <header class="flex justify-between items-center mb-8 pt-4 border-b border-white/5 pb-4">
-            <div>
-                <p class="text-[9px] text-purple-500 font-black uppercase tracking-[3px]">System Control</p>
-                <h1 style="font-family: 'Orbitron';" class="text-lg font-bold text-white uppercase"><%= brandName %> HQ</h1>
+    <nav class="fixed bottom-0 left-0 w-full md:relative md:w-64 md:h-screen bg-black/90 md:bg-[#050505] border-t md:border-t-0 md:border-r border-white/10 z-50 backdrop-blur-md md:backdrop-blur-none">
+        <div class="flex md:flex-col justify-around md:justify-start items-center md:items-stretch h-16 md:h-full p-2 md:p-6 gap-1 md:gap-4">
+            
+            <div class="hidden md:block mb-8 text-center">
+                <div class="w-12 h-12 bg-purple-600 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl shadow-lg shadow-purple-900/50">🦊</div>
+                <h1 style="font-family: 'Orbitron';" class="text-sm font-bold text-white uppercase tracking-wider"><%= brandName %></h1>
+                <p class="text-[9px] text-purple-500 font-bold uppercase tracking-[3px] mt-1">System Owner</p>
             </div>
-            <a href="/dashboard" class="bg-zinc-900 px-4 py-2 rounded-xl text-[10px] font-bold uppercase text-zinc-400 border border-white/5">Dash</a>
+
+            <button onclick="showPage('dashboard')" id="btn-dashboard" class="nav-item active flex flex-col md:flex-row items-center md:gap-3 p-2 md:p-3 rounded-xl md:rounded-2xl flex-1 md:flex-none">
+                <span class="text-xl md:text-lg">📊</span>
+                <span class="text-[9px] md:text-xs font-bold uppercase mt-1 md:mt-0">Vezérlő</span>
+            </button>
+
+            <button onclick="showPage('communication')" id="btn-communication" class="nav-item flex flex-col md:flex-row items-center md:gap-3 p-2 md:p-3 rounded-xl md:rounded-2xl flex-1 md:flex-none">
+                <span class="text-xl md:text-lg">💬</span>
+                <span class="text-[9px] md:text-xs font-bold uppercase mt-1 md:mt-0">Comm</span>
+            </button>
+
+            <button onclick="showPage('users')" id="btn-users" class="nav-item flex flex-col md:flex-row items-center md:gap-3 p-2 md:p-3 rounded-xl md:rounded-2xl flex-1 md:flex-none">
+                <span class="text-xl md:text-lg">👥</span>
+                <span class="text-[9px] md:text-xs font-bold uppercase mt-1 md:mt-0">Tagok</span>
+            </button>
+
+            <button onclick="showPage('finance')" id="btn-finance" class="nav-item flex flex-col md:flex-row items-center md:gap-3 p-2 md:p-3 rounded-xl md:rounded-2xl flex-1 md:flex-none">
+                <span class="text-xl md:text-lg">💰</span>
+                <span class="text-[9px] md:text-xs font-bold uppercase mt-1 md:mt-0">Pénzügy</span>
+            </button>
+
+            <div class="hidden md:block mt-auto">
+                <a href="/dashboard" class="flex items-center gap-3 p-3 text-zinc-500 hover:text-white transition">
+                    <span>🚪</span>
+                    <span class="text-xs font-bold">Kilépés a menübe</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 p-4 md:p-10 pb-safe md:overflow-y-auto h-screen">
+        
+        <header class="md:hidden flex justify-between items-center mb-6 pt-2">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-sm shadow-lg shadow-purple-900/50">🦊</div>
+                <div>
+                    <h1 style="font-family: 'Orbitron';" class="text-sm font-bold text-white uppercase"><%= brandName %></h1>
+                    <p class="text-[8px] text-purple-500 font-bold uppercase tracking-[2px]">Owner Access</p>
+                </div>
+            </div>
+            <a href="/dashboard" class="bg-zinc-900 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase text-zinc-400 border border-white/5">Exit</a>
         </header>
 
-        <div class="fox-card p-5 mb-6 relative overflow-hidden shadow-2xl shadow-purple-900/10">
-            <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-4 text-center tracking-widest">Mai Hadművelet (<%= dbDate %>)</h3>
-
-            <% if (currentTip) { %>
-                <div class="bg-purple-900/20 border border-purple-500/30 p-4 rounded-xl mb-4 text-center">
-                    <h2 class="text-sm font-black text-white uppercase mb-1"><%= currentTip.match %></h2>
-                    <p class="text-xs text-purple-400 font-bold"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <form action="/admin/settle-tip" method="POST">
-                        <input type="hidden" name="tipId" value="<%= currentTip._id %>">
-                        <input type="hidden" name="status" value="win">
-                        <button class="w-full bg-green-900/30 border border-green-500/50 text-green-500 py-3 rounded-xl font-black uppercase text-xs hover:bg-green-600 hover:text-white transition">WIN ✅</button>
-                    </form>
-                    
-                    <form action="/admin/settle-tip" method="POST">
-                        <input type="hidden" name="tipId" value="<%= currentTip._id %>">
-                        <input type="hidden" name="status" value="loss">
-                        <button class="w-full bg-red-900/30 border border-red-500/50 text-red-500 py-3 rounded-xl font-black uppercase text-xs hover:bg-red-600 hover:text-white transition">LOSS ❌</button>
-                    </form>
-                </div>
-                <p class="text-[9px] text-zinc-600 text-center mt-3 italic">Eredmény rögzítése frissíti a Dashboardot</p>
-
-            <% } else { %>
-                <div class="text-center py-4">
-                    <p class="text-xs text-zinc-400 mb-4">A rendszer várakozik...</p>
-                    <form action="/admin/run-robot" method="POST">
-                        <button type="submit" class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs shadow-lg hover:scale-[1.02] transition">🚀 Elemzés Indítása</button>
-                    </form>
-                </div>
-            <% } %>
-        </div>
-
-        <div class="fox-card p-5 mb-6 border border-blue-500/20">
-            <h3 class="text-[10px] font-black uppercase text-blue-400 mb-4 text-center tracking-widest">📧 Hírlevél & Értesítés</h3>
-            
-            <div class="mb-4">
-                <label class="text-[9px] text-zinc-500 font-bold uppercase">Miről szóljon a levél?</label>
-                <div class="flex gap-2 mt-1">
-                    <input type="text" id="email-topic" class="flex-1 bg-black border border-zinc-800 rounded-xl p-2 text-xs text-white" placeholder="Pl. Heti összegzés, profit...">
-                    <button onclick="draftEmail()" id="draft-btn" class="bg-blue-600 px-3 rounded-xl text-[10px] font-bold uppercase">Varázslat ✨</button>
-                </div>
+        <div id="page-dashboard" class="space-y-6 animate-fade-in">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white">Napi Hadművelet</h2>
+                <span class="bg-zinc-800 text-zinc-400 text-[10px] px-3 py-1 rounded-full font-mono"><%= dbDate %></span>
             </div>
 
-            <form action="/admin/send-email" method="POST">
-                <div class="mb-3">
-                    <input type="text" name="subject" id="email-subject" class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-2 text-xs font-bold text-white mb-2" placeholder="Tárgy (Automatikusan kitöltve...)">
-                    <textarea name="messageBody" id="email-body" rows="6" class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-300" placeholder="Itt jelenik meg az AI által írt szöveg, amit szerkeszthetsz..."></textarea>
-                </div>
-                <button type="submit" onclick="return confirm('Biztosan kiküldöd minden tagnak?')" class="w-full bg-white text-black py-3 rounded-xl font-black uppercase text-xs hover:bg-zinc-200 transition">✉️ Küldés Minden Tagnak 🚀</button>
-            </form>
-        </div>
-
-        <div class="fox-card p-5 mb-6">
-            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-4 text-center tracking-widest">Közvetlen Kapcsolat</h3>
-            <div id="chat-win" class="h-40 overflow-y-auto mb-4 space-y-3 pr-1 scrollbar-hide">
-                <% chatHistory.forEach(msg => { %>
-                    <div class="flex w-full">
-                        <div class="chat-bubble <%= msg.sender === 'Főnök' ? 'chat-boss' : 'chat-ai' %>">
-                            <strong><%= msg.sender %>:</strong> <%= msg.text %>
+            <div class="glass-panel p-6 relative overflow-hidden shadow-2xl">
+                <% if (currentTip) { %>
+                    <div class="absolute top-0 right-0 bg-purple-600 text-[9px] font-bold px-4 py-1 rounded-bl-xl text-white shadow-lg">AKTÍV ELEMZÉS</div>
+                    
+                    <div class="flex flex-col items-center justify-center mb-6 mt-2">
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">A Róka Választása</div>
+                        <h3 class="text-lg md:text-2xl font-black text-white text-center leading-tight mb-1"><%= currentTip.match %></h3>
+                        <div class="bg-white/5 px-4 py-1 rounded-full border border-white/10 mt-2">
+                            <p class="text-xs text-purple-400 font-mono font-bold"><%= currentTip.prediction %> <span class="text-white opacity-50">|</span> @<%= currentTip.odds %></p>
                         </div>
                     </div>
-                <% }) %>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <form action="/admin/settle-tip" method="POST">
+                            <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                            <input type="hidden" name="status" value="win">
+                            <button class="w-full group relative overflow-hidden bg-green-500/10 border border-green-500/20 hover:border-green-500 text-green-500 py-4 rounded-xl font-black uppercase text-xs transition-all duration-300">
+                                <span class="relative z-10 group-hover:scale-110 block transition">WIN ✅</span>
+                                <div class="absolute inset-0 bg-green-500/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                            </button>
+                        </form>
+                        
+                        <form action="/admin/settle-tip" method="POST">
+                            <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                            <input type="hidden" name="status" value="loss">
+                            <button class="w-full group relative overflow-hidden bg-red-500/10 border border-red-500/20 hover:border-red-500 text-red-500 py-4 rounded-xl font-black uppercase text-xs transition-all duration-300">
+                                <span class="relative z-10 group-hover:scale-110 block transition">LOSS ❌</span>
+                                <div class="absolute inset-0 bg-red-500/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                            </button>
+                        </form>
+                    </div>
+                    <p class="text-[9px] text-zinc-600 text-center mt-4">⚠️ Az eredmény rögzítése azonnal frissíti a tagok felületét.</p>
+
+                <% } else { %>
+                    <div class="text-center py-10">
+                        <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-pulse">💤</div>
+                        <p class="text-sm text-zinc-400 font-bold mb-6">A rendszer várakozik a parancsra...</p>
+                        <form action="/admin/run-robot" method="POST">
+                            <button type="submit" class="bg-white text-black px-8 py-4 rounded-xl font-black uppercase text-xs shadow-xl hover:scale-105 transition hover:shadow-white/20">🚀 Elemzés Indítása</button>
+                        </form>
+                    </div>
+                <% } %>
             </div>
-            <div class="flex gap-2 relative">
-                <input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl p-3 pl-4 text-xs text-white focus:outline-none focus:border-purple-600" placeholder="Utasítás a Rókának...">
-                <button onclick="talk()" class="bg-purple-600 text-white p-3 rounded-xl font-bold uppercase text-xs">➤</button>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-4">
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase">Havi Tippek</p>
+                    <p class="text-2xl font-black text-white"><%= stats[0]?.totalTips || 0 %></p>
+                </div>
+                <div class="glass-panel p-4">
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase">Győzelmi Arány</p>
+                    <p class="text-2xl font-black text-purple-400">
+                        <%= stats[0]?.totalTips > 0 ? Math.round((stats[0].winCount / stats[0].totalTips) * 100) : 0 %>%
+                    </p>
+                </div>
             </div>
         </div>
 
-        <div class="fox-card p-5 border border-purple-500/20">
-            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-4 border-b border-white/5 pb-2">Havi Profit</h3>
-            <div class="space-y-1 max-h-40 overflow-y-auto pr-2">
-                <% if(calculatorData && calculatorData.length > 0) { %>
-                    <% calculatorData.forEach(row => { %>
-                        <div class="flex justify-between text-[10px] py-1 border-b border-white/5">
-                            <span class="text-zinc-500"><%= row.date %></span>
-                            <span class="truncate w-32 font-medium text-zinc-300"><%= row.match %></span>
-                            <span class="font-black <%= row.totalRunning > 0 ? 'text-green-400' : 'text-red-400' %>"><%= row.totalRunning.toFixed(1) %>%</span>
+        <div id="page-communication" class="space-y-6 hidden animate-fade-in">
+            <h2 class="text-xl font-bold text-white">Kommunikációs Központ</h2>
+
+            <div class="glass-panel p-4 h-[500px] flex flex-col">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/5">
+                    <h3 class="text-[10px] font-black uppercase text-purple-500 tracking-widest">Privát Vonal (Róka)</h3>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+                
+                <div id="chat-win" class="flex-1 overflow-y-auto mb-4 space-y-4 pr-2 scrollbar-hide">
+                    <% chatHistory.forEach(msg => { %>
+                        <div class="flex w-full">
+                            <div class="chat-bubble <%= msg.sender === 'Főnök' ? 'chat-boss' : 'chat-ai' %>">
+                                <strong><%= msg.sender %>:</strong> <%= msg.text %>
+                            </div>
                         </div>
                     <% }) %>
-                <% } else { %>
-                    <p class="text-center text-[10px] text-zinc-600 italic">Még nincs adat ebben a hónapban.</p>
-                <% } %>
+                </div>
+                
+                <div class="flex gap-2 relative">
+                    <input type="text" id="chat-in" class="flex-1 bg-black/50 border border-zinc-700 rounded-xl p-3 pl-4 text-xs text-white focus:outline-none focus:border-purple-600 focus:bg-black transition" placeholder="Utasítás a Rókának...">
+                    <button onclick="talk()" class="bg-purple-600 hover:bg-purple-500 text-white p-3 rounded-xl font-bold transition shadow-lg shadow-purple-900/20">➤</button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 border border-blue-500/20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl">📧</span>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Hírlevél Küldés</h3>
+                        <p class="text-[9px] text-zinc-500 uppercase">Automata AI Szövegíróval</p>
+                    </div>
+                </div>
+                
+                <div class="bg-black/30 p-4 rounded-xl mb-4 border border-white/5">
+                    <label class="text-[9px] text-zinc-500 font-bold uppercase block mb-2">Téma Generálás (AI)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="email-topic" class="flex-1 bg-transparent border-b border-zinc-700 p-2 text-xs text-white focus:outline-none focus:border-blue-500" placeholder="Pl. Heti profit összegzés...">
+                        <button onclick="draftEmail()" id="draft-btn" class="bg-blue-600/20 text-blue-400 border border-blue-500/50 px-4 rounded-lg text-[10px] font-bold uppercase hover:bg-blue-600 hover:text-white transition">Írd meg ✨</button>
+                    </div>
+                </div>
+
+                <form action="/admin/send-email" method="POST">
+                    <div class="space-y-3 mb-6">
+                        <input type="text" name="subject" id="email-subject" class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-3 text-xs font-bold text-white focus:border-blue-500 outline-none" placeholder="Tárgy...">
+                        <textarea name="messageBody" id="email-body" rows="5" class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-3 text-xs text-zinc-300 focus:border-blue-500 outline-none" placeholder="Levél tartalma..."></textarea>
+                    </div>
+                    <button type="submit" onclick="return confirm('Biztosan kiküldöd minden tagnak?')" class="w-full bg-white text-black py-3 rounded-xl font-black uppercase text-xs hover:bg-zinc-200 transition">✉️ Küldés Minden Tagnak</button>
+                </form>
             </div>
         </div>
-        
-        <div class="fox-card p-5 mt-6">
-                <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-4 border-b border-white/5 pb-2">Tagok Kezelése</h3>
-                <div class="space-y-3">
+
+        <div id="page-users" class="space-y-6 hidden animate-fade-in">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white">Felhasználók</h2>
+                <span class="text-xs font-bold text-zinc-500"><%= users.length %> regisztrált</span>
+            </div>
+
+            <div class="glass-panel p-2">
                 <% users.forEach(u => { %>
-                    <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg">
-                        <div>
-                            <p class="text-[10px] font-bold text-white"><%= u.fullname %></p>
-                            <p class="text-[8px] text-zinc-500"><%= u.email %></p>
+                    <div class="flex justify-between items-center p-4 border-b border-white/5 last:border-0 hover:bg-white/5 transition rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-600 flex items-center justify-center text-[10px] font-bold">
+                                <%= u.fullname.charAt(0) %>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white"><%= u.fullname %></p>
+                                <p class="text-[9px] text-zinc-500"><%= u.email %></p>
+                            </div>
                         </div>
                         <% if (!u.hasLicense) { %>
                             <form action="/admin/activate-user" method="POST">
                                 <input type="hidden" name="userId" value="<%= u._id %>">
-                                <button class="bg-green-600 text-white text-[9px] px-3 py-1.5 rounded-lg uppercase font-bold shadow-md">Engedélyez</button>
+                                <button class="bg-green-500/10 text-green-500 border border-green-500/50 text-[9px] px-3 py-1.5 rounded-lg uppercase font-bold hover:bg-green-500 hover:text-white transition">Engedélyez</button>
                             </form>
                         <% } else { %>
-                            <span class="text-green-500 text-[8px] font-black uppercase bg-green-500/10 px-2 py-1 rounded">Aktív</span>
+                            <span class="text-green-500 text-[9px] font-black uppercase bg-green-500/10 px-2 py-1 rounded border border-green-500/20">Aktív</span>
                         <% } %>
                     </div>
                 <% }) %>
+            </div>
+        </div>
+
+        <div id="page-finance" class="space-y-6 hidden animate-fade-in">
+            <h2 class="text-xl font-bold text-white">Profit Kalkulátor</h2>
+            
+            <div class="glass-panel p-6 border border-purple-500/20">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-[10px] font-black uppercase text-purple-500 tracking-widest">Havi Teljesítmény</h3>
+                    <span class="text-xs font-bold text-white bg-white/5 px-2 py-1 rounded">Aktuális Hónap</span>
+                </div>
+
+                <div class="space-y-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <% if(calculatorData && calculatorData.length > 0) { %>
+                        <% calculatorData.forEach(row => { %>
+                            <div class="flex justify-between items-center text-[10px] py-3 border-b border-white/5 hover:bg-white/5 px-2 rounded transition">
+                                <span class="text-zinc-500 font-mono"><%= row.date %></span>
+                                <span class="truncate w-32 font-medium text-zinc-300"><%= row.match %></span>
+                                <div class="flex flex-col items-end">
+                                    <span class="font-bold <%= row.dailyProfit > 0 ? 'text-green-400' : (row.dailyProfit < 0 ? 'text-red-400' : 'text-zinc-500') %>">
+                                        <%= row.dailyProfit > 0 ? '+' : '' %><%= row.dailyProfit %>%
+                                    </span>
+                                    <span class="text-[8px] text-zinc-600">Össz: <%= row.totalRunning.toFixed(1) %>%</span>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="text-center py-10 text-zinc-600">
+                            <p class="italic text-xs">Még nincs rögzített adat ebben a hónapban.</p>
+                        </div>
+                    <% } %>
                 </div>
             </div>
+        </div>
 
-    </div>
+    </main>
 
     <script>
-        const win = document.getElementById('chat-win'); 
-        win.scrollTop = win.scrollHeight;
+        // Oldal váltó logika (SPA érzés)
+        function showPage(pageId) {
+            // Minden oldalt elrejtünk
+            ['dashboard', 'communication', 'users', 'finance'].forEach(id => {
+                document.getElementById('page-' + id).classList.add('hidden');
+                document.getElementById('btn-' + id).classList.remove('active');
+            });
 
-        // CHAT FUNKCIÓ
+            // Kiválasztottat megjelenítjük
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            document.getElementById('btn-' + pageId).classList.add('active');
+        }
+
+        // Chat logika
+        const win = document.getElementById('chat-win'); 
+        if(win) win.scrollTop = win.scrollHeight;
+
         async function talk() {
             const i = document.getElementById('chat-in'); 
             if(!i.value) return;
             const msgText = i.value; i.value = '';
+            
             win.innerHTML += `<div class="flex w-full"><div class="chat-bubble chat-boss"><strong>Főnök:</strong> ${msgText}</div></div>`;
             win.scrollTop = win.scrollHeight;
+            
             try {
                 const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})});
                 const d = await r.json(); 
@@ -156,7 +293,7 @@
             } catch (err) { console.error(err); }
         }
 
-        // EMAIL GENERÁLÓ FUNKCIÓ
+        // Email AI logika
         async function draftEmail() {
             const topic = document.getElementById('email-topic').value;
             if(!topic) return alert("Írj be egy témát!");
@@ -168,25 +305,4 @@
                 const res = await fetch('/admin/draft-email', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic })
-                });
-                const data = await res.json();
-                
-                const lines = data.draft.split('\n');
-                let subject = "Hírlevél a Rókától";
-                let body = data.draft;
-
-                if(lines[0].toLowerCase().includes("tárgy") || lines[0].toLowerCase().includes("subject")) {
-                    subject = lines[0].replace(/Tárgy:|Subject:/i, '').trim();
-                    body = lines.slice(1).join('\n').trim();
-                }
-
-                document.getElementById('email-subject').value = subject;
-                document.getElementById('email-body').value = body;
-            } catch(e) { alert("Hiba az AI generálásnál."); }
-            
-            btn.innerHTML = "Varázslat ✨"; btn.classList.remove('loading');
-        }
-    </script>
-</body>
-</html>
+       
