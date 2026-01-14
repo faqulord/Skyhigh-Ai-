@@ -33,9 +33,12 @@
         /* Gomb animáció */
         .btn-pulse { animation: btn-pulse 2s infinite; }
         @keyframes btn-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 159, 67, 0.5); } 70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
+
+        .telegram-float { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #229ED9, #1c7caf); color: white; width: 55px; height: 55px; border-radius: 50px; display: flex; align-items: center; justify-content: center; z-index: 1000; box-shadow: 0 5px 20px rgba(34, 158, 217, 0.4); transition: transform 0.2s; }
+        .telegram-float:active { transform: scale(0.9); }
     </style>
 </head>
-<body class="p-6 max-w-lg mx-auto pb-20">
+<body class="p-6 max-w-lg mx-auto pb-20 relative">
 
     <div class="text-center mb-10 mt-4">
         <div class="inline-block mb-4 fox-pulse">
@@ -66,8 +69,8 @@
                     <li>✅ Alap Tőkemenedzsment</li>
                 </ul>
 
-                <a href="https://t.me/SHANNA444" target="_blank" class="block w-full bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded-xl font-bold uppercase text-xs transition border border-zinc-600">
-                    Ezt választom
+                <a href="https://revolut.me/csaba6da3" target="_blank" class="block w-full bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded-xl font-bold uppercase text-xs transition border border-zinc-600">
+                    Ezt választom (Revolut)
                 </a>
             </div>
         </div>
@@ -89,8 +92,8 @@
                     <li>🔥 <span class="font-bold text-[#FF9F43]">Extra "High-Risk" Tippek</span></li>
                 </ul>
 
-                <a href="https://t.me/SHANNA444" target="_blank" class="block w-full bg-gradient-to-r from-[#FF9F43] to-[#FFC75F] text-black py-4 rounded-xl font-black uppercase text-xs shadow-lg btn-pulse hover:scale-105 transition transform">
-                    🚀 EZ KELL NEKEM!
+                <a href="https://revolut.me/csaba6da3" target="_blank" class="block w-full bg-gradient-to-r from-[#FF9F43] to-[#FFC75F] text-black py-4 rounded-xl font-black uppercase text-xs shadow-lg btn-pulse hover:scale-105 transition transform">
+                    🚀 EZ KELL NEKEM! (Revolut)
                 </a>
             </div>
         </div>
@@ -109,22 +112,26 @@
                     <li>👑 Prioritásos Támogatás</li>
                 </ul>
 
-                <a href="https://t.me/SHANNA444" target="_blank" class="block w-full bg-zinc-900 hover:bg-zinc-800 text-purple-400 border border-purple-900/50 py-3 rounded-xl font-bold uppercase text-xs transition">
-                    Főnök leszek
+                <a href="https://revolut.me/csaba6da3" target="_blank" class="block w-full bg-zinc-900 hover:bg-zinc-800 text-purple-400 border border-purple-900/50 py-3 rounded-xl font-bold uppercase text-xs transition">
+                    Főnök leszek (Revolut)
                 </a>
             </div>
         </div>
 
     </div>
 
-    <div class="mt-12 text-center">
-        <p class="text-xs text-zinc-500 mb-2">Kérdésed van a csomagokkal kapcsolatban?</p>
+    <div class="mt-12 text-center mb-8">
+        <p class="text-xs text-zinc-500 mb-2">Technikai gond vagy kérdés?</p>
         <a href="https://t.me/SHANNA444" target="_blank" class="text-xs font-bold text-white border-b border-zinc-700 pb-1">Írj nekünk Telegramon -></a>
     </div>
 
-    <div class="mt-8 text-center">
+    <div class="text-center">
          <a href="/logout" class="text-[10px] text-zinc-700 hover:text-red-500 transition">Kijelentkezés</a>
     </div>
+
+    <a href="https://t.me/SHANNA444" target="_blank" class="telegram-float">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </a>
 
 </body>
 </html>
