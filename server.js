@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - PURPLE MODE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - MARKETING MODE`));
 
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
@@ -152,10 +152,8 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, recentTips, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
-// --- ÚJ SOCIAL MEDIA GENERÁTOR ---
 app.post('/admin/social-content', checkAdmin, async (req, res) => {
-    const { type } = req.body; // 'win', 'motivation'
-    
+    const { type } = req.body; 
     let promptContext = "";
     if (type === 'win') {
         const lastWin = await Tip.findOne({ status: 'win' }).sort({ date: -1 });
@@ -163,21 +161,10 @@ app.post('/admin/social-content', checkAdmin, async (req, res) => {
     } else {
         promptContext = "Téma: MOTIVÁCIÓ / CSATLAKOZZ.";
     }
-
-    const socialPrompt = `
-        Te vagy a Rafinált Róka Social Media menedzsere.
-        Cél: Embereket vonzani az Instagramon/Facebookon.
-        Stílus: Zsivány, Csúcstechnológiás, Profi, de Laza.
-        Feladat: Írj egy rövid, ütős poszt szöveget (caption).
-        Használj emojikat (🔥, 💸, 🦊, 🚀) és hashtageket (#sportfogadás #tippmix #profit).
-        ${promptContext}
-    `;
-
     const aiRes = await openai.chat.completions.create({ 
         model: "gpt-4-turbo-preview", 
-        messages: [{ role: "system", content: "Social Media Expert." }, { role: "user", content: socialPrompt }] 
+        messages: [{ role: "system", content: "Social Media Expert." }, { role: "user", content: `Írj Insta posztot. ${promptContext}` }] 
     });
-    
     res.json({ content: aiRes.choices[0].message.content });
 });
 
@@ -190,8 +177,7 @@ app.post('/admin/publish-stat', checkAdmin, async (req, res) => {
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => {
     const { tipId } = req.body;
     const tip = await Tip.findById(tipId);
-    const transformPrompt = `Eredeti: "${tip.reasoning}". Írd át a Csoportnak. Szerep: Zsivány Róka. Stílus: Laza, profi. TILOS: "Főnök".`;
-    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "AI Copywriter." }, { role: "user", content: transformPrompt }] });
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "AI Copywriter." }, { role: "user", content: `Írd át a tagoknak laza, profi stílusban (NE használd a Főnök szót): ${tip.reasoning}` }] });
     const memberText = aiRes.choices[0].message.content;
     await Tip.findByIdAndUpdate(tipId, { isPublished: true, memberMessage: memberText });
     res.redirect('/admin');
@@ -199,8 +185,7 @@ app.post('/admin/publish-tip', checkAdmin, async (req, res) => {
 
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save();
-    const adminPrompt = `Te vagy a ${BRAND_NAME} (Belső Én). Profi stratéga.`;
-    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: adminPrompt }, { role: "user", content: req.body.message }] });
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Te vagy a Rafinált Róka. Profi stratéga." }, { role: "user", content: req.body.message }] });
     const reply = aiRes.choices[0].message.content;
     await new ChatMessage({ sender: 'AI', text: reply }).save();
     res.json({ reply });
@@ -208,10 +193,30 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
 
 app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     const topic = req.body.topic;
-    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Marketing Expert." }, { role: "user", content: `Téma: ${topic}` }] });
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Marketing Expert." }, { role: "user", content: `Írj hírlevél vázlatot erről: ${topic}` }] });
     res.json({ draft: aiRes.choices[0].message.content });
 });
 
+// --- TESZT EMAIL KÜLDÉS ---
+app.post('/admin/send-test-email', checkAdmin, async (req, res) => {
+    const { subject, messageBody } = req.body;
+    try {
+        await transporter.sendMail({
+            from: `"${BRAND_NAME}" <${process.env.EMAIL_USER || OWNER_EMAIL}>`,
+            to: process.env.EMAIL_USER || OWNER_EMAIL, // CSAK NEKED MEGY
+            subject: `[TESZT] ${subject}`,
+            text: messageBody,
+            html: messageBody.replace(/\n/g, '<br>')
+        });
+        await new ChatMessage({ sender: 'System', text: `🧪 Teszt levél elküldve a Főnöknek!` }).save();
+        res.redirect('/admin');
+    } catch (e) {
+        console.error(e);
+        res.redirect('/admin');
+    }
+});
+
+// --- ÉLES EMAIL KÜLDÉS ---
 app.post('/admin/send-email', checkAdmin, async (req, res) => {
     const { subject, messageBody } = req.body;
     try {
