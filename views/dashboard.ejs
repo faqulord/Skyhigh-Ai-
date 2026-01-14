@@ -8,7 +8,7 @@
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; overflow-x: hidden; }
         
-        /* --- VÉKONY LILA-RÓZSASZÍN KERET --- */
+        /* --- VÉKONY LILA-RÓZSASZÍN KERET (A Kártyákhoz) --- */
         .thin-purple-border {
             border: 1px solid transparent; 
             background: linear-gradient(#111, #111) padding-box, 
@@ -16,24 +16,19 @@
             box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); 
         }
 
-        /* NEON NARANCS SZÖVEG (Felső üzenet) */
+        /* --- ÚJ: VÉKONY NARANCS KERET (A Gombokhoz) --- */
+        .thin-orange-border {
+            border: 1px solid transparent; 
+            background: linear-gradient(#111, #111) padding-box, 
+                        linear-gradient(to right, #FF9F43, #FFC75F) border-box;
+            box-shadow: 0 0 15px rgba(255, 159, 67, 0.2); 
+        }
+
+        /* NEON NARANCS SZÖVEG */
         .orange-neon { color: #FF9F43; text-shadow: 0 0 5px rgba(255, 159, 67, 0.5); font-weight: 600; }
+        .orange-neon-xl { color: #FF9F43; text-shadow: 0 0 15px rgba(255, 159, 67, 0.8), 0 0 30px rgba(255, 159, 67, 0.4); }
+        .purple-pink-text-gradient { background: linear-gradient(to right, #a855f7, #ff77e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3)); }
 
-        /* ERŐSEBB NEON NARANCS (Tipp számok) */
-        .orange-neon-xl {
-            color: #FF9F43; text-shadow: 0 0 15px rgba(255, 159, 67, 0.8), 0 0 30px rgba(255, 159, 67, 0.4);
-        }
-        
-        /* LILA-RÓZSASZÍN GRADIENS SZÖVEG (Magyarázat) */
-        .purple-pink-text-gradient {
-             background: linear-gradient(to right, #a855f7, #ff77e9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 600;
-            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3));
-        }
-
-        /* ANIMÁCIÓK */
         .marquee-container { overflow: hidden; white-space: nowrap; position: relative; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); }
         .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
@@ -58,11 +53,19 @@
         </div>
         
         <div class="flex gap-2">
-            <a href="/stats" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1"><span>📊</span> STATS</a>
+            <a href="/stats" class="thin-orange-border text-[#FF9F43] px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1 hover:text-white hover:shadow-[0_0_15px_rgba(255,159,67,0.4)]">
+                <span>📊</span> STATS
+            </a>
+
             <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %>
-                <a href="/admin" class="bg-purple-900/50 hover:bg-purple-600 text-purple-200 border border-purple-500/30 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1"><span>⚡</span> HQ</a>
+                <a href="/admin" class="thin-orange-border text-[#FF9F43] px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1 hover:text-white hover:shadow-[0_0_15px_rgba(255,159,67,0.4)]">
+                    <span>⚡</span> HQ
+                </a>
             <% } %>
-            <a href="/logout" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center">EXIT</a>
+            
+            <a href="/logout" class="thin-orange-border text-[#FF9F43] px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center hover:text-white hover:shadow-[0_0_15px_rgba(255,159,67,0.4)]">
+                EXIT
+            </a>
         </div>
     </header>
 
@@ -89,7 +92,6 @@
 
     <% if (dailyTip && dailyTip.isPublished) { %>
         <div class="thin-purple-border bg-[#111] p-6 mb-8 relative overflow-hidden rounded-2xl">
-            
             <div class="absolute top-0 right-0 bg-purple-600/20 text-purple-300 text-[9px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-purple-500/30">MAI FIX</div>
             <div class="text-center mb-6 mt-2">
                 <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2"><%= dailyTip.league %></p>
@@ -103,7 +105,6 @@
             
             <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-xl relative shadow-inner mt-4">
                 <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl border border-zinc-800 rounded-full">🦊</span>
-                
                 <p class="text-sm purple-pink-text-gradient italic leading-relaxed mt-2 tracking-wide">
                     "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet... (Admin: Nyomj a Szöveg Újragenerálásra!)' %>"
                 </p>
