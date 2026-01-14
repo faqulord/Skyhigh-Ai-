@@ -25,7 +25,6 @@
             50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(236, 72, 153, 0.7)); } 
         }
 
-        /* GOMB ANIMÁCIÓ */
         .btn-pulse { animation: btn-pulse 2s infinite; }
         @keyframes btn-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 159, 67, 0.5); } 70% { box-shadow: 0 0 0 15px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
 
@@ -49,13 +48,20 @@
       </defs>
     </svg>
 
-    <div class="mb-8 fox-pulse">
+    <div class="mb-8 fox-pulse relative inline-block">
         <svg width="110" height="110" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M50 10L20 30L30 80L50 90L70 80L80 30L50 10Z" fill="#111" stroke="url(#foxGradient)" stroke-width="1.5"/>
             <path d="M50 15L25 35L33 75L50 83L67 75L75 35L50 15Z" fill="url(#foxGradient)" opacity="0.9"/>
             <path d="M35 45L50 65L65 45" stroke="#111" stroke-width="3" stroke-linecap="round"/>
             <path d="M35 35H40M60 35H65" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
         </svg>
+        
+        <div class="absolute top-0 right-0 translate-x-1 translate-y-2">
+            <span class="relative flex h-4 w-4">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-[#050505]"></span>
+            </span>
+        </div>
     </div>
 
     <div class="text-center mb-10">
