@@ -11,11 +11,13 @@
         .chat-bubble { padding: 10px 15px; border-radius: 15px; font-size: 11px; line-height: 1.4; max-width: 85%; }
         .chat-boss { background: #7c3aed; color: white; border-bottom-right-radius: 2px; margin-left: auto; }
         .chat-ai { background: #27272a; color: #d4d4d8; border-bottom-left-radius: 2px; margin-right: auto; }
+        /* Animáció a töltéshez */
+        .loading { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body class="p-4 flex justify-center min-h-screen">
     <div class="max-w-md w-full pb-20">
-        
+
         <header class="flex justify-between items-center mb-8 pt-4 border-b border-white/5 pb-4">
             <div>
                 <p class="text-[9px] text-purple-500 font-black uppercase tracking-[3px]">System Control</p>
@@ -26,7 +28,7 @@
 
         <div class="fox-card p-5 mb-6 relative overflow-hidden shadow-2xl shadow-purple-900/10">
             <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-4 text-center tracking-widest">Mai Hadművelet (<%= dbDate %>)</h3>
-            
+
             <% if (currentTip) { %>
                 <div class="bg-purple-900/20 border border-purple-500/30 p-4 rounded-xl mb-4 text-center">
                     <h2 class="text-sm font-black text-white uppercase mb-1"><%= currentTip.match %></h2>
@@ -58,10 +60,29 @@
             <% } %>
         </div>
 
+        <div class="fox-card p-5 mb-6 border border-blue-500/20">
+            <h3 class="text-[10px] font-black uppercase text-blue-400 mb-4 text-center tracking-widest">📧 Hírlevél & Értesítés</h3>
+            
+            <div class="mb-4">
+                <label class="text-[9px] text-zinc-500 font-bold uppercase">Miről szóljon a levél?</label>
+                <div class="flex gap-2 mt-1">
+                    <input type="text" id="email-topic" class="flex-1 bg-black border border-zinc-800 rounded-xl p-2 text-xs text-white" placeholder="Pl. Heti összegzés, profit...">
+                    <button onclick="draftEmail()" id="draft-btn" class="bg-blue-600 px-3 rounded-xl text-[10px] font-bold uppercase">Varázslat ✨</button>
+                </div>
+            </div>
+
+            <form action="/admin/send-email" method="POST">
+                <div class="mb-3">
+                    <input type="text" name="subject" id="email-subject" class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-2 text-xs font-bold text-white mb-2" placeholder="Tárgy (Automatikusan kitöltve...)">
+                    <textarea name="messageBody" id="email-body" rows="6" class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-300" placeholder="Itt jelenik meg az AI által írt szöveg, amit szerkeszthetsz..."></textarea>
+                </div>
+                <button type="submit" onclick="return confirm('Biztosan kiküldöd minden tagnak?')" class="w-full bg-white text-black py-3 rounded-xl font-black uppercase text-xs hover:bg-zinc-200 transition">✉️ Küldés Minden Tagnak 🚀</button>
+            </form>
+        </div>
+
         <div class="fox-card p-5 mb-6">
             <h3 class="text-[10px] font-black uppercase text-purple-500 mb-4 text-center tracking-widest">Közvetlen Kapcsolat</h3>
-            
-            <div id="chat-win" class="h-64 overflow-y-auto mb-4 space-y-3 pr-1 scrollbar-hide">
+            <div id="chat-win" class="h-40 overflow-y-auto mb-4 space-y-3 pr-1 scrollbar-hide">
                 <% chatHistory.forEach(msg => { %>
                     <div class="flex w-full">
                         <div class="chat-bubble <%= msg.sender === 'Főnök' ? 'chat-boss' : 'chat-ai' %>">
@@ -70,15 +91,30 @@
                     </div>
                 <% }) %>
             </div>
-            
             <div class="flex gap-2 relative">
                 <input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl p-3 pl-4 text-xs text-white focus:outline-none focus:border-purple-600" placeholder="Utasítás a Rókának...">
-                <button onclick="talk()" class="bg-purple-600 text-white p-3 rounded-xl font-bold uppercase text-xs shadow-lg hover:bg-purple-500">➤</button>
+                <button onclick="talk()" class="bg-purple-600 text-white p-3 rounded-xl font-bold uppercase text-xs">➤</button>
             </div>
         </div>
 
-        <div class="grid gap-6">
-            <div class="fox-card p-5">
+        <div class="fox-card p-5 border border-purple-500/20">
+            <h3 class="text-[10px] font-black uppercase text-purple-500 mb-4 border-b border-white/5 pb-2">Havi Profit (Javítva)</h3>
+            <div class="space-y-1 max-h-40 overflow-y-auto pr-2">
+                <% if(calculatorData && calculatorData.length > 0) { %>
+                    <% calculatorData.forEach(row => { %>
+                        <div class="flex justify-between text-[10px] py-1 border-b border-white/5">
+                            <span class="text-zinc-500"><%= row.date %></span>
+                            <span class="truncate w-32 font-medium text-zinc-300"><%= row.match %></span>
+                            <span class="font-black <%= row.totalRunning > 0 ? 'text-green-400' : 'text-red-400' %>"><%= row.totalRunning.toFixed(1) %>%</span>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-center text-[10px] text-zinc-600 italic">Még nincs adat ebben a hónapban.</p>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="fox-card p-5 mt-6">
                 <h3 class="text-[10px] font-black uppercase text-zinc-500 mb-4 border-b border-white/5 pb-2">Tagok Kezelése</h3>
                 <div class="space-y-3">
                 <% users.forEach(u => { %>
@@ -100,63 +136,58 @@
                 </div>
             </div>
 
-            <div class="fox-card p-5 border border-purple-500/20">
-                <h3 class="text-[10px] font-black uppercase text-purple-500 mb-4 border-b border-white/5 pb-2">Havi Profit Statisztika</h3>
-                <div class="space-y-1 max-h-40 overflow-y-auto pr-2">
-                    <% calculatorData.forEach(row => { %>
-                        <div class="flex justify-between text-[10px] py-1">
-                            <span class="text-zinc-500"><%= row.date.split('-')[2] %>.</span>
-                            <span class="truncate w-32 font-medium text-zinc-300"><%= row.match %></span>
-                            <span class="font-black <%= row.totalRunning > 0 ? 'text-green-400' : 'text-red-400' %>"><%= row.totalRunning.toFixed(1) %>%</span>
-                        </div>
-                    <% }) %>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <script>
         const win = document.getElementById('chat-win'); 
-        // Automata görgetés az aljára betöltéskor
         win.scrollTop = win.scrollHeight;
 
+        // CHAT FUNKCIÓ
         async function talk() {
             const i = document.getElementById('chat-in'); 
             if(!i.value) return;
-            
-            const msgText = i.value;
-            i.value = ''; // Azonnal töröljük a mezőt
-
-            // Saját üzenet azonnali megjelenítése
-            win.innerHTML += `
-                <div class="flex w-full">
-                    <div class="chat-bubble chat-boss">
-                        <strong>Főnök:</strong> ${msgText}
-                    </div>
-                </div>`;
+            const msgText = i.value; i.value = '';
+            win.innerHTML += `<div class="flex w-full"><div class="chat-bubble chat-boss"><strong>Főnök:</strong> ${msgText}</div></div>`;
             win.scrollTop = win.scrollHeight;
-
-            // Küldés a szervernek
             try {
-                const r = await fetch('/admin/chat', {
-                    method:'POST', 
-                    headers:{'Content-Type':'application/json'}, 
-                    body:JSON.stringify({message: msgText})
-                });
+                const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})});
                 const d = await r.json(); 
-                
-                // Válasz megjelenítése
-                win.innerHTML += `
-                    <div class="flex w-full">
-                        <div class="chat-bubble chat-ai">
-                            <strong>Róka:</strong> ${d.reply}
-                        </div>
-                    </div>`;
+                win.innerHTML += `<div class="flex w-full"><div class="chat-bubble chat-ai"><strong>Róka:</strong> ${d.reply}</div></div>`;
                 win.scrollTop = win.scrollHeight;
-            } catch (err) {
-                console.error("Hiba a chatben:", err);
-            }
+            } catch (err) { console.error(err); }
+        }
+
+        // EMAIL GENERÁLÓ FUNKCIÓ
+        async function draftEmail() {
+            const topic = document.getElementById('email-topic').value;
+            if(!topic) return alert("Írj be egy témát!");
+            
+            const btn = document.getElementById('draft-btn');
+            btn.innerHTML = "Írás..."; btn.classList.add('loading');
+
+            try {
+                const res = await fetch('/admin/draft-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic })
+                });
+                const data = await res.json();
+                
+                // Az első sort megpróbáljuk tárgynak beállítani
+                const lines = data.draft.split('\n');
+                let subject = "Hírlevél a Rókától";
+                let body = data.draft;
+
+                if(lines[0].toLowerCase().includes("tárgy") || lines[0].toLowerCase().includes("subject")) {
+                    subject = lines[0].replace(/Tárgy:|Subject:/i, '').trim();
+                    body = lines.slice(1).join('\n').trim();
+                }
+
+                document.getElementById('email-subject').value = subject;
+                document.getElementById('email-body').value = body;
+            } catch(e) { alert("Hiba az AI generálásnál."); }
+            
+            btn.innerHTML = "Varázslat ✨"; btn.classList.remove('loading');
         }
     </script>
 </body>
