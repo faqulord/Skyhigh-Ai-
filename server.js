@@ -77,15 +77,15 @@ async function logToChat(sender, message) {
 
 // --- CSATLAKOZÁS ---
 mongoose.connect(process.env.MONGO_URL)
-    .then(() => console.log(`🚀 ${BRAND_NAME} System Ready - v28 AUTO-KICK`))
+    .then(() => console.log(`🚀 ${BRAND_NAME} System Ready - v29 MARKETING FIX`))
     .catch(err => console.error("MongoDB Hiba:", err));
 
-// FELHASZNÁLÓ MODEL (ÚJ: licenseExpiresAt)
+// MODELLEK
 const UserSchema = new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, 
     hasLicense: { type: Boolean, default: false },
-    licenseExpiresAt: { type: Date }, // ITT A LEJÁRAT DÁTUMA!
+    licenseExpiresAt: { type: Date }, 
     isAdmin: { type: Boolean, default: false }, 
     startingCapital: { type: Number, default: 0 }
 });
@@ -115,6 +115,7 @@ const ChatMessageSchema = new mongoose.Schema({
 });
 const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', ChatMessageSchema);
 
+// EMAIL KÜLDŐ
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.EMAIL_USER || OWNER_EMAIL, pass: process.env.EMAIL_PASS }
@@ -127,7 +128,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_boss_system_secret_v28',
+    secret: 'skyhigh_boss_system_secret_v29',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -136,7 +137,7 @@ app.use(session({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 
-// --- AI MOTOR (IDŐPONT JELZÉSSEL!) ---
+// --- AI MOTOR (DÁTUM KIÍRATÁSSAL) ---
 async function runAiRobot() {
     await ChatMessage.deleteMany({});
     const targetDate = getDbDate();
@@ -176,7 +177,11 @@ async function runAiRobot() {
         if (validFixtures.length > 0) isRealData = true;
         else validFixtures = [{ fixture: { date: targetDate + "T21:00:00", id: 999 }, league: { name: "Bajnokok Ligája (SZIMULÁCIÓ)" }, teams: { home: { name: "Liverpool" }, away: { name: "Real Madrid" } } }];
 
-        const matchData = validFixtures.slice(0, 40).map(f => `[${new Date(f.fixture.date).toLocaleTimeString('hu-HU',{timeZone:'Europe/Budapest'})}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`).join("\n");
+        // Meccsek listázása az AI-nak
+        const matchData = validFixtures.slice(0, 40).map(f => {
+            const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', {timeZone:'Europe/Budapest', hour:'2-digit', minute:'2-digit'});
+            return `[${time}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`;
+        }).join("\n");
 
         const analysisPrompt = `SZEREP: Profi Sportfogadó Stratéga. ADAT: ${isRealData ? "VALÓS" : "SZIMULÁCIÓ"} MÓD: ${strategyMode} FELADAT: Válassz meccset. FORMAT (JSON): { "league": "...", "match": "Hazai - Vendég", "prediction": "Tipp", "odds": "1.XX", "reasoning": "...", "profitPercent": 5, "matchTime": "ÓÓ:PP", "matchDate": "YYYY.MM.DD", "bookmaker": "...", "stake": "${stakeAdvice}" }`;
 
@@ -188,14 +193,14 @@ async function runAiRobot() {
 
         const result = JSON.parse(aiRes.choices[0].message.content);
         
-        // --- PROMPT MÓDOSÍTÁS: DÁTUM MEGADÁSA KÖTELEZŐ ---
+        // --- JAVÍTOTT MARKETING PROMPT (DÁTUMMAL!) ---
         const marketingPrompt = `
             Eredeti elemzés: "${result.reasoning}" 
             Meccs: ${result.match}
-            Időpont: ${result.matchTime} (VAGY a valós időpont)
+            Időpont: ${result.matchTime}
             
-            FELADAT: Írd át "Zsivány Róka" stílusban. 
-            FONTOS: KÖTELEZŐEN írd bele a szövegbe a meccs kezdési időpontját! (Pl: "Kezdés ma 21:00-kor!")
+            FELADAT: Írd át "Zsivány Róka" stílusban a tagoknak.
+            FONTOS: A szöveg kezdődjön a pontos dátummal és időponttal! (Pl: "📅 MA 21:00 - ...")
             Legyen vicces, magabiztos, használj emojikat.
         `;
         
@@ -236,15 +241,13 @@ app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     
-    // ADMIN MINDIG BELÉPHET
     if (user.email === OWNER_EMAIL) { user.isAdmin = true; user.hasLicense = true; await user.save(); }
     
-    // --- KIDOBÓEMBER LOGIKA (AUTO-KICK) ---
-    // Ha van engedélye, de lejárt a dátum
+    // Auto-Kick (Lejárat)
     if (user.hasLicense && user.licenseExpiresAt && new Date() > new Date(user.licenseExpiresAt)) {
-        user.hasLicense = false; // Engedély elvétele
+        user.hasLicense = false; 
         await user.save();
-        return res.redirect('/pricing'); // Irány a kassza
+        return res.redirect('/pricing');
     }
 
     if (!user.hasLicense) return res.redirect('/pricing');
@@ -277,12 +280,63 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, recentTips: [], stats: [], chatHistory: [], calculatorData: [], dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
-// --- ADMIN MŰVELETEK ---
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
 app.post('/admin/delete-today', checkAdmin, async (req, res) => { await Tip.findOneAndDelete({ date: getDbDate() }); res.redirect('/admin'); });
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { req.setTimeout(300000); await runAiRobot(); res.redirect('/admin'); });
 
-// SZÖVEG JAVÍTÁSA (RÖVIDÍTÉS + DÁTUM)
+// --- MARKETING & EMAIL ÚTVONALAK (VISSZARAKVA!) ---
+app.post('/admin/social-content', checkAdmin, async (req, res) => {
+    try {
+        const tip = await Tip.findOne({ date: getDbDate() });
+        const type = req.body.type; // 'win' vagy 'motivation'
+        
+        const prompt = type === 'win' 
+            ? `Írj egy nagyon rövid, emojikkal teli Instagram sztori szöveget erről a nyereményről: ${tip ? tip.match : 'Mai Profit'}! Legyen benne, hogy a Zsivány Róka megint hozta a pénzt!`
+            : `Írj egy rövid, ütős motivációs üzenetet sportfogadóknak. Zsivány stílus.`;
+
+        const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Social Media Manager" }, { role: "user", content: prompt }] });
+        res.json({ content: aiRes.choices[0].message.content });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/admin/draft-email', checkAdmin, async (req, res) => {
+    try {
+        const prompt = `Írj egy hírlevél vázlatot erről a témáról: "${req.body.topic}". Stílus: Zsivány Róka. Legyen rövid, figyelemfelkeltő. Formátum: Tárgy: [tárgy]\n\n[szöveg]`;
+        const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Email Marketer" }, { role: "user", content: prompt }] });
+        res.json({ draft: aiRes.choices[0].message.content });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/admin/send-email', checkAdmin, async (req, res) => {
+    try {
+        const users = await User.find({ hasLicense: true }); // Csak aktív tagoknak
+        const emails = users.map(u => u.email);
+        
+        await transporter.sendMail({
+            from: `"Zsivány Róka" <${process.env.EMAIL_USER || OWNER_EMAIL}>`,
+            bcc: emails, // Titkos másolat, hogy ne lássák egymást
+            subject: req.body.subject,
+            text: req.body.messageBody
+        });
+        await logToChat('System', `📧 Hírlevél elküldve ${emails.length} tagnak.`);
+        res.redirect('/admin');
+    } catch(e) { console.error(e); res.redirect('/admin'); }
+});
+
+app.post('/admin/send-test-email', checkAdmin, async (req, res) => {
+    try {
+        await transporter.sendMail({
+            from: `"Zsivány Róka" <${process.env.EMAIL_USER || OWNER_EMAIL}>`,
+            to: OWNER_EMAIL,
+            subject: `[TESZT] ${req.body.subject}`,
+            text: req.body.messageBody
+        });
+        await logToChat('System', `🧪 Teszt email elküldve neked.`);
+        res.redirect('/admin');
+    } catch(e) { console.error(e); res.redirect('/admin'); }
+});
+
+// SZÖVEG JAVÍTÁSA (Rövidítés + Időpont)
 app.post('/admin/refine-text', checkAdmin, async (req, res) => {
     try {
         const tip = await Tip.findById(req.body.tipId);
@@ -291,13 +345,13 @@ app.post('/admin/refine-text', checkAdmin, async (req, res) => {
             Eredeti szöveg: "${tip.memberMessage}"
             Időpont: ${tip.matchTime}
             
-            FELADAT: Írd át "Zsivány Róka" stílusban, RÖVIDEN (max 2 mondat).
-            FONTOS: A szövegben szerepeljen a meccs időpontja!
+            FELADAT: Írd át "Zsivány Róka" stílusban, RÖVIDEN.
+            FONTOS: A szöveg kezdődjön a meccs időpontjával! (Pl: "⏰ 21:00 - ...")
         `;
         const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Profi Marketing Copywriter." }, { role: "user", content: refinePrompt }] });
         tip.memberMessage = aiRes.choices[0].message.content;
         await tip.save();
-        await logToChat('System', '📝 Szöveg javítva (rövid + időpont)!');
+        await logToChat('System', '📝 Szöveg javítva!');
         res.redirect('/admin');
     } catch(e) { console.error(e); res.redirect('/admin'); }
 });
@@ -305,15 +359,11 @@ app.post('/admin/refine-text', checkAdmin, async (req, res) => {
 app.post('/admin/chat', checkAdmin, async (req, res) => { await logToChat('Főnök', req.body.message); const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Róka." }, { role: "user", content: req.body.message }] }); await logToChat('Róka', aiRes.choices[0].message.content); res.json({ reply: aiRes.choices[0].message.content }); });
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { status: req.body.status }); res.redirect('/admin'); });
 
-// --- ÚJ: AKTIVÁLÁS 30 NAPRA ---
+// AKTIVÁLÁS
 app.post('/admin/activate-user', checkAdmin, async (req, res) => {
     const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 30); // MA + 30 NAP
-    
-    await User.findByIdAndUpdate(req.body.userId, { 
-        hasLicense: true,
-        licenseExpiresAt: expiryDate 
-    });
+    expiryDate.setDate(expiryDate.getDate() + 30); 
+    await User.findByIdAndUpdate(req.body.userId, { hasLicense: true, licenseExpiresAt: expiryDate });
     res.redirect('/admin');
 });
 
