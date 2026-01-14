@@ -1,158 +1,46 @@
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Owner HQ | <%= brandName %></title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body { background: #000000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .tech-card { background: #111111; border: 1px solid #333; border-radius: 16px; margin-bottom: 20px; position: relative; z-index: 1; }
-        .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.3); }
-        .pulse-btn { animation: pulse-border 2s infinite; }
-        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); } 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); } }
-        .gold-text { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
-        .gold-border { border-color: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); }
+<main class="pt-[100px] px-4 pb-20 max-w-2xl mx-auto">
         
-        #mobile-menu {
-            position: fixed; top: 0; left: 0; width: 260px; height: 100%;
-            background: #0a0a0a; border-right: 1px solid #333;
-            z-index: 10000; transform: translateX(-100%); transition: transform 0.3s ease-in-out;
-            padding-top: 80px; box-shadow: 5px 0 30px rgba(0,0,0,0.8);
-        }
-        #mobile-menu.open { transform: translateX(0); }
-        
-        .sidebar-btn {
-            display: flex; align-items: center; gap: 12px;
-            width: 100%; padding: 15px 20px;
-            color: #888; font-weight: bold; text-transform: uppercase; font-size: 11px;
-            border-bottom: 1px solid #1a1a1a; transition: all 0.2s;
-        }
-        .sidebar-btn:hover, .sidebar-btn.active { background: #111; color: #c084fc; border-left: 4px solid #c084fc; padding-left: 16px; }
-        .sidebar-btn svg { width: 18px; height: 18px; fill: currentColor; }
-        
-        #menu-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 9999;
-            display: none; backdrop-filter: blur(3px);
-        }
-        #menu-overlay.show { display: block; }
-        .hidden-section { display: none !important; }
-        .orbitron { font-family: 'Orbitron', sans-serif; }
-    </style>
-</head>
-<body class="min-h-screen">
-
-    <header class="fixed top-0 left-0 w-full bg-black/90 backdrop-blur border-b border-zinc-900 p-4 z-[5000] flex justify-between items-center h-[70px]">
-        <div class="flex items-center gap-3">
-            <button onclick="toggleMenu()" class="text-white p-2 border border-zinc-800 rounded-lg hover:bg-zinc-800">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-            </button>
-            <div class="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-lg fox-glow">🦊</div>
-        </div>
-        <div class="bg-yellow-900/10 px-4 py-1.5 rounded-full border border-yellow-500/50 gold-border">
-            <span class="text-[10px] font-black text-yellow-400 uppercase tracking-widest gold-text">SYSTEM OWNER</span>
-        </div>
-        <a href="/dashboard" class="text-zinc-500 text-[10px] font-bold px-3 py-2 border border-zinc-800 rounded-lg">EXIT</a>
-    </header>
-
-    <div id="menu-overlay" onclick="toggleMenu()"></div>
-    <nav id="mobile-menu">
-        <div class="px-5 mb-6">
-            <h2 class="text-xs font-bold text-zinc-500 uppercase orbitron tracking-tighter">Irányítóközpont</h2>
-        </div>
-        <button onclick="selectTab('dashboard')" id="btn-dashboard" class="sidebar-btn active">📊 VEZÉRLŐPULT</button>
-        <button onclick="selectTab('users')" id="btn-users" class="sidebar-btn">👥 TAGOK KEZELÉSE</button>
-        <button onclick="selectTab('marketing')" id="btn-marketing" class="sidebar-btn">📱 MARKETING AI</button>
-        <button onclick="selectTab('finance')" id="btn-finance" class="sidebar-btn">💰 PÉNZÜGY & STAT</button>
-        <button onclick="selectTab('chat')" id="btn-chat" class="sidebar-btn">💬 CHAT A RÓKÁVAL</button>
-    </nav>
-
-    <main class="pt-[100px] px-4 pb-20 max-w-2xl mx-auto">
-
         <div id="tab-dashboard" class="content-tab">
-            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">🚀 Aktuális Elemzés</h2>
-            
             <div class="tech-card p-6 border-t-2 border-purple-600">
+                <h2 class="text-lg font-bold mb-4">🤖 Mai Robot Státusz</h2>
                 <% if (currentTip) { %>
-                    <div class="flex justify-between items-start mb-4 text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                        <span><%= currentTip.league %></span>
-                        <span><%= dbDate %></span>
-                    </div>
-                    <h3 class="text-2xl font-black mb-1"><%= currentTip.match %></h3>
-                    <p class="text-purple-400 font-bold mb-6 text-lg"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
-                    
-                    <div class="bg-zinc-900/80 p-4 rounded-xl border border-zinc-800 mb-6">
-                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-2">🦊 Elemző Róka Jelentése (Neked):</p>
-                        <p class="text-xs text-zinc-300 italic leading-relaxed">"<%= currentTip.reasoning %>"</p>
-                    </div>
-
-                    <% if (!currentTip.isPublished) { %>
-                        <form action="/admin/publish-tip" method="POST">
-                            <input type="hidden" name="tipId" value="<%= currentTip._id %>">
-                            <button class="w-full bg-purple-600 py-4 rounded-xl font-black uppercase text-xs pulse-btn">📢 PUBLIKÁLÁS A TAGOKNAK</button>
-                        </form>
                     <% } else { %>
-                        <div class="bg-green-600/20 text-green-400 text-[10px] font-bold p-2 rounded text-center mb-6 border border-green-600/30 uppercase tracking-widest">Élesítve a Zsivány stílusban ✅</div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <form action="/admin/settle-tip" method="POST">
-                                <input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="win">
-                                <button class="w-full bg-green-600 py-3 rounded-xl font-bold text-xs uppercase">NYERT</button>
-                            </form>
-                            <form action="/admin/settle-tip" method="POST">
-                                <input type="hidden" name="tipId" value="<%= currentTip._id %>"><input type="hidden" name="status" value="loss">
-                                <button class="w-full bg-red-600 py-3 rounded-xl font-bold text-xs uppercase">VESZTETT</button>
-                            </form>
-                        </div>
-                    <% } %>
-                <% } else { %>
-                    <div class="text-center py-10">
-                        <p class="text-zinc-500 text-sm mb-6 font-bold">Nincs aktív elemzés a mai napra.</p>
-                        <form action="/admin/run-robot" method="POST">
-                            <button class="bg-white text-black px-10 py-4 rounded-xl font-black uppercase text-xs shadow-xl transition active:scale-95">🚀 ROBOT INDÍTÁSA MOST</button>
-                        </form>
-                    </div>
+                    <form action="/admin/run-robot" method="POST" class="text-center py-6">
+                        <button class="bg-white text-black px-8 py-4 rounded-xl font-black uppercase text-xs pulse-btn">🚀 ROBOT INDÍTÁSA MOST</button>
+                    </form>
                 <% } %>
             </div>
         </div>
 
-        <div id="tab-users" class="content-tab hidden-section">
-            <h2 class="text-xl font-bold mb-6">👥 Előfizetők (<%= users.length %>)</h2>
-            <div class="space-y-3">
-                <% users.forEach(u => { %>
-                    <div class="tech-card p-4 flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-sm"><%= u.fullname %></p>
-                            <p class="text-[10px] text-zinc-500 uppercase"><%= u.email %></p>
-                        </div>
-                        <% if(!u.hasLicense) { %>
-                            <form action="/admin/activate-user" method="POST">
-                                <input type="hidden" name="userId" value="<%= u._id %>">
-                                <button class="bg-purple-600 text-[10px] px-4 py-2 rounded-lg font-bold">AKTIVÁL</button>
-                            </form>
-                        <% } else { %>
-                            <span class="text-green-500 text-[10px] font-bold">AKTÍV</span>
-                        <% } %>
-                    </div>
-                <% }) %>
+        <div id="tab-marketing" class="content-tab hidden-section">
+            <h2 class="text-lg font-bold mb-4">📱 Marketing Generátor</h2>
+            <div class="tech-card p-5">
+                <p class="text-xs text-zinc-500 mb-4 font-bold uppercase tracking-widest">Válassz stílust:</p>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button onclick="generateSocial('win')" class="bg-zinc-800 p-3 rounded-xl text-[10px] font-bold border border-green-900/30 text-green-400">🏆 MAI NYERŐ</button>
+                    <button onclick="generateSocial('hype')" class="bg-zinc-800 p-3 rounded-xl text-[10px] font-bold border border-pink-900/30 text-pink-400">🔥 HYPE / CSATLAKOZZ</button>
+                </div>
+                <textarea id="social-result" class="w-full bg-black border border-zinc-800 rounded-xl p-3 text-xs text-zinc-300 mb-2 h-32" placeholder="Itt jelenik meg a szöveg..."></textarea>
+                <button onclick="copyText()" class="w-full bg-zinc-800 py-3 rounded-xl text-[10px] font-bold uppercase">Másolás</button>
             </div>
         </div>
 
-        </main>
+        <div id="tab-finance" class="content-tab hidden-section">
+            <h2 class="text-lg font-bold mb-4">💰 Pénzügyi Áttekintés</h2>
+            <div class="tech-card p-5">
+                </div>
+        </div>
 
-    <script>
-        function toggleMenu() {
-            document.getElementById('mobile-menu').classList.toggle('open');
-            document.getElementById('menu-overlay').classList.toggle('show');
-        }
-        function selectTab(tabId) {
-            document.querySelectorAll('.content-tab').forEach(t => t.classList.add('hidden-section'));
-            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden-section');
-            document.getElementById('btn-' + tabId).classList.add('active');
-            if(window.innerWidth < 1024) toggleMenu();
-            window.scrollTo(0,0);
-        }
-    </script>
-</body>
-</html>
+        <div id="tab-chat" class="content-tab hidden-section">
+            <h2 class="text-lg font-bold mb-4">💬 Stratégiai Chat</h2>
+            <div class="tech-card p-4">
+                <div id="chat-window" class="h-64 overflow-y-auto mb-4 space-y-2 p-2 bg-black/50 rounded-xl border border-zinc-800">
+                    </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-msg" class="flex-1 bg-black border border-zinc-800 rounded-xl p-3 text-xs" placeholder="Kérdezz a Rókától...">
+                    <button onclick="sendMessage()" class="bg-purple-600 px-4 rounded-xl font-bold">➤</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
