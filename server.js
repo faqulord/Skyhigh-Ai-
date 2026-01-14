@@ -5,13 +5,24 @@ const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const { OpenAI } = require('openai');
+const nodemailer = require('nodemailer'); // EZ ÚJ!
 const path = require('path');
 const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Rafinált Róka"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - BOSS MODE FIXED`));
+// --- EMAIL BEÁLLÍTÁSOK (Környezeti változóból vagy fixen) ---
+// A Railway-en állítsd be: EMAIL_USER (a gmail címed) és EMAIL_PASS (az App Jelszó)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER || OWNER_EMAIL, 
+        pass: process.env.EMAIL_PASS // IDE KELL MAJD AZ APP JELSZÓ!
+    }
+});
+
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - MAIL SYSTEM ACTIVE`));
 
 // --- ADATMODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -67,7 +78,6 @@ async function runAiRobot() {
             `[${f.fixture.date}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`
         ).join("\n");
 
-        // GENERÁLÓ PROMPT
         const systemPrompt = `
             Te vagy a "${BRAND_NAME}", a Főnök elit sportfogadási algoritmusa.
             CÉL: A csoporttagok anyagi függetlensége. Minden tipp egy lépés a szabadság felé.
@@ -123,14 +133,13 @@ app.get('/pricing', async (req, res) => {
     res.render('pricing', { user });
 });
 
-// ADMIN PANEL - ITT VOLT A HIBA, MOST JAVÍTVA
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(50);
     
-    // --- EZ HIÁNYZOTT! VISSZATETTEM A KALKULÁTORT ---
+    // Kalkulátor logika visszaállítva és javítva
     const currentMonthPrefix = getDbDate().substring(0, 7);
     const monthlyTips = await Tip.find({ date: { $regex: new RegExp('^' + currentMonthPrefix) } }).sort({ date: 1 });
     
@@ -140,12 +149,10 @@ app.get('/admin', checkAdmin, async (req, res) => {
         runningProfit += dailyRes;
         return { date: t.date, match: t.match, status: t.status, dailyProfit: dailyRes, totalRunning: runningProfit };
     });
-    // ------------------------------------------------
     
     res.render('admin', { users, currentTip, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
-// ADMIN CHAT
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save();
     
@@ -155,18 +162,58 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
         Stílus: Katonás, precíz, de lelkes. Szólítsd mindig "Főnök"-nek.
         Ha a Főnök kérdez, válaszolj röviden, okosan, magyarul.
     `;
-
     const aiRes = await openai.chat.completions.create({ 
-        model: "gpt-4-turbo-preview", 
-        messages: [
-            { role: "system", content: adminPrompt }, 
-            { role: "user", content: req.body.message }
-        ] 
+        model: "gpt-4-turbo-preview", messages: [{ role: "system", content: adminPrompt }, { role: "user", content: req.body.message }] 
     });
-    
     const reply = aiRes.choices[0].message.content;
     await new ChatMessage({ sender: 'AI', text: reply }).save();
     res.json({ reply });
+});
+
+// --- ÚJ FUNKCIÓ: EMAIL PISZKOZAT GENERÁLÁS (AI) ---
+app.post('/admin/draft-email', checkAdmin, async (req, res) => {
+    const topic = req.body.topic;
+    const emailPrompt = `
+        Te vagy a ${BRAND_NAME} marketing zsenije. 
+        Írj egy RÖVID, LELKESÍTŐ, PROFI emailt a csoporttagoknak erről a témáról: "${topic}".
+        A levél tárgyát (Subject) is írd meg az első sorba.
+        Ne legyen túl hosszú. Ösztönözze őket a kitartásra és a profitra.
+        Csak a levél szövegét írd ki.
+    `;
+    const aiRes = await openai.chat.completions.create({ 
+        model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Profi marketing szövegíró vagy." }, { role: "user", content: emailPrompt }] 
+    });
+    res.json({ draft: aiRes.choices[0].message.content });
+});
+
+// --- ÚJ FUNKCIÓ: EMAIL KÜLDÉS MINDENKINEK ---
+app.post('/admin/send-email', checkAdmin, async (req, res) => {
+    const { subject, messageBody } = req.body;
+    
+    try {
+        // 1. Megkeressük azokat, akiknek van licencük (vagy mindenkit, ha úgy akarod)
+        const recipients = await User.find({ hasLicense: true });
+        const emails = recipients.map(u => u.email);
+
+        if(emails.length === 0) return res.redirect('/admin');
+
+        // 2. Küldés
+        await transporter.sendMail({
+            from: `"${BRAND_NAME}" <${process.env.EMAIL_USER || OWNER_EMAIL}>`,
+            to: process.env.EMAIL_USER || OWNER_EMAIL, // Titkos másolatban megy mindenkinek
+            bcc: emails,
+            subject: subject,
+            text: messageBody,
+            html: messageBody.replace(/\n/g, '<br>') // Sortörések kezelése
+        });
+
+        await new ChatMessage({ sender: 'System', text: `📧 Hírlevél sikeresen kiküldve ${emails.length} tagnak!` }).save();
+        res.redirect('/admin');
+    } catch (e) {
+        console.error("Email hiba:", e);
+        await new ChatMessage({ sender: 'System', text: `❌ Hiba a levélküldésben: Ellenőrizd az SMTP beállításokat!` }).save();
+        res.redirect('/admin');
+    }
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
@@ -180,12 +227,8 @@ app.post('/admin/activate-user', checkAdmin, async (req, res) => {
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     const { tipId, status } = req.body;
     const tip = await Tip.findById(tipId);
-    
     if (tip.status !== status) {
-        tip.status = status; 
-        await tip.save();
-        
-        // Statisztika frissítése (Egyszerűsített)
+        tip.status = status; await tip.save();
         const month = tip.date.substring(0, 7);
         let ms = await MonthlyStat.findOne({ month }) || new MonthlyStat({ month });
         ms.totalTips += 1;
@@ -196,7 +239,6 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     res.redirect('/admin');
 });
 
-// Auth & Setup
 app.post('/auth/register', async (req, res) => {
     if (!req.body.terms) return res.send("Hiba: ÁSZF!");
     const hashed = await bcrypt.hash(req.body.password, 10);
