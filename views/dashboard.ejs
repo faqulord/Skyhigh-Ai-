@@ -10,6 +10,10 @@
         .startup-card { background: #111; border: 1px solid #27272a; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
         .gradient-text { background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
+        
+        /* TOAST ANIMÁCIÓ */
+        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
+        .toast.show { bottom: 20px; }
     </style>
 </head>
 <body class="p-5 max-w-lg mx-auto">
@@ -19,16 +23,27 @@
             <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl shadow-lg fox-glow">🦊</div>
             <div>
                 <h1 class="text-sm font-bold text-white tracking-wide">RAFINÁLT RÓKA</h1>
-                <p class="text-[10px] text-zinc-400 font-medium">AI Sportfogadó Asszisztens</p>
+                <p class="text-[10px] text-zinc-400 font-medium">Privát Csoport</p>
             </div>
         </div>
-        <a href="/logout" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-4 py-2 rounded-full text-[10px] font-bold transition">KILÉPÉS</a>
+        
+        <div class="flex gap-2">
+            <% if (user.isAdmin) { %>
+                <a href="/admin" class="bg-purple-900/50 hover:bg-purple-600 text-purple-200 border border-purple-500/30 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                    <span>⚡</span> HQ
+                </a>
+            <% } %>
+            <a href="/logout" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center">EXIT</a>
+        </div>
     </header>
 
-    <div class="mb-6">
+    <div class="mb-8">
         <p class="text-zinc-500 text-xs font-bold uppercase mb-1"><%= displayDate %></p>
-        <h2 class="text-xl font-bold text-white">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
-        <p class="text-sm text-zinc-400 mt-1">A tőkéd készen áll a növekedésre?</p>
+        <h2 class="text-2xl font-bold text-white mb-2">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
+        
+        <div class="bg-zinc-900/50 p-3 rounded-xl border border-white/5 inline-block">
+            <p class="text-xs text-zinc-300 italic">"<%= randomQuote %>"</p>
+        </div>
     </div>
 
     <% if (dailyTip && dailyTip.isPublished) { %>
@@ -39,7 +54,7 @@
                 <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2"><%= dailyTip.league %></p>
                 <h3 class="text-lg font-black text-white leading-tight mb-4"><%= dailyTip.match %></h3>
                 
-                <div class="bg-zinc-900/80 inline-block px-6 py-3 rounded-2xl border border-zinc-800">
+                <div class="bg-zinc-900/80 inline-block px-6 py-3 rounded-2xl border border-zinc-800 w-full">
                     <p class="text-[10px] text-zinc-500 uppercase font-bold mb-1">A Róka Tippje</p>
                     <p class="text-xl font-black gradient-text"><%= dailyTip.prediction %></p>
                     <p class="text-xs font-bold text-white mt-1">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
@@ -49,7 +64,7 @@
             <div class="bg-purple-900/10 border border-purple-500/20 p-4 rounded-xl relative">
                 <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl">🦊</span>
                 <p class="text-xs text-zinc-300 italic leading-relaxed mt-2">
-                    "<%= dailyTip.memberMessage || dailyTip.reasoning %>"
+                    "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet... (Admin: Publikáld újra a tippet a HQ-n!)' %>"
                 </p>
             </div>
 
@@ -63,8 +78,7 @@
             <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl animate-pulse">⏳</div>
             <h3 class="text-lg font-bold text-white mb-2">A Róka még dolgozik...</h3>
             <p class="text-xs text-zinc-500 leading-relaxed">
-                Az AI éppen a piacot elemzi, hogy megtalálja a tökéletes lehetőséget.
-                <br>Nézz vissza később, általában 08:00-ig kikerül a tipp!
+                Az AI éppen a piacot elemzi. Nézz vissza később!
             </p>
         </div>
     <% } %>
@@ -74,31 +88,31 @@
             <span>Legutóbbi Eredmények</span>
             <span class="h-px bg-zinc-800 flex-1"></span>
         </h3>
-
         <div class="space-y-3">
             <% pastTips.forEach(tip => { %>
-                <div class="bg-zinc-900/50 p-4 rounded-xl flex justify-between items-center border border-white/5">
+                <div class="bg-zinc-900/50 p-4 rounded-xl flex justify-between items-center border border-white/5 hover:bg-zinc-800 transition">
                     <div>
                         <p class="text-[10px] text-zinc-500 mb-0.5"><%= tip.date %></p>
                         <p class="text-xs font-bold text-white"><%= tip.match %></p>
                     </div>
-                    <% if(tip.status === 'win') { %>
-                        <div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 border border-green-500/20">
-                            ✓
-                        </div>
-                    <% } else { %>
-                        <div class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
-                            ✕
-                        </div>
-                    <% } %>
+                    <% if(tip.status === 'win') { %> <div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 border border-green-500/20">✓</div> <% } else { %> <div class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">✕</div> <% } %>
                 </div>
             <% }) %>
         </div>
-        
-        <div class="mt-8 text-center">
-            <p class="text-[9px] text-zinc-600">A befektetés kockázattal jár. Játssz felelősséggel.</p>
-        </div>
     </div>
 
+    <div id="toast" class="toast">
+        <span>🚀</span>
+        <span>Üdv újra! Ma nagyot robbantunk?</span>
+    </div>
+
+    <script>
+        // Toast megjelenítése belépéskor
+        window.addEventListener('load', () => {
+            const toast = document.getElementById('toast');
+            setTimeout(() => { toast.classList.add('show'); }, 500);
+            setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        });
+    </script>
 </body>
 </html>
