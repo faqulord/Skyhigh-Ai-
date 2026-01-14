@@ -5,24 +5,23 @@ const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const { OpenAI } = require('openai');
-const nodemailer = require('nodemailer'); // EZ ÚJ!
+const nodemailer = require('nodemailer');
 const path = require('path');
 const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Rafinált Róka"; 
 
-// --- EMAIL BEÁLLÍTÁSOK (Környezeti változóból vagy fixen) ---
-// A Railway-en állítsd be: EMAIL_USER (a gmail címed) és EMAIL_PASS (az App Jelszó)
+// --- EMAIL BEÁLLÍTÁSOK ---
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER || OWNER_EMAIL, 
-        pass: process.env.EMAIL_PASS // IDE KELL MAJD AZ APP JELSZÓ!
+        pass: process.env.EMAIL_PASS 
     }
 });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - MAIL SYSTEM ACTIVE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - MAIL & BOSS MODE ACTIVE`));
 
 // --- ADATMODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -133,13 +132,13 @@ app.get('/pricing', async (req, res) => {
     res.render('pricing', { user });
 });
 
+// ADMIN PANEL LEKÉRDEZÉS (JAVÍTVA A CRASH ELLEN)
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(50);
     
-    // Kalkulátor logika visszaállítva és javítva
     const currentMonthPrefix = getDbDate().substring(0, 7);
     const monthlyTips = await Tip.find({ date: { $regex: new RegExp('^' + currentMonthPrefix) } }).sort({ date: 1 });
     
@@ -170,7 +169,7 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
     res.json({ reply });
 });
 
-// --- ÚJ FUNKCIÓ: EMAIL PISZKOZAT GENERÁLÁS (AI) ---
+// EMAIL PISZKOZAT GENERÁLÁS (AI)
 app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     const topic = req.body.topic;
     const emailPrompt = `
@@ -186,25 +185,23 @@ app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     res.json({ draft: aiRes.choices[0].message.content });
 });
 
-// --- ÚJ FUNKCIÓ: EMAIL KÜLDÉS MINDENKINEK ---
+// EMAIL KÜLDÉS MINDENKINEK
 app.post('/admin/send-email', checkAdmin, async (req, res) => {
     const { subject, messageBody } = req.body;
     
     try {
-        // 1. Megkeressük azokat, akiknek van licencük (vagy mindenkit, ha úgy akarod)
         const recipients = await User.find({ hasLicense: true });
         const emails = recipients.map(u => u.email);
 
         if(emails.length === 0) return res.redirect('/admin');
 
-        // 2. Küldés
         await transporter.sendMail({
             from: `"${BRAND_NAME}" <${process.env.EMAIL_USER || OWNER_EMAIL}>`,
-            to: process.env.EMAIL_USER || OWNER_EMAIL, // Titkos másolatban megy mindenkinek
+            to: process.env.EMAIL_USER || OWNER_EMAIL, 
             bcc: emails,
             subject: subject,
             text: messageBody,
-            html: messageBody.replace(/\n/g, '<br>') // Sortörések kezelése
+            html: messageBody.replace(/\n/g, '<br>') 
         });
 
         await new ChatMessage({ sender: 'System', text: `📧 Hírlevél sikeresen kiküldve ${emails.length} tagnak!` }).save();
