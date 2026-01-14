@@ -11,12 +11,13 @@
         .nav-btn { color: #555; transition: all 0.2s; }
         .nav-btn.active { color: #8b5cf6; }
         .nav-btn.active svg { fill: #8b5cf6; }
-        /* Chat */
         .chat-container { background: #111; border-radius: 12px; height: 400px; display: flex; flex-direction: column; }
         .msg { padding: 8px 12px; border-radius: 12px; font-size: 12px; max-width: 80%; margin-bottom: 8px; }
         .msg-me { background: #8b5cf6; color: white; align-self: flex-end; }
         .msg-ai { background: #333; color: #ddd; align-self: flex-start; }
         .pb-safe { padding-bottom: 90px; }
+        .pulse-btn { animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -47,77 +48,83 @@
 
                 <% if (currentTip) { %>
                     <h3 class="text-xl font-black text-white mb-1"><%= currentTip.match %></h3>
-                    <p class="text-xs text-purple-400 font-mono mb-6"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
+                    <p class="text-xs text-purple-400 font-mono mb-4"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <form action="/admin/settle-tip" method="POST">
-                            <input type="hidden" name="tipId" value="<%= currentTip._id %>">
-                            <input type="hidden" name="status" value="win">
-                            <button class="w-full bg-green-500/10 border border-green-500/30 text-green-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-green-500 hover:text-white transition">WIN ✅</button>
-                        </form>
-                        <form action="/admin/settle-tip" method="POST">
-                            <input type="hidden" name="tipId" value="<%= currentTip._id %>">
-                            <input type="hidden" name="status" value="loss">
-                            <button class="w-full bg-red-500/10 border border-red-500/30 text-red-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-500 hover:text-white transition">LOSS ❌</button>
-                        </form>
+                    <div class="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 mb-6">
+                        <p class="text-[9px] text-zinc-500 font-bold uppercase mb-1">Róka jelentése a Főnöknek:</p>
+                        <p class="text-xs text-zinc-300 italic">"<%= currentTip.reasoning %>"</p>
                     </div>
+
+                    <% if (!currentTip.isPublished) { %>
+                        <div class="border border-yellow-500/30 bg-yellow-500/10 p-4 rounded-xl text-center mb-4">
+                            <p class="text-xs text-yellow-500 font-bold uppercase mb-3">⚠️ JÓVÁHAGYÁSRA VÁR</p>
+                            <p class="text-[10px] text-zinc-400 mb-4">A tagok még nem látják ezt a tippet. Olvasd el a jelentést, és ha rendben van, élesítsd!</p>
+                            
+                            <form action="/admin/publish-tip" method="POST">
+                                <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                                <button class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs pulse-btn hover:scale-[1.02] transition">📢 PUBLIKÁLÁS A TAGOKNAK</button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <div class="bg-green-500/10 border border-green-500/30 p-2 rounded mb-4 text-center">
+                            <p class="text-[10px] text-green-500 font-bold uppercase">✅ ÉLESÍTVE (LÁTHATÓ)</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <form action="/admin/settle-tip" method="POST">
+                                <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                                <input type="hidden" name="status" value="win">
+                                <button class="w-full bg-zinc-800 border border-zinc-700 text-green-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-green-900/30 transition">WIN ✅</button>
+                            </form>
+                            <form action="/admin/settle-tip" method="POST">
+                                <input type="hidden" name="tipId" value="<%= currentTip._id %>">
+                                <input type="hidden" name="status" value="loss">
+                                <button class="w-full bg-zinc-800 border border-zinc-700 text-red-500 py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-900/30 transition">LOSS ❌</button>
+                            </form>
+                        </div>
+                    <% } %>
+
                 <% } else { %>
-                    <div class="text-center py-6">
-                        <p class="text-xs text-zinc-500 mb-4">Nincs aktív elemzés mára.</p>
+                    <div class="text-center py-10">
+                        <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-pulse">🧠</div>
+                        <p class="text-xs text-zinc-500 mb-6">A mai stratégia még nem készült el.</p>
                         <form action="/admin/run-robot" method="POST">
-                            <button class="bg-white text-black px-6 py-3 rounded-xl font-bold text-xs uppercase">Robot Indítása 🚀</button>
+                            <button class="bg-white text-black px-8 py-4 rounded-xl font-black uppercase text-xs shadow-xl hover:scale-105 transition">🚀 Elemzés Indítása</button>
                         </form>
                     </div>
                 <% } %>
             </div>
 
-            <h3 class="text-xs font-bold text-zinc-500 uppercase mb-3 ml-1">Legutóbbi Tippek Kezelése</h3>
+            <h3 class="text-xs font-bold text-zinc-500 uppercase mb-3 ml-1">Előző Napok</h3>
             <div class="space-y-3 mb-6">
                 <% recentTips.forEach(tip => { %>
                     <div class="tech-card p-4 flex justify-between items-center">
                         <div>
                             <p class="text-[10px] text-zinc-500"><%= tip.date %></p>
                             <p class="text-xs font-bold text-white"><%= tip.match %></p>
-                            <p class="text-[10px] <%= tip.status === 'win' ? 'text-green-500' : (tip.status === 'loss' ? 'text-red-500' : 'text-zinc-400') %> uppercase font-bold">
-                                Jelenleg: <%= tip.status %>
+                            <p class="text-[9px] font-bold uppercase mt-1 <%= tip.status === 'win' ? 'text-green-500' : (tip.status === 'loss' ? 'text-red-500' : 'text-zinc-500') %>">
+                                <%= tip.status %>
                             </p>
                         </div>
                         <div class="flex gap-2">
                              <form action="/admin/settle-tip" method="POST">
                                 <input type="hidden" name="tipId" value="<%= tip._id %>">
                                 <input type="hidden" name="status" value="win">
-                                <button class="bg-green-900/30 text-green-500 border border-green-500/30 px-3 py-2 rounded-lg text-[10px] font-bold">W</button>
+                                <button class="bg-zinc-800 text-green-500 border border-zinc-700 px-3 py-2 rounded-lg text-[10px] font-bold hover:bg-green-900/20">W</button>
                             </form>
                             <form action="/admin/settle-tip" method="POST">
                                 <input type="hidden" name="tipId" value="<%= tip._id %>">
                                 <input type="hidden" name="status" value="loss">
-                                <button class="bg-red-900/30 text-red-500 border border-red-500/30 px-3 py-2 rounded-lg text-[10px] font-bold">L</button>
+                                <button class="bg-zinc-800 text-red-500 border border-zinc-700 px-3 py-2 rounded-lg text-[10px] font-bold hover:bg-red-900/20">L</button>
                             </form>
                         </div>
                     </div>
                 <% }) %>
             </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class="tech-card p-4">
-                    <p class="text-[9px] text-zinc-500 font-bold uppercase">Győzelmi Arány</p>
-                    <p class="text-2xl font-black text-white">
-                        <% if(stats[0] && stats[0].totalTips > 0) { %>
-                            <%= Math.round((stats[0].winCount / stats[0].totalTips) * 100) %>%
-                        <% } else { %>
-                            0%
-                        <% } %>
-                    </p>
-                </div>
-                <div class="tech-card p-4">
-                    <p class="text-[9px] text-zinc-500 font-bold uppercase">Profit</p>
-                    <p class="text-2xl font-black text-purple-500"><%= stats[0]?.totalProfit || 0 %>%</p>
-                </div>
-            </div>
         </div>
 
         <div id="section-comm" class="page-section hidden">
-            <h2 class="text-lg font-bold text-white mb-4">Stratégiai Megbeszélés</h2>
+            <h2 class="text-lg font-bold text-white mb-4">Stratégia & Email</h2>
             
             <div class="tech-card p-4 mb-6">
                 <div id="chat-win" class="chat-container overflow-y-auto mb-4 custom-scrollbar">
@@ -134,9 +141,9 @@
             </div>
 
             <div class="tech-card p-4 border border-blue-900/30">
-                <h3 class="text-xs font-bold text-white mb-2">📢 Hírlevél Küldés</h3>
+                <h3 class="text-xs font-bold text-white mb-2">📢 Hírlevél</h3>
                 <input type="text" id="email-topic" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Téma (pl. Heti profit)...">
-                <button onclick="draftEmail()" class="bg-zinc-800 text-zinc-300 w-full py-2 rounded-lg text-[10px] font-bold uppercase mb-4 hover:bg-zinc-700">AI Vázlatírás</button>
+                <button onclick="draftEmail()" class="bg-zinc-800 text-zinc-300 w-full py-2 rounded-lg text-[10px] font-bold uppercase mb-4">AI Vázlatírás</button>
 
                 <form action="/admin/send-email" method="POST">
                     <input type="text" name="subject" id="email-subject" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Tárgy">
@@ -151,7 +158,6 @@
                 <h2 class="text-lg font-bold text-white">Csoport Tagok</h2>
                 <span class="bg-zinc-800 text-xs px-2 py-1 rounded text-white"><%= users.length %> fő</span>
             </div>
-
             <div class="space-y-2">
                 <% users.forEach(u => { %>
                     <div class="tech-card p-3 flex justify-between items-center">
@@ -220,35 +226,19 @@
     </nav>
 
     <script>
-        // SIMPLIFIED & ROBUST NAVIGATION LOGIC
         function switchTab(tabId) {
-            // 1. Hide all sections
             document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-            
-            // 2. Remove active class from all buttons
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-
-            // 3. Show selected section
-            const targetSection = document.getElementById('section-' + tabId);
-            if(targetSection) targetSection.classList.remove('hidden');
-
-            // 4. Add active class to button
-            const targetBtn = document.getElementById('btn-' + tabId);
-            if(targetBtn) targetBtn.classList.add('active');
+            document.getElementById('section-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
         }
 
-        // Chat Script
-        const win = document.getElementById('chat-win'); 
-        if(win) win.scrollTop = win.scrollHeight;
-
+        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
         async function talk() {
-            const i = document.getElementById('chat-in'); 
-            if(!i.value) return;
+            const i = document.getElementById('chat-in'); if(!i.value) return;
             const msgText = i.value; i.value = '';
-            
             win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`;
             win.scrollTop = win.scrollHeight;
-            
             try {
                 const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})});
                 const d = await r.json(); 
@@ -257,23 +247,16 @@
             } catch (err) { console.error(err); }
         }
 
-        // Email AI
         async function draftEmail() {
             const topic = document.getElementById('email-topic').value;
             if(!topic) return alert("Írj témát!");
-            
             try {
                 const res = await fetch('/admin/draft-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic }) });
                 const data = await res.json();
                 const lines = data.draft.split('\n');
-                let subject = "Hírlevél";
-                let body = data.draft;
-                if(lines[0].toLowerCase().includes("tárgy") || lines[0].toLowerCase().includes("subject")) {
-                    subject = lines[0].replace(/Tárgy:|Subject:/i, '').trim();
-                    body = lines.slice(1).join('\n').trim();
-                }
-                document.getElementById('email-subject').value = subject;
-                document.getElementById('email-body').value = body;
+                let subject = "Hírlevél"; let body = data.draft;
+                if(lines[0].toLowerCase().includes("tárgy")) { subject = lines[0].replace(/Tárgy:/i, '').trim(); body = lines.slice(1).join('\n').trim(); }
+                document.getElementById('email-subject').value = subject; document.getElementById('email-body').value = body;
             } catch(e) { alert("AI Hiba"); }
         }
     </script>
