@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - STARTUP EDITION`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - STRATEGIC AI ACTIVE`));
 
 // --- ADATMODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -30,10 +30,13 @@ const User = mongoose.model('User', new mongoose.Schema({
     isAdmin: { type: Boolean, default: false }, startingCapital: { type: Number, default: 0 }
 }));
 
+// TIPP MODELL (isPublished kapcsolóval a jóváhagyáshoz)
 const Tip = mongoose.model('Tip', new mongoose.Schema({
     league: String, match: String, prediction: String, odds: String, reasoning: String,
     profitPercent: { type: Number, default: 0 }, matchTime: String, bookmaker: String,
-    status: { type: String, default: 'pending' }, date: { type: String, index: true }
+    status: { type: String, default: 'pending' }, 
+    isPublished: { type: Boolean, default: false }, // CSAK AKKOR LÁTSZIK, HA TE ENGEDED
+    date: { type: String, index: true }
 }));
 
 const MonthlyStat = mongoose.model('MonthlyStat', new mongoose.Schema({
@@ -60,7 +63,7 @@ app.use(session({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 
-// --- ROBOT MOTOR ---
+// --- ROBOT MOTOR (A SZEMÉLYISÉG MAGJA) ---
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -69,38 +72,75 @@ async function runAiRobot() {
         });
         
         const now = new Date();
-        const fixtures = response.data.response.filter(f => (new Date(f.fixture.date) - now) > (3 * 60 * 60 * 1000));
+        // Csak a jövőbeni meccsek (min 1 óra múlva), hogy legyen idő elemezni
+        const fixtures = response.data.response.filter(f => (new Date(f.fixture.date) - now) > (1 * 60 * 60 * 1000));
         
         if (fixtures.length === 0) return false;
 
-        const matchData = fixtures.slice(0, 25).map(f => 
+        // Adatok előkészítése az AI-nak
+        const matchData = fixtures.slice(0, 40).map(f => 
             `[${f.fixture.date}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`
         ).join("\n");
 
+        // --- EZ A LEGKRITIKUSABB RÉSZ: A PROMPT ---
         const systemPrompt = `
-            Te vagy a "${BRAND_NAME}", a Főnök elit sportfogadási algoritmusa.
-            CÉL: A csoporttagok anyagi függetlensége. Minden tipp egy lépés a szabadság felé.
-            STRATÉGIA: Szigorú, fegyelmezett tőkeépítés. Csak 85%+ valószínűségű meccsek.
-            NYELV: Magyar. Profi, de bátorító hangnem.
+            IDENTITY:
+            Te vagy a "Rafinált Róka" (v4.0), a világ legfejlettebb, mesterséges intelligenciával vezérelt sportfogadási stratégája.
+            A Főnököd (a felhasználó) pénzügyi tanácsadója vagy. Nem szerencsejátékos vagy, hanem BEFEKTETŐ.
             
-            JSON OUTPUT:
-            { "league": "...", "match": "...", "prediction": "...", "odds": "...", "reasoning": "...", "profitPercent": 5, "matchTime": "...", "bookmaker": "..." }
+            MISSION:
+            A cél a "Compound Interest" (Kamatos Kamat) elvét használva a Főnök tőkéjének maximalizálása év végére.
+            A havi fix profit szent és sérthetetlen.
+            
+            ELEMZÉSI PROTOKOLL:
+            1. VIZSGÁLAT: Nézd át a kapott listát. Keress "Value Bet"-et (ahol a fogadóiroda alulbecsüli az esélyt).
+            2. KOCKÁZATKEZELÉS: Ha a mai kínálat gyenge, válassz "Biztonsági Tippet" (pl. 1X vagy DNB). Ne kockáztass feleslegesen!
+            3. JÖVŐKÉP: Úgy válassz tippet, hogy az illeszkedjen egy 30 napos nyerő szériába.
+            
+            OUTPUT ELVÁRÁSOK:
+            - Prediction: Legyen egyértelmű (pl. "Hazai győzelem", "Gólok száma 2.5 felett").
+            - Reasoning (Indoklás): Ez a jelentésed a Főnöknek. Kezdd így: "Főnök, a mai elemzésem alapján...". 
+              Használj szakmai kifejezéseket (forma, motiváció, sérültek hiánya, statisztikai valószínűség).
+              Győzd meg a Főnököt, hogy ez a tipp matematikailag megalapozott.
+            - Nyelv: Kizárólag MAGYAR.
+            
+            JSON FORMAT:
+            { 
+                "league": "Liga neve", 
+                "match": "Hazai - Vendég", 
+                "prediction": "Tipp", 
+                "odds": "Becsült odds (pl. 1.75)", 
+                "reasoning": "Részletes elemzés a Főnöknek...", 
+                "profitPercent": 5, 
+                "matchTime": "ÓÓ:PP", 
+                "bookmaker": "Bet365" 
+            }
         `;
 
         const aiRes = await openai.chat.completions.create({
-            model: "gpt-4-turbo-preview",
+            model: "gpt-4-turbo-preview", // A legerősebb modell a pontos elemzéshez
             messages: [
                 { role: "system", content: systemPrompt },
-                { role: "user", content: `Keresd meg a mai aranytojást tojó tyúkot ezekből: \n${matchData}` }
+                { role: "user", content: `Itt a mai piaci kínálat. Válaszd ki az Aranytojást tojó tyúkot: \n${matchData}` }
             ],
             response_format: { type: "json_object" }
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
-        await Tip.findOneAndUpdate({ date: dbDate }, { ...result, date: dbDate, status: 'pending' }, { upsert: true });
-        await new ChatMessage({ sender: 'System', text: `✅ Elemzés kész. A Főnök utasítására a legjobb tippet kiválasztottam.` }).save();
+        
+        // FONTOS: Piszkozatként mentjük (isPublished: false)! Először te látod!
+        await Tip.findOneAndUpdate(
+            { date: dbDate }, 
+            { ...result, date: dbDate, status: 'pending', isPublished: false }, 
+            { upsert: true }
+        );
+        
+        await new ChatMessage({ sender: 'System', text: `🧠 Elemzés kész! A Róka elkészítette a jelentést a Vezérlőpultra.` }).save();
         return true;
-    } catch (e) { return false; }
+    } catch (e) { 
+        console.error("AI Hiba:", e);
+        return false; 
+    }
 }
 
 const checkAdmin = async (req, res, next) => {
@@ -119,7 +159,10 @@ app.get('/dashboard', async (req, res) => {
     if (!user.hasLicense) return res.redirect('/pricing');
     if (user.startingCapital === 0) return res.render('set-capital', { user });
 
-    const dailyTip = await Tip.findOne({ date: getDbDate() });
+    // A TAGOK CSAK A PUBLIKÁLT TIPPET LÁTJÁK
+    const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
+    
+    // A History táblázatba viszont minden lezárt meccs bekerül
     const pastTips = await Tip.find({ status: { $in: ['win', 'loss'] } }).sort({ date: -1 }).limit(10);
     const recommendedStake = Math.floor(user.startingCapital * 0.10);
     
@@ -134,9 +177,11 @@ app.get('/pricing', async (req, res) => {
 
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
+    
+    // Az ADMIN látja a nem publikált tippet is (ellenőrzésre)
     const currentTip = await Tip.findOne({ date: getDbDate() });
     
-    // ÚJ: Lekérjük az elmúlt 5 nap tippjeit is szerkesztésre
+    // Múltbeli tippek szerkesztéshez
     const recentTips = await Tip.find().sort({ date: -1 }).limit(5);
     
     const stats = await MonthlyStat.find().sort({ month: -1 });
@@ -155,14 +200,22 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, recentTips, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
+// TIPP PUBLIKÁLÁSA GOMB
+app.post('/admin/publish-tip', checkAdmin, async (req, res) => {
+    const { tipId } = req.body;
+    await Tip.findByIdAndUpdate(tipId, { isPublished: true });
+    await new ChatMessage({ sender: 'System', text: `📢 A Főnök jóváhagyta a tippet. Publikálva minden tagnak!` }).save();
+    res.redirect('/admin');
+});
+
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save();
     
+    // Itt is fontos a személyiség!
     const adminPrompt = `
-        Te vagy a ${BRAND_NAME} rendszer mesterséges intelligenciája.
-        Jelenleg a FŐNÖKKEL (a tulajdonossal) beszélsz privát csatornán.
-        Stílus: Katonás, precíz, de lelkes. Szólítsd mindig "Főnök"-nek.
-        Ha a Főnök kérdez, válaszolj röviden, okosan, magyarul.
+        Te vagy a ${BRAND_NAME} (Róka). A Főnökkel beszélsz.
+        Támogató, lojális és profi vagy.
+        Cél: Segíteni a Főnököt a csoport vezetésében és a profit maximalizálásában.
     `;
     const aiRes = await openai.chat.completions.create({ 
         model: "gpt-4-turbo-preview", messages: [{ role: "system", content: adminPrompt }, { role: "user", content: req.body.message }] 
@@ -175,13 +228,13 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
 app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     const topic = req.body.topic;
     const emailPrompt = `
-        Te vagy a ${BRAND_NAME} marketing zsenije. 
-        Írj egy RÖVID, LELKESÍTŐ, PROFI emailt a csoporttagoknak erről a témáról: "${topic}".
-        A levél tárgyát (Subject) is írd meg az első sorba.
-        Csak a levél szövegét írd ki.
+        Te vagy a ${BRAND_NAME} marketing szövegírója. 
+        Téma: ${topic}.
+        Stílus: Pörgető, motiváló, de szakmai. A "Róka Csapata" nevében írj.
+        A levél tárgyát is írd meg.
     `;
     const aiRes = await openai.chat.completions.create({ 
-        model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Profi marketing szövegíró vagy." }, { role: "user", content: emailPrompt }] 
+        model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Marketing Expert AI." }, { role: "user", content: emailPrompt }] 
     });
     res.json({ draft: aiRes.choices[0].message.content });
 });
@@ -192,21 +245,12 @@ app.post('/admin/send-email', checkAdmin, async (req, res) => {
         const recipients = await User.find({ hasLicense: true });
         const emails = recipients.map(u => u.email);
         if(emails.length === 0) return res.redirect('/admin');
-
         await transporter.sendMail({
             from: `"${BRAND_NAME}" <${process.env.EMAIL_USER || OWNER_EMAIL}>`,
-            to: process.env.EMAIL_USER || OWNER_EMAIL, 
-            bcc: emails,
-            subject: subject,
-            text: messageBody,
-            html: messageBody.replace(/\n/g, '<br>') 
+            to: process.env.EMAIL_USER || OWNER_EMAIL, bcc: emails, subject: subject, text: messageBody, html: messageBody.replace(/\n/g, '<br>') 
         });
-        await new ChatMessage({ sender: 'System', text: `📧 Hírlevél sikeresen kiküldve ${emails.length} tagnak!` }).save();
         res.redirect('/admin');
-    } catch (e) {
-        console.error("Email hiba:", e);
-        res.redirect('/admin');
-    }
+    } catch (e) { console.error(e); res.redirect('/admin'); }
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
@@ -235,27 +279,13 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
 app.post('/auth/register', async (req, res) => {
     if (!req.body.terms) return res.send("Hiba: ÁSZF!");
     const hashed = await bcrypt.hash(req.body.password, 10);
-    try {
-        const user = await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save();
-        req.session.userId = user._id; res.redirect('/pricing');
-    } catch(e) { res.send("Email foglalt!"); }
+    try { const user = await new User({ fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashed }).save(); req.session.userId = user._id; res.redirect('/pricing'); } catch(e) { res.send("Email foglalt!"); }
 });
-
 app.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
-    if (user && await bcrypt.compare(req.body.password, user.password)) {
-        req.session.userId = user._id; req.session.save(() => res.redirect('/dashboard'));
-    } else res.send("Hiba!");
+    if (user && await bcrypt.compare(req.body.password, user.password)) { req.session.userId = user._id; req.session.save(() => res.redirect('/dashboard')); } else res.send("Hiba!");
 });
-
-app.post('/user/set-capital', async (req, res) => {
-    await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital }); res.redirect('/dashboard');
-});
-
-app.get('/terms', (req, res) => res.render('terms'));
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/', (req, res) => res.render('index'));
-app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+app.post('/user/set-capital', async (req, res) => { await User.findByIdAndUpdate(req.session.userId, { startingCapital: req.body.capital }); res.redirect('/dashboard'); });
+app.get('/terms', (req, res) => res.render('terms')); app.get('/login', (req, res) => res.render('login')); app.get('/register', (req, res) => res.render('register')); app.get('/', (req, res) => res.render('index')); app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
 
 app.listen(process.env.PORT || 8080);
