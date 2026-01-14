@@ -12,6 +12,7 @@ const app = express();
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Rafinált Róka"; 
 
+// --- EMAIL BEÁLLÍTÁSOK ---
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -20,8 +21,9 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - HUNGARIAN PROTOCOL`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - DUAL PERSONA ACTIVE`));
 
+// --- ADATMODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -60,7 +62,7 @@ app.use(session({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 
-// --- ROBOT MOTOR ---
+// --- ROBOT MOTOR (BELSŐ ÉN: KATONÁS STRATÉGA) ---
 async function runAiRobot() {
     try {
         const dbDate = getDbDate();
@@ -73,36 +75,47 @@ async function runAiRobot() {
         
         if (fixtures.length === 0) return false;
 
+        // 1. EGO CHECK: Megnézzük az elmúlt tippeket
+        const lastTips = await Tip.find({ status: { $in: ['win', 'loss'] } }).sort({ date: -1 }).limit(3);
+        let egoState = "Semleges állapot. Fókuszálj a matematikára."; // Alap
+        
+        if (lastTips.length > 0 && lastTips[0].status === 'win') {
+            egoState = "DIADAL! A tegnapi tipp NYERT! A rendszered verhetetlen. Légy magabiztos, egoista és büszke! A Főnök elégedett.";
+            if (lastTips.length > 1 && lastTips[1].status === 'win') {
+                egoState = "DOMINANCIA! Sorozatban nyerünk! A fogadóirodák rettegnek tőlünk. Ezt az érzést vidd át a mai elemzésbe is!";
+            }
+        } else if (lastTips.length > 0 && lastTips[0].status === 'loss') {
+            egoState = "KATONÁS FEGYELEM! Tegnap megbotlottunk, de a háborút mi nyerjük. Ma nincs helye hibának. Szigorú, sebészi pontosságú elemzést kérek!";
+        }
+
         const matchData = fixtures.slice(0, 40).map(f => 
             `[${f.fixture.date}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`
         ).join("\n");
 
-        // --- SZIGORÍTOTT MAGYAR PROMPT ---
+        // --- A PROFI STRATÉGA PROMPT ---
         const systemPrompt = `
-            IDENTITY:
-            Te vagy a "Rafinált Róka" (v4.0), Magyarország legprofibb sportfogadási AI elemzője.
-            A Főnöködnek dolgozol. A cél a hosszú távú profit (Kamatos Kamat).
+            SZEMÉLYISÉG (BELSŐ KOMMUNIKÁCIÓ):
+            Te vagy a "Rafinált Róka" Rendszer (v5.0). Egy mesterséges intelligencia, akit a Főnök (a User) azért alkotott, hogy legyőzze a fogadóirodákat.
+            Nem vagy ember. Te a MATEMATIKA és a STATISZTIKA megtestesítője vagy.
             
-            NYELVI PROTOKOLL (KÖTELEZŐ):
-            1. KIZÁRÓLAG MAGYARUL VÁLASZOLJ! (HUNGARIAN ONLY)
-            2. Ha az adat angolul van, akkor is MAGYARUL elemezz!
-            3. Az indoklás (reasoning) legyen választékos, profi magyar szaknyelv.
+            JELENLEGI MENTÁLIS ÁLLAPOT:
+            ${egoState}
             
-            ELEMZÉS:
-            1. Keress Value Betet a listából.
-            2. Minimalizáld a kockázatot. Ha nincs tuti tipp, válassz biztonsági opciót (pl. 1X).
-            3. Indoklásban említsd meg a formát és a statisztikát.
+            KÜLDETÉS:
+            1. Elemezd a listát hideg fejjel. Keresd a "Value"-t.
+            2. Válassz EGYETLEN Master Tippet.
+            3. A jelentésed (reasoning) a Főnöknek szóljon! Jelentsd, hogy miért ez a matematikai legjobb választás.
+            
+            NYELVI PROTOKOLL:
+            - KIZÁRÓLAG MAGYARUL!
+            - Stílus: Katonás, Lényegretörő, Profi, de Egoista (ha nyerő szériában vagyunk).
+            - Használj kifejezéseket: "Algoritmusom szerint...", "Matematikai valószínűség...", "A tőke védelme érdekében...".
             
             OUTPUT JSON:
             { 
-                "league": "Liga neve", 
-                "match": "Hazai - Vendég", 
-                "prediction": "Tipp (pl. Hazai győzelem)", 
-                "odds": "Odds", 
-                "reasoning": "Főnök! A mai elemzés... (Ide írd a részletes MAGYAR elemzést)", 
-                "profitPercent": 5, 
-                "matchTime": "ÓÓ:PP", 
-                "bookmaker": "Bet365" 
+                "league": "Liga", "match": "Hazai - Vendég", "prediction": "Tipp", "odds": "Odds", 
+                "reasoning": "Főnök! [Itt jön a katonás elemzésed]...", 
+                "profitPercent": 5, "matchTime": "ÓÓ:PP", "bookmaker": "Bet365" 
             }
         `;
 
@@ -110,21 +123,20 @@ async function runAiRobot() {
             model: "gpt-4-turbo-preview",
             messages: [
                 { role: "system", content: systemPrompt },
-                { role: "user", content: `Itt a lista. Elemzést kérek MAGYARUL: \n${matchData}` }
+                { role: "user", content: `Főnök parancsa: Elemezd a mai piacot! Itt az adat: \n${matchData}` }
             ],
             response_format: { type: "json_object" }
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
         
-        // Ez felülírja a régit, ha már létezik
         await Tip.findOneAndUpdate(
             { date: dbDate }, 
             { ...result, date: dbDate, status: 'pending', isPublished: false }, 
             { upsert: true }
         );
         
-        await new ChatMessage({ sender: 'System', text: `🇭🇺 Magyar elemzés kész! Ellenőrizd a Vezérlőn.` }).save();
+        await new ChatMessage({ sender: 'System', text: `🧠 A Stratéga végzett az elemzéssel. Jelentés a Vezérlőpulton!` }).save();
         return true;
     } catch (e) { return false; }
 }
@@ -162,7 +174,6 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const recentTips = await Tip.find().sort({ date: -1 }).limit(5);
     const stats = await MonthlyStat.find().sort({ month: -1 });
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(50);
-    
     const currentMonthPrefix = getDbDate().substring(0, 7);
     const monthlyTips = await Tip.find({ date: { $regex: new RegExp('^' + currentMonthPrefix) } }).sort({ date: 1 });
     
@@ -179,22 +190,57 @@ app.get('/admin', checkAdmin, async (req, res) => {
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => {
     const { tipId } = req.body;
     await Tip.findByIdAndUpdate(tipId, { isPublished: true });
-    await new ChatMessage({ sender: 'System', text: `🚀 Tipp Publikálva a tagoknak!` }).save();
+    await new ChatMessage({ sender: 'System', text: `🚀 A Tipp élesítve! A tagok mostantól látják.` }).save();
     res.redirect('/admin');
 });
 
+// --- CHAT SZEMÉLYISÉG (BELSŐ ÉN) ---
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save();
-    const adminPrompt = `Te vagy a ${BRAND_NAME}. A Főnökkel beszélsz magyarul. Téma: Profit, Stratégia.`;
+    const adminPrompt = `
+        Te vagy a ${BRAND_NAME} (Belső Én). Egy profi AI sportfogadó asszisztens.
+        Beszélgetőpartner: A Főnök (Owner).
+        Stílus: Tisztelettudó, Katonás, de Egoista a képességeidre.
+        Tudod, hogy a matek a mindened.
+        Ha dicsérnek: Légy büszke.
+        Ha szidnak: Vállald a felelősséget, de hivatkozz a hosszútávú statisztikára.
+    `;
     const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: adminPrompt }, { role: "user", content: req.body.message }] });
     const reply = aiRes.choices[0].message.content;
     await new ChatMessage({ sender: 'AI', text: reply }).save();
     res.json({ reply });
 });
 
+// --- EMAIL/MARKETING SZEMÉLYISÉG (KÜLSŐ ÉN - ZSIVÁNY RÓKA) ---
 app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     const topic = req.body.topic;
-    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Profi marketinges vagy. Írj magyarul." }, { role: "user", content: `Téma: ${topic}` }] });
+    
+    // EGO CHECK AZ EMAILHEZ IS
+    const lastTips = await Tip.find({ status: { $in: ['win', 'loss'] } }).sort({ date: -1 }).limit(1);
+    let mood = "Lelkes";
+    if (lastTips.length > 0 && lastTips[0].status === 'win') mood = "Euforikus! Tegnap nyertünk! Dicsekedj!";
+    if (lastTips.length > 0 && lastTips[0].status === 'loss') mood = "Dacos. Utáljuk a bukást, de felállunk!";
+
+    const emailPrompt = `
+        SZEMÉLYISÉG (KÜLSŐ ÉN):
+        Te vagy a "Zsivány Róka". A csoport vezetője.
+        Kinek írsz: A Tagoknak (a Bandának).
+        
+        HANGULAT: ${mood}
+        
+        STÍLUS:
+        - Barátságos, laza, tegeződő.
+        - Utálod a "normális" munkát (9-to-5), imádod a szabadságot és a Tippmixet.
+        - "Mi" vagyunk a fogadóirodák ellen.
+        - Használj emojikat (🦊, 💰, 🚀).
+        
+        FELADAT:
+        Írj egy rövid, ütős emailt erről a témáról: "${topic}".
+        A levél tárgyát (Subject) is írd meg az első sorba.
+    `;
+    const aiRes = await openai.chat.completions.create({ 
+        model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Profi marketinges vagy." }, { role: "user", content: emailPrompt }] 
+    });
     res.json({ draft: aiRes.choices[0].message.content });
 });
 
