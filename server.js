@@ -9,9 +9,9 @@ const path = require('path');
 const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
-const BRAND_NAME = "Rafinált Róka"; // Ezt később bármire átírhatod, ha eladod a szoftvert!
+const BRAND_NAME = "Rafinált Róka"; 
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - BOSS MODE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - BOSS MODE FIXED`));
 
 // --- ADATMODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -67,7 +67,7 @@ async function runAiRobot() {
             `[${f.fixture.date}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`
         ).join("\n");
 
-        // GENERÁLÓ PROMPT - A TAGOKNAK
+        // GENERÁLÓ PROMPT
         const systemPrompt = `
             Te vagy a "${BRAND_NAME}", a Főnök elit sportfogadási algoritmusa.
             CÉL: A csoporttagok anyagi függetlensége. Minden tipp egy lépés a szabadság felé.
@@ -123,31 +123,36 @@ app.get('/pricing', async (req, res) => {
     res.render('pricing', { user });
 });
 
-// ADMIN PANEL
+// ADMIN PANEL - ITT VOLT A HIBA, MOST JAVÍTVA
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const stats = await MonthlyStat.find().sort({ month: -1 });
-    // Csak az utolsó 50 üzenet kell a chatbe, hogy gyors legyen
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(50);
     
-    res.render('admin', { users, currentTip, stats, chatHistory, dbDate: getDbDate(), brandName: BRAND_NAME });
+    // --- EZ HIÁNYZOTT! VISSZATETTEM A KALKULÁTORT ---
+    const currentMonthPrefix = getDbDate().substring(0, 7);
+    const monthlyTips = await Tip.find({ date: { $regex: new RegExp('^' + currentMonthPrefix) } }).sort({ date: 1 });
+    
+    let runningProfit = 0;
+    const calculatorData = monthlyTips.map(t => {
+        let dailyRes = (t.status === 'win') ? parseFloat(t.profitPercent) : (t.status === 'loss' ? -10 : 0);
+        runningProfit += dailyRes;
+        return { date: t.date, match: t.match, status: t.status, dailyProfit: dailyRes, totalRunning: runningProfit };
+    });
+    // ------------------------------------------------
+    
+    res.render('admin', { users, currentTip, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
-// ADMIN CHAT - A SZEMÉLYISÉG MAGJA
+// ADMIN CHAT
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save();
     
     const adminPrompt = `
         Te vagy a ${BRAND_NAME} rendszer mesterséges intelligenciája.
         Jelenleg a FŐNÖKKEL (a tulajdonossal) beszélsz privát csatornán.
-        
-        A SZEMÉLYISÉGED:
-        - Rendkívül lojális vagy a Főnökhöz.
-        - A célod: Segíteni neki, hogy a csoporttagok profitosak legyenek és ő anyagilag független legyen a szoftver által.
-        - Stílus: Katonás, precíz, de lelkes. Szólítsd mindig "Főnök"-nek.
-        - Tudatában vagy, hogy ez egy üzlet. A profit a lényeg.
-        
+        Stílus: Katonás, precíz, de lelkes. Szólítsd mindig "Főnök"-nek.
         Ha a Főnök kérdez, válaszolj röviden, okosan, magyarul.
     `;
 
@@ -175,9 +180,18 @@ app.post('/admin/activate-user', checkAdmin, async (req, res) => {
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     const { tipId, status } = req.body;
     const tip = await Tip.findById(tipId);
+    
     if (tip.status !== status) {
-        tip.status = status; await tip.save();
-        // Itt lehet bővíteni a statisztikát később
+        tip.status = status; 
+        await tip.save();
+        
+        // Statisztika frissítése (Egyszerűsített)
+        const month = tip.date.substring(0, 7);
+        let ms = await MonthlyStat.findOne({ month }) || new MonthlyStat({ month });
+        ms.totalTips += 1;
+        if (status === 'win') { ms.winCount += 1; ms.totalProfit += tip.profitPercent; }
+        else if (status === 'loss') { ms.totalProfit -= 10; }
+        await ms.save();
     }
     res.redirect('/admin');
 });
