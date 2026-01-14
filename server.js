@@ -13,12 +13,12 @@ const app = express();
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Rafinált Róka"; 
 
+// --- 2026-OS MOTIVÁCIÓ ---
 const foxQuotes = [
-    "A tőzsde évi 10%-ot hoz. Mi ezt egy hétvégén megcsináljuk. Csak ésszel. 🦊📈",
-    "Az érzelmek a szegények luxusa. Mi algoritussal dolgozunk. 🤖💸",
-    "Ne a csapatnak szurkolj. A profitnak szurkolj. ⚽💰",
-    "A fogadóiroda algoritmusokat használ ellened. Most te is használsz egyet ellenük. ⚔️",
-    "Hideg fej, forró szelvény. Ez a recept. ❄️🔥"
+    "2026 a mi évünk. A profit nem vár. 🦊💸",
+    "Az algoritmus erősebb, mint valaha. Használd! 🤖",
+    "Ne a csapatnak szurkolj, hanem a pénztárcádnak. 💰",
+    "A piac változik, de a Róka mindig egy lépéssel előrébb jár. 📈"
 ];
 
 const transporter = nodemailer.createTransport({
@@ -27,7 +27,7 @@ const transporter = nodemailer.createTransport({
 });
 
 mongoose.connect(process.env.MONGO_URL)
-    .then(() => console.log(`🚀 ${BRAND_NAME} System Ready - 2026 COMPATIBLE`))
+    .then(() => console.log(`🚀 ${BRAND_NAME} System Ready - 2026 REAL TIME`))
     .catch(err => console.error("MongoDB Hiba:", err));
 
 // MODELLEK
@@ -62,17 +62,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_boss_system_secret_v2026',
+    secret: 'skyhigh_boss_system_secret_2026_final',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-// A Te szervered dátumát használjuk (2026.01.14)
+
+// A MAI DÁTUM (Ami 2026.01.14 a te rendszereden)
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 
-// --- NYERŐ SZÉRIA SZÁMÍTÁS ---
+// --- NYERŐ SZÉRIA ---
 async function calculateStreak() {
     const tips = await Tip.find({ status: { $in: ['win', 'loss'] } }).sort({ date: -1 }).limit(10);
     let streak = 0;
@@ -80,91 +81,92 @@ async function calculateStreak() {
     return streak;
 }
 
-// --- AI MOTOR (DÁTUM ALAPÚ LEKÉRDEZÉS - INGYENES API BARÁT) ---
+// --- AI MOTOR (2026 KOMPATIBILIS) ---
 async function runAiRobot() {
-    console.log("🦊 AI MOTOR INDÍTÁSA...");
+    const today = getDbDate();
+    console.log(`🦊 AI MOTOR: Elemzés indítása erre a napra: ${today}`);
+    
     try {
-        const currentDate = getDbDate(); // Ez 2026-01-14 lesz nálad
-        console.log(`📅 Lekérdezés dátuma: ${currentDate}`);
-        
-        let allFixtures = [];
+        // SSL Bypass (Biztonság kedvéért)
         const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
-        // 1. PRÓBÁLKOZÁS: MAI NAP
-        try {
-            // Fontos: ?date=YYYY-MM-DD formátumot használunk, amit ENGED az ingyenes csomag!
-            const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${currentDate}`, {
+        // 1. API HÍVÁS (Dátum alapján - Ingyenes csomag kompatibilis)
+        const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${today}`, {
+            headers: { 
+                'x-apisports-key': process.env.SPORT_API_KEY,
+                'x-apisports-host': 'v3.football.api-sports.io'
+            },
+            httpsAgent: httpsAgent
+        });
+
+        // HIBAKERESÉS (Kritikus!)
+        if (response.data.errors && Object.keys(response.data.errors).length > 0) {
+            const errStr = JSON.stringify(response.data.errors);
+            console.error("API HIBA:", errStr);
+            
+            if (errStr.includes("suspended")) {
+                await new ChatMessage({ sender: 'System', text: `⛔ KRITIKUS: A Fiókod le van tiltva (Suspended)! ÚJ API KULCS KELL!` }).save();
+                return false;
+            }
+            if (errStr.includes("Free plans")) {
+                await new ChatMessage({ sender: 'System', text: `⚠️ Csomag hiba (De a dátum lekérésnek működnie kéne).` }).save();
+            }
+            // Egyéb hiba esetén is jelez
+            await new ChatMessage({ sender: 'System', text: `⚠️ API HIBA: ${errStr}` }).save();
+            return false; 
+        }
+
+        let fixtures = response.data.response || [];
+        
+        // 2. HA NINCS MA MECCS (vagy már vége), NÉZZÜK A HOLNAPOT
+        if (fixtures.length === 0) {
+            console.log("Ma nincs adat, nézzük a holnapot...");
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toLocaleDateString('en-CA');
+            
+            const res2 = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${tomorrowStr}`, {
                 headers: { 'x-apisports-key': process.env.SPORT_API_KEY },
                 httpsAgent: httpsAgent
             });
-            
-            if (response.data.errors && Object.keys(response.data.errors).length > 0) {
-                // Ha még mindig hiba van, kiírjuk a chatbe
-                const errJson = JSON.stringify(response.data.errors);
-                await new ChatMessage({ sender: 'System', text: `⚠️ API HIBA: ${errJson}` }).save();
-                throw new Error("API Limit vagy Jogosultság");
-            }
-            allFixtures = response.data.response || [];
-        } catch (apiErr) {
-            console.log("API Hiba a mai napon:", apiErr.message);
+            fixtures = res2.data.response || [];
         }
 
-        // 2. PRÓBÁLKOZÁS: HOLNAPI NAP (Ha ma nincs meccs vagy hiba volt)
-        if (allFixtures.length === 0) {
-            console.log("Nincs mai meccs, nézzük a holnapot...");
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowDate = tomorrow.toLocaleDateString('en-CA');
-            
-            try {
-                const res2 = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${tomorrowDate}`, {
-                    headers: { 'x-apisports-key': process.env.SPORT_API_KEY },
-                    httpsAgent: httpsAgent
-                });
-                allFixtures = res2.data.response || [];
-            } catch (e2) { console.log("Holnap sincs adat."); }
-        }
-
-        // 3. ADATOK ELŐKÉSZÍTÉSE AZ AI-NAK
-        // Szűrjük a meccseket: Csak ami még nem kezdődött el (NS) vagy félidőben van
-        const activeFixtures = allFixtures.filter(f => ['NS', '1H', 'HT', 'PST'].includes(f.fixture.status.short));
+        // 3. SZŰRÉS (Csak ami még nem kezdődött el)
+        const activeFixtures = fixtures.filter(f => ['NS', '1H', 'HT'].includes(f.fixture.status.short));
 
         if (activeFixtures.length === 0) {
-            await new ChatMessage({ sender: 'System', text: `⚠️ Nem találtam meccset a mai (${currentDate}) vagy holnapi napra az API-ban. Ellenőrizd, hogy van-e foci 2026-ban ezen a napon!` }).save();
-            // VÉGSŐ ESET: OFFLINE TIPP (Hogy ne álljon meg a rendszer)
-            // De most már tudjuk, hogy ez csak végszükség
+            await new ChatMessage({ sender: 'System', text: `⚠️ Nincs elérhető meccs a mai (${today}) napra. (Vagy az API nem ad adatot 2026-ra).` }).save();
             return false;
         }
 
-        console.log(`⚽ Talált meccsek: ${activeFixtures.length}`);
-        
-        // Csak az első 30 meccset küldjük be (Token spórolás)
+        console.log(`✅ SIKER: ${activeFixtures.length} meccs talált.`);
+
+        // 4. AI ELŐKÉSZÍTÉS
         const matchData = activeFixtures.slice(0, 30).map(f => 
             `[${f.fixture.date.split('T')[1].substr(0,5)}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`
         ).join("\n");
 
-        // 4. AI ELEMZÉS
         const streak = await calculateStreak();
         let memoryContext = streak > 0 ? `Széria: ${streak} WIN` : "Tegnap: LOSS. Ma javítunk.";
 
+        // 5. GPT DÖNTÉS
         const systemPrompt = `
-            IDENTITY: Te vagy a "Rafinált Róka" AI Sportfogadó Algoritmus.
+            IDENTITY: "Rafinált Róka" AI Sportfogadó (2026 Edition).
             CONTEXT: ${memoryContext}
-            FELADAT: Válassz ki EGYETLEN meccset a listából, ami a legbiztosabb profitot ígéri (Value Bet).
-            STÍLUS: Szakmai, tömör, elemző.
+            FELADAT: Válassz 1 Value Betet.
             FORMAT: JSON.
-            JSON STRUCTURE: { "league": "...", "match": "Hazai vs Vendég", "prediction": "...", "odds": "1.XX", "reasoning": "Főnök! Az elemzés alapján...", "profitPercent": 5, "matchTime": "HH:MM", "bookmaker": "..." }
+            JSON: { "league": "...", "match": "Hazai - Vendég", "prediction": "...", "odds": "1.XX", "reasoning": "...", "profitPercent": 5, "matchTime": "HH:MM", "bookmaker": "..." }
         `;
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Elérhető meccsek:\n${matchData}` }],
+            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Meccsek:\n${matchData}` }],
             response_format: { type: "json_object" }
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
         
-        // MENTÉS
         await Tip.findOneAndUpdate({ date: getDbDate() }, { 
             ...result, 
             date: getDbDate(), 
@@ -175,10 +177,10 @@ async function runAiRobot() {
 
         return true;
 
-    } catch (e) { 
-        console.error("AI HIBA:", e); 
-        await new ChatMessage({ sender: 'System', text: `⚠️ KRITIKUS HIBA: ${e.message}` }).save();
-        return false; 
+    } catch (e) {
+        console.error("RENDSZER HIBA:", e);
+        await new ChatMessage({ sender: 'System', text: `⚠️ RENDSZER HIBA: ${e.message}` }).save();
+        return false;
     }
 }
 
@@ -229,7 +231,6 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const recentTips = await Tip.find().sort({ date: -1 }).limit(5);
     const stats = await MonthlyStat.find().sort({ month: -1 });
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(50);
-    
     const currentMonthPrefix = getDbDate().substring(0, 7);
     const monthlyTips = await Tip.find({ date: { $regex: new RegExp('^' + currentMonthPrefix) } }).sort({ date: 1 });
     let runningProfit = 0;
@@ -238,7 +239,6 @@ app.get('/admin', checkAdmin, async (req, res) => {
         runningProfit += dailyRes;
         return { date: t.date, match: t.match, status: t.status, dailyProfit: dailyRes, totalRunning: runningProfit };
     });
-    
     res.render('admin', { users, currentTip, recentTips, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
@@ -253,28 +253,16 @@ app.post('/admin/publish-tip', checkAdmin, async (req, res) => {
     res.redirect('/admin');
 });
 
-app.post('/admin/delete-today', checkAdmin, async (req, res) => {
-    await Tip.findOneAndDelete({ date: getDbDate() });
-    await new ChatMessage({ sender: 'System', text: '🗑️ Tipp törölve.' }).save();
-    res.redirect('/admin');
-});
-
+app.post('/admin/delete-today', checkAdmin, async (req, res) => { await Tip.findOneAndDelete({ date: getDbDate() }); res.redirect('/admin'); });
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { 
     req.setTimeout(300000); 
     const success = await runAiRobot(); 
-    if(success) await new ChatMessage({ sender: 'AI', text: '🧠 Kész az elemzés! Nézd meg a Vezérlőpultot.' }).save();
+    if(success) await new ChatMessage({ sender: 'AI', text: '🧠 Kész az elemzés!' }).save();
     res.redirect('/admin'); 
 });
-
-app.post('/admin/social-content', checkAdmin, async (req, res) => {
-    const { type } = req.body; 
-    let context = type === 'win' ? "Téma: NYERTÜNK!" : "Téma: MOTIVÁCIÓ.";
-    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Social Media Expert." }, { role: "user", content: `Írj Insta posztot. ${context}` }] });
-    res.json({ content: aiRes.choices[0].message.content });
-});
-
-app.post('/admin/chat', checkAdmin, async (req, res) => { await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save(); const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Te vagy a Rafinált Róka." }, { role: "user", content: req.body.message }] }); await new ChatMessage({ sender: 'AI', text: aiRes.choices[0].message.content }).save(); res.json({ reply: aiRes.choices[0].message.content }); });
-app.post('/admin/draft-email', checkAdmin, async (req, res) => { const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Marketing Expert." }, { role: "user", content: `Írj hírlevél vázlatot: ${req.body.topic}` }] }); res.json({ draft: aiRes.choices[0].message.content }); });
+app.post('/admin/social-content', checkAdmin, async (req, res) => { const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Social." }, { role: "user", content: `Írj Insta posztot. Téma: ${req.body.type}` }] }); res.json({ content: aiRes.choices[0].message.content }); });
+app.post('/admin/chat', checkAdmin, async (req, res) => { await new ChatMessage({ sender: 'Főnök', text: req.body.message }).save(); const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Róka." }, { role: "user", content: req.body.message }] }); await new ChatMessage({ sender: 'AI', text: aiRes.choices[0].message.content }).save(); res.json({ reply: aiRes.choices[0].message.content }); });
+app.post('/admin/draft-email', checkAdmin, async (req, res) => { const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Marketing." }, { role: "user", content: `Téma: ${req.body.topic}` }] }); res.json({ draft: aiRes.choices[0].message.content }); });
 app.post('/admin/send-test-email', checkAdmin, async (req, res) => { try { await transporter.sendMail({ from: `"${BRAND_NAME}" <${process.env.EMAIL_USER || OWNER_EMAIL}>`, to: OWNER_EMAIL, subject: `[TESZT] ${req.body.subject}`, text: req.body.messageBody }); res.redirect('/admin'); } catch(e){console.error(e);res.redirect('/admin');} });
 app.post('/admin/send-email', checkAdmin, async (req, res) => { try { const u = await User.find({hasLicense:true}); if(u.length>0) await transporter.sendMail({ from: `"${BRAND_NAME}" <${process.env.EMAIL_USER || OWNER_EMAIL}>`, to: OWNER_EMAIL, bcc: u.map(x=>x.email), subject: req.body.subject, text: req.body.messageBody }); res.redirect('/admin'); } catch(e){console.error(e);res.redirect('/admin');} });
 app.post('/admin/publish-stat', checkAdmin, async (req, res) => { await MonthlyStat.findByIdAndUpdate(req.body.statId, { isPublished: true }); res.redirect('/admin'); });
