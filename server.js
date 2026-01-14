@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - MARKETING MODE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - SIDEBAR MODE`));
 
 const User = mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
@@ -152,6 +152,7 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, recentTips, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
+// SOCIAL MEDIA GENERATOR
 app.post('/admin/social-content', checkAdmin, async (req, res) => {
     const { type } = req.body; 
     let promptContext = "";
@@ -197,26 +198,23 @@ app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     res.json({ draft: aiRes.choices[0].message.content });
 });
 
-// --- TESZT EMAIL KÜLDÉS ---
+// TESZT EMAIL
 app.post('/admin/send-test-email', checkAdmin, async (req, res) => {
     const { subject, messageBody } = req.body;
     try {
         await transporter.sendMail({
             from: `"${BRAND_NAME}" <${process.env.EMAIL_USER || OWNER_EMAIL}>`,
-            to: process.env.EMAIL_USER || OWNER_EMAIL, // CSAK NEKED MEGY
+            to: process.env.EMAIL_USER || OWNER_EMAIL,
             subject: `[TESZT] ${subject}`,
             text: messageBody,
             html: messageBody.replace(/\n/g, '<br>')
         });
         await new ChatMessage({ sender: 'System', text: `🧪 Teszt levél elküldve a Főnöknek!` }).save();
         res.redirect('/admin');
-    } catch (e) {
-        console.error(e);
-        res.redirect('/admin');
-    }
+    } catch (e) { console.error(e); res.redirect('/admin'); }
 });
 
-// --- ÉLES EMAIL KÜLDÉS ---
+// ÉLES EMAIL
 app.post('/admin/send-email', checkAdmin, async (req, res) => {
     const { subject, messageBody } = req.body;
     try {
