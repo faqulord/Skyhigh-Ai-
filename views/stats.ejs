@@ -72,8 +72,10 @@
                     </div>
                     <% if(tip.status === 'win') { %> 
                         <div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 border border-green-500/20 font-bold">✓</div> 
-                    <% } else { %> 
+                    <% } else if(tip.status === 'loss') { %> 
                         <div class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 font-bold">✕</div> 
+                    <% } else { %>
+                        <div class="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500 border border-yellow-500/20 font-bold">?</div>
                     <% } %>
                 </div>
             <% }) %>
