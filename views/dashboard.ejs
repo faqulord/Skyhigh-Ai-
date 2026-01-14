@@ -1,115 +1,159 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard | Rafinált Róka</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vezérlőpult | Rafinált Róka</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; }
-        .startup-card { background: #111; border: 1px solid #27272a; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
-        
-        /* A TIPP SZÖVEG (ERŐS ARANY GRADIENS) */
-        .gradient-text { 
-            background: linear-gradient(to right, #FCD34D, #F59E0B, #D97706);
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3)); 
+        /* --- PRÉMIUM STÍLUSOK --- */
+        body { 
+            background-color: #050505; 
+            /* Finom technológiai rács háttér */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: #fff; 
+            font-family: 'Inter', sans-serif; 
         }
 
-        /* A MAGYARÁZAT SZÖVEG (PRÉMIUM PEZSGŐ ARANY) */
-        .premium-text {
-            color: #fef3c7; /* Halvány Pezsgő */
-            text-shadow: 0 0 15px rgba(252, 211, 77, 0.15); /* Nagyon finom ragyogás */
+        /* ÜVEGHATÁSÚ KÁRTYA (Glassmorphism) */
+        .glass-card {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        
-        .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
-        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
-        .toast.show { bottom: 20px; }
+
+        /* ARANY GRADIENS SZÖVEG (A TIPPHEZ) */
+        .gold-gradient {
+            background: linear-gradient(135deg, #FFD700 0%, #FDB931 50%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(253, 185, 49, 0.3));
+        }
+
+        /* PEZSGŐ SZÍNŰ MAGYARÁZAT (OLVASHATÓ, ELEGÁNS) */
+        .champagne-text {
+            color: #F3E5AB; 
+            line-height: 1.7;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        /* ARANY SZEGÉLY A BAL OLDALON */
+        .gold-border-left {
+            border-left: 3px solid #FFD700;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+        }
     </style>
 </head>
-<body class="p-5 max-w-lg mx-auto">
+<body class="p-4 md:p-8 max-w-2xl mx-auto min-h-screen flex flex-col">
 
-    <header class="flex justify-between items-center mb-8 pt-2">
+    <header class="flex justify-between items-center mb-10">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl shadow-lg fox-glow">🦊</div>
+            <div class="text-2xl">🦊</div>
             <div>
-                <h1 class="text-sm font-bold text-white tracking-wide">RAFINÁLT RÓKA</h1>
-                <p class="text-[10px] text-zinc-400 font-medium">Privát Csoport</p>
+                <h1 class="text-sm font-bold text-white tracking-widest uppercase">Rafinált Róka</h1>
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <p class="text-[10px] text-zinc-400 font-medium">System Online</p>
+                </div>
             </div>
         </div>
         
         <div class="flex gap-2">
-            <a href="/stats" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                <span>📊</span> STATS
-            </a>
-
             <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %>
-                <a href="/admin" class="bg-purple-900/50 hover:bg-purple-600 text-purple-200 border border-purple-500/30 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                    <span>⚡</span> HQ
-                </a>
+                <a href="/admin" class="status-badge text-yellow-500 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-white/10 transition">ADMIN</a>
             <% } %>
-            <a href="/logout" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center">EXIT</a>
+            <a href="/logout" class="status-badge text-zinc-400 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:text-white transition">KILÉPÉS</a>
         </div>
     </header>
 
-    <div class="mb-8">
-        <p class="text-zinc-500 text-xs font-bold uppercase mb-1"><%= displayDate %></p>
-        <h2 class="text-2xl font-bold text-white mb-2">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
-        <div class="bg-zinc-900/50 p-3 rounded-xl border border-white/5 inline-block">
-            <p class="text-xs text-zinc-300 italic">"<%= randomQuote %>"</p>
-        </div>
+    <div class="mb-8 px-2">
+        <p class="text-zinc-500 text-xs font-bold uppercase mb-1 tracking-widest"><%= displayDate %></p>
+        <h2 class="text-3xl font-light text-white mb-2">Üdv a Falkában, <span class="font-bold text-yellow-500"><%= user.fullname.split(' ')[0] %></span>.</h2>
     </div>
 
     <% if (dailyTip && dailyTip.isPublished) { %>
-        <div class="startup-card p-6 mb-8 relative overflow-hidden border-t-2 border-t-purple-500">
-            <div class="absolute top-0 right-0 bg-purple-600/20 text-purple-300 text-[9px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-purple-500/30">MAI FIX</div>
-            <div class="text-center mb-6 mt-2">
-                <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2"><%= dailyTip.league %></p>
-                <h3 class="text-lg font-black text-white leading-tight mb-4"><%= dailyTip.match %></h3>
-                <div class="bg-zinc-900/80 inline-block px-6 py-3 rounded-2xl border border-zinc-800 w-full">
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold mb-1">A Róka Tippje</p>
-                    <p class="text-xl font-black gradient-text"><%= dailyTip.prediction %></p>
-                    <p class="text-xs font-bold text-white mt-1">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
+        <div class="glass-card p-0 overflow-hidden relative mb-8">
+            <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest"><%= dailyTip.league %></span>
+                <% if(dailyTip.isReal) { %>
+                    <span class="text-[10px] font-bold text-green-400 bg-green-900/20 px-2 py-1 rounded border border-green-500/20">ÉLŐ ADAT</span>
+                <% } else { %>
+                    <span class="text-[10px] font-bold text-yellow-400 bg-yellow-900/20 px-2 py-1 rounded border border-yellow-500/20">DEMÓ</span>
+                <% } %>
+            </div>
+
+            <div class="p-8 text-center">
+                <h3 class="text-xl font-medium text-white mb-6"><%= dailyTip.match %></h3>
+                
+                <div class="inline-block relative">
+                    <div class="absolute inset-0 bg-yellow-500/10 blur-xl rounded-full"></div>
+                    <div class="relative bg-black/40 border border-yellow-500/30 px-8 py-4 rounded-2xl backdrop-blur-md">
+                        <p class="text-xs text-zinc-500 uppercase font-bold mb-1 tracking-widest">CÉLPONT</p>
+                        <p class="text-3xl font-black gold-gradient mb-1"><%= dailyTip.prediction %></p>
+                        <p class="text-sm font-medium text-zinc-400">Odds: <span class="text-white font-bold"><%= dailyTip.odds %></span></p>
+                    </div>
                 </div>
             </div>
-            
-            <div class="bg-purple-900/10 border border-purple-500/20 p-4 rounded-xl relative">
-                <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl">🦊</span>
-                
-                <p class="text-sm italic leading-relaxed mt-2 font-medium premium-text">
-                    "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet... (Admin: Nyomj a Szöveg Újragenerálásra!)' %>"
-                </p>
+
+            <div class="bg-black/20 p-6 border-t border-white/5">
+                <div class="gold-border-left pl-4">
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase mb-2 flex items-center gap-2">
+                        <span>💬</span> ELEMZÉS
+                    </p>
+                    <p class="text-sm champagne-text italic">
+                        "<%= dailyTip.memberMessage %>"
+                    </p>
+                </div>
             </div>
-            
-            <div class="mt-4 flex justify-between items-center border-t border-white/5 pt-4">
-                <span class="text-[10px] text-zinc-500 font-bold uppercase">Ajánlott Tét</span>
-                <span class="text-sm font-bold text-white bg-zinc-800 px-3 py-1 rounded-lg">
-                    <%= dailyTip.recommendedStake %>
-                </span>
+
+            <div class="bg-black/40 px-6 py-4 flex justify-between items-center border-t border-white/5">
+                <div class="text-center">
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase">KEZDÉS</p>
+                    <p class="text-sm font-bold text-white"><%= dailyTip.matchTime %></p>
+                </div>
+                <div class="h-6 w-px bg-white/10"></div>
+                <div class="text-center">
+                    <p class="text-[9px] text-yellow-600 font-bold uppercase">JAVASOLT TÉT</p>
+                    <p class="text-sm font-bold text-yellow-500"><%= dailyTip.recommendedStake %></p>
+                </div>
             </div>
         </div>
     <% } else { %>
-        <div class="startup-card p-8 text-center mb-8 border-dashed border border-zinc-800">
-            <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl animate-pulse">⏳</div>
-            <h3 class="text-lg font-bold text-white mb-2">A Róka még dolgozik...</h3>
-            <p class="text-xs text-zinc-500 leading-relaxed">Az AI éppen a piacot elemzi. Hamarosan jön a fix profit!</p>
+        <div class="glass-card p-10 text-center mb-8">
+            <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl animate-pulse ring-1 ring-white/10">⏳</div>
+            <h3 class="text-xl font-bold text-white mb-2">Adatok feldolgozása...</h3>
+            <p class="text-sm text-zinc-500">A Róka éppen a piacot elemzi. Hamarosan érkezik a prémium tipp.</p>
         </div>
     <% } %>
 
-    <div class="mt-8 text-center">
-        <a href="/stats" class="text-xs font-bold text-zinc-500 hover:text-white transition uppercase border-b border-zinc-700 pb-1">
-            Megnézem a teljes statisztikát ->
-        </a>
+    <div class="grid grid-cols-2 gap-4 mt-auto">
+        <div class="status-badge p-4 rounded-xl text-center">
+            <p class="text-[10px] text-zinc-500 font-bold uppercase">BANKROLL</p>
+            <p class="text-lg font-bold text-white"><%= user.startingCapital %> Ft</p>
+        </div>
+        <div class="status-badge p-4 rounded-xl text-center">
+            <p class="text-[10px] text-zinc-500 font-bold uppercase">WIN STREAK</p>
+            <p class="text-lg font-bold text-green-400">
+                <% if(streak > 0) { %> 🔥 <%= streak %> <% } else { %> - <% } %>
+            </p>
+        </div>
     </div>
 
-    <div id="toast" class="toast"><span>🚀</span><span>Csúcstechnológia. Fix Profit.</span></div>
-    <script>
-        window.addEventListener('load', () => {
-            const toast = document.getElementById('toast');
-            setTimeout(() => { toast.classList.add('show'); }, 500);
-            setTimeout(() => { toast.classList.remove('show'); }, 4000);
-        });
-    </script>
+    <div class="text-center mt-8 pb-4">
+        <p class="text-[10px] text-zinc-700 font-bold uppercase">&copy; 2026 RAFINÁLT RÓKA AI SYSTEM</p>
+    </div>
+
 </body>
 </html>
