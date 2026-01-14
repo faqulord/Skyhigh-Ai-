@@ -7,40 +7,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { background: #000000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .tech-card { background: #111111; border: 1px solid #27272a; border-radius: 16px; }
-        /* LILA/PINK SZÍNVILÁG */
+        .tech-card { background: #111111; border: 1px solid #333; border-radius: 16px; }
+        
+        /* SZÍNVILÁG */
         .nav-btn { color: #555; transition: all 0.2s; }
         .nav-btn.active { color: #c084fc; } /* Lila aktív szín */
         .nav-btn.active svg { fill: #c084fc; }
+        
         .chat-container { background: #111; border-radius: 12px; height: 350px; display: flex; flex-direction: column; }
         .msg { padding: 8px 12px; border-radius: 12px; font-size: 12px; max-width: 80%; margin-bottom: 8px; }
         .msg-me { background: #7c3aed; color: white; align-self: flex-end; }
         .msg-ai { background: #27272a; color: #ddd; align-self: flex-start; }
-        .pb-safe { padding-bottom: 90px; }
+        
+        /* Fontos: A tartalom ne csússzon a menü alá */
+        .pb-safe { padding-bottom: 100px; } 
+        
         .pulse-btn { animation: pulse-border 2s infinite; }
         @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); } 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); } }
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.3); }
-        .hidden { display: none; } /* Biztos, ami biztos */
+        .hidden { display: none !important; } /* Kényszerített elrejtés */
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <header class="p-5 border-b border-zinc-900 bg-black sticky top-0 z-20 flex justify-between items-center">
-        <div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl shadow-lg fox-glow">🦊</div>
-                <div>
-                    <h1 style="font-family: 'Orbitron';" class="text-sm font-bold text-white uppercase tracking-wider"><%= brandName %></h1>
-                    <p class="text-[9px] text-purple-400 italic mt-0.5 font-bold">Programmed by faqubelord</p>
-                </div>
+    <header class="p-4 border-b border-zinc-900 bg-black sticky top-0 z-20 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl shadow-lg fox-glow">🦊</div>
+            <div>
+                <h1 style="font-family: 'Orbitron';" class="text-sm font-bold text-white uppercase tracking-wider"><%= brandName %></h1>
+                <p class="text-[9px] text-purple-400 italic mt-0.5 font-bold">Programmed by faqubelord</p>
             </div>
         </div>
-        <div class="bg-purple-900/20 px-4 py-2 rounded-full border border-purple-500/50">
-            <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest">SYSTEM OWNER</span>
+        
+        <div class="flex items-center gap-2">
+            <a href="/dashboard" class="bg-zinc-800 hover:bg-zinc-700 text-white text-[10px] font-bold px-3 py-2 rounded-lg border border-zinc-700 transition flex items-center gap-1">
+                🏠 DASH
+            </a>
+            <div class="bg-purple-900/20 px-3 py-2 rounded-full border border-purple-500/50 hidden md:block">
+                <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest">OWNER</span>
+            </div>
         </div>
     </header>
 
-    <main class="flex-1 p-4 pb-safe">
+    <main class="flex-1 p-4 pb-safe relative z-10">
         
         <div id="section-dashboard" class="page-section">
             <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-purple-500 pl-3">Vezérlőpult</h2>
@@ -65,7 +74,7 @@
                             <p class="text-xs text-yellow-500 font-bold uppercase mb-3">⚠️ JÓVÁHAGYÁSRA VÁR</p>
                             <form action="/admin/publish-tip" method="POST">
                                 <input type="hidden" name="tipId" value="<%= currentTip._id %>">
-                                <button class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs pulse-btn hover:scale-[1.02] transition">📢 PUBLIKÁLÁS (TAGOKNAK)</button>
+                                <button class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs pulse-btn hover:scale-[1.02] transition">📢 PUBLIKÁLÁS</button>
                             </form>
                              <form action="/admin/run-robot" method="POST" class="mt-2">
                                 <button class="text-[9px] text-zinc-500 hover:text-white uppercase font-bold underline">Újraelemzés</button>
@@ -128,14 +137,14 @@
             <div class="tech-card p-5 mb-6 border border-fuchsia-900/30">
                 <div class="flex items-center gap-2 mb-4">
                     <span class="text-xl">📱</span>
-                    <h3 class="text-xs font-bold text-white uppercase">Insta/FB Poszt Generátor</h3>
+                    <h3 class="text-xs font-bold text-white uppercase">Insta/FB Poszt</h3>
                 </div>
                 <div class="flex gap-2 mb-4">
-                    <button onclick="generateSocial('win')" class="flex-1 bg-zinc-800 text-green-400 border border-green-900/30 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-zinc-700">🏆 Mai Nyerő</button>
-                    <button onclick="generateSocial('motivation')" class="flex-1 bg-zinc-800 text-purple-400 border border-purple-900/30 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-zinc-700">🔥 Motiváció</button>
+                    <button onclick="generateSocial('win')" type="button" class="flex-1 bg-zinc-800 text-green-400 border border-green-900/30 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-zinc-700">🏆 Mai Nyerő</button>
+                    <button onclick="generateSocial('motivation')" type="button" class="flex-1 bg-zinc-800 text-purple-400 border border-purple-900/30 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-zinc-700">🔥 Motiváció</button>
                 </div>
-                <textarea id="social-result" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-xs text-white focus:border-fuchsia-500 outline-none" placeholder="Itt jelenik meg a generált szöveg..."></textarea>
-                <button onclick="copySocial()" class="w-full bg-fuchsia-600 text-white mt-2 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-fuchsia-500">Szöveg Másolása</button>
+                <textarea id="social-result" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-xs text-white focus:border-fuchsia-500 outline-none" placeholder="Generált szöveg..."></textarea>
+                <button onclick="copySocial()" type="button" class="w-full bg-fuchsia-600 text-white mt-2 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-fuchsia-500">Másolás</button>
             </div>
 
             <div class="tech-card p-4 mb-6">
@@ -143,13 +152,13 @@
                 <div id="chat-win" class="chat-container overflow-y-auto mb-4 custom-scrollbar">
                     <% chatHistory.forEach(msg => { %> <div class="msg <%= msg.sender === 'Főnök' ? 'msg-me' : 'msg-ai' %>"><strong><%= msg.sender %>:</strong> <%= msg.text %></div> <% }) %>
                 </div>
-                <div class="flex gap-2"><input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Írj a Rókának..."><button onclick="talk()" class="bg-purple-600 text-white px-4 py-3 rounded-xl font-bold">➤</button></div>
+                <div class="flex gap-2"><input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Írj a Rókának..."><button onclick="talk()" type="button" class="bg-purple-600 text-white px-4 py-3 rounded-xl font-bold">➤</button></div>
             </div>
 
             <div class="tech-card p-4 border border-blue-900/30">
                 <h3 class="text-xs font-bold text-white mb-2">📢 Hírlevél</h3>
                 <input type="text" id="email-topic" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Téma...">
-                <button onclick="draftEmail()" class="bg-zinc-800 text-zinc-300 w-full py-2 rounded-lg text-[10px] font-bold uppercase mb-4 hover:bg-zinc-700">AI Vázlat</button>
+                <button onclick="draftEmail()" type="button" class="bg-zinc-800 text-zinc-300 w-full py-2 rounded-lg text-[10px] font-bold uppercase mb-4 hover:bg-zinc-700">AI Vázlat</button>
                 <form action="/admin/send-email" method="POST">
                     <input type="text" name="subject" id="email-subject" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-white mb-2" placeholder="Tárgy">
                     <textarea name="messageBody" id="email-body" rows="4" class="w-full bg-black border border-zinc-800 rounded-lg p-2 text-xs text-zinc-300 mb-2" placeholder="Szöveg..."></textarea>
@@ -176,7 +185,7 @@
         <div id="section-finance" class="page-section hidden">
             <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3">Pénzügy</h2>
             <div class="tech-card p-4 mb-6 border border-purple-500/30 bg-purple-900/10">
-                <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-bold text-white uppercase">Havi Zárás</h3><span class="text-[9px] bg-purple-900/50 text-purple-300 px-2 py-1 rounded border border-purple-500/30">Admin Only</span></div>
+                <div class="flex justify-between items-center mb-3"><h3 class="text-xs font-bold text-white uppercase">Havi Zárás</h3></div>
                 <% if(stats && stats.length > 0) { %> <% stats.forEach(stat => { %> <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl mb-2 border border-zinc-800"><div><p class="text-xs font-bold text-white"><%= stat.month %></p><p class="text-[9px] text-zinc-500"><%= stat.totalTips %> tipp</p></div><% if (!stat.isPublished) { %> <form action="/admin/publish-stat" method="POST"><input type="hidden" name="statId" value="<%= stat._id %>"><button class="bg-blue-600 text-white text-[9px] px-3 py-2 rounded-lg font-bold uppercase hover:bg-blue-500">Publikál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold">Publikálva ✅</span> <% } %></div> <% }) %> <% } else { %> <p class="text-[10px] text-zinc-500 italic">Nincs adat.</p> <% } %>
             </div>
             <div class="tech-card p-4"><div class="space-y-1 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"><% if(calculatorData && calculatorData.length > 0) { %> <% calculatorData.forEach(row => { %> <div class="flex justify-between items-center text-[10px] py-3 border-b border-zinc-800"><span class="text-zinc-500 font-mono"><%= row.date %></span><span class="truncate w-32 font-medium text-zinc-300"><%= row.match %></span><span class="font-bold <%= row.dailyProfit > 0 ? 'text-green-500' : 'text-red-500' %>"><%= row.dailyProfit %>%</span></div> <% }) %> <% } else { %> <p class="text-center text-[10px] text-zinc-600 italic py-4">Nincs adat.</p> <% } %></div></div>
@@ -184,33 +193,67 @@
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 w-full bg-black border-t border-zinc-900 p-2 pb-6 z-50 flex justify-around">
-        <button onclick="changeTab('dashboard')" id="btn-dashboard" class="nav-btn active flex flex-col items-center gap-1 p-2"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span class="text-[9px] font-bold uppercase">Vezérlő</span></button>
-        <button onclick="changeTab('comm')" id="btn-comm" class="nav-btn flex flex-col items-center gap-1 p-2"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg><span class="text-[9px] font-bold uppercase">Comm</span></button>
-        <button onclick="changeTab('users')" id="btn-users" class="nav-btn flex flex-col items-center gap-1 p-2"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span class="text-[9px] font-bold uppercase">Tagok</span></button>
-        <button onclick="changeTab('finance')" id="btn-finance" class="nav-btn flex flex-col items-center gap-1 p-2"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg><span class="text-[9px] font-bold uppercase">Pénzügy</span></button>
+    <nav class="fixed bottom-0 left-0 w-full bg-black border-t border-zinc-900 p-2 pb-6 z-[9999] flex justify-around">
+        <button type="button" onclick="selectTab('dashboard')" id="btn-dashboard" class="nav-btn active flex flex-col items-center gap-1 p-2 w-16">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <span class="text-[9px] font-bold uppercase">Vezérlő</span>
+        </button>
+        <button type="button" onclick="selectTab('comm')" id="btn-comm" class="nav-btn flex flex-col items-center gap-1 p-2 w-16">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            <span class="text-[9px] font-bold uppercase">Comm</span>
+        </button>
+        <button type="button" onclick="selectTab('users')" id="btn-users" class="nav-btn flex flex-col items-center gap-1 p-2 w-16">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span class="text-[9px] font-bold uppercase">Tagok</span>
+        </button>
+        <button type="button" onclick="selectTab('finance')" id="btn-finance" class="nav-btn flex flex-col items-center gap-1 p-2 w-16">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+            <span class="text-[9px] font-bold uppercase">Pénzügy</span>
+        </button>
     </nav>
 
     <script>
-        // ATOMBIZTOS NAVIGÁCIÓ
-        function changeTab(tabName) {
-            // Elrejtünk mindent
-            document.getElementById('section-dashboard').classList.add('hidden');
-            document.getElementById('section-comm').classList.add('hidden');
-            document.getElementById('section-users').classList.add('hidden');
-            document.getElementById('section-finance').classList.add('hidden');
-            
-            // Gombok inaktívak
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        // JAVÍTOTT VÁLTÓ SCRIPT
+        function selectTab(tabId) {
+            // Minden szekció elrejtése
+            const sections = ['dashboard', 'comm', 'users', 'finance'];
+            sections.forEach(id => {
+                const el = document.getElementById('section-' + id);
+                if(el) el.classList.add('hidden');
+                
+                const btn = document.getElementById('btn-' + id);
+                if(btn) btn.classList.remove('active');
+            });
 
             // Kiválasztott megjelenítése
-            document.getElementById('section-' + tabName).classList.remove('hidden');
-            document.getElementById('btn-' + tabName).classList.add('active');
+            const targetSection = document.getElementById('section-' + tabId);
+            if(targetSection) targetSection.classList.remove('hidden');
+
+            const targetBtn = document.getElementById('btn-' + tabId);
+            if(targetBtn) targetBtn.classList.add('active');
+            
+            // Görgetés a tetejére váltáskor
+            window.scrollTo(0,0);
         }
 
-        // SOCIAL GENERATOR LOGIKA
+        // CHAT és GENERÁTOR script
+        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
+        async function talk() {
+            const i = document.getElementById('chat-in'); if(!i.value) return;
+            const msgText = i.value; i.value = '';
+            win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`;
+            win.scrollTop = win.scrollHeight;
+            try {
+                const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})});
+                const d = await r.json(); 
+                win.innerHTML += `<div class="msg msg-ai"><strong>Róka:</strong> ${d.reply}</div>`;
+                win.scrollTop = win.scrollHeight;
+            } catch (err) { console.error(err); }
+        }
+
         async function generateSocial(type) {
             const btn = event.target;
+            const originalText = btn.innerText;
             btn.innerText = "⏳ Generálás...";
             try {
                 const res = await fetch('/admin/social-content', { 
@@ -218,20 +261,4 @@
                     headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ type }) 
                 });
-                const data = await res.json();
-                document.getElementById('social-result').value = data.content;
-                btn.innerText = type === 'win' ? "🏆 Mai Nyerő" : "🔥 Motiváció";
-            } catch(e) { alert('Hiba!'); }
-        }
-
-        function copySocial() {
-            const copyText = document.getElementById("social-result");
-            copyText.select();
-            document.execCommand("copy");
-            alert("Szöveg másolva!");
-        }
-
-        // CHAT & EMAIL
-        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
-        async function talk() { const i = document.getElementById('chat-in'); if(!i.value) return; const msgText = i.value; i.value = ''; win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`; win.scrollTop = win.scrollHeight; try { const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})}); const d = await r.json(); win.innerHTML += `<div class="msg msg-ai"><strong>Róka:</strong> ${d.reply}</div>`; win.scrollTop = win.scrollHeight; } catch (err) { console.error(err); } }
-        async function draftEmail() { const topic = document.getElementById('email-topic').value; if(!topic) return alert("Írj témát!"); try { const res = await fetch('/admin/draft-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic }) }); const data = await res.json(); const lines =
+                
