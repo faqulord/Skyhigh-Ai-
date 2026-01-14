@@ -6,8 +6,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; }
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; overflow-x: hidden; }
         .startup-card { background: #111; border: 1px solid #27272a; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+        
+        .gradient-text { 
+            background: linear-gradient(to right, #FCD34D, #F59E0B, #D97706); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3));
+        }
+        
+        /* ÚJ: LILA-RÓZSASZÍN GRADIENS A KERETHEZ ÉS A SZÖVEGHEZ */
+        .purple-pink-gradient {
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .purple-pink-border {
+            border-image: linear-gradient(to right, #a855f7, #ec4899) 1;
+        }
+
+        /* ÚJ: A SZÖVEG ÚSZÓ ANIMÁCIÓJA (MARQUEE) */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .marquee-text {
+            display: inline-block;
+            padding-left: 100%; /* Kezdés a képernyőn kívül */
+            animation: marquee 15s linear infinite; /* 15 mp alatt úszik át */
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
         .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
         .toast.show { bottom: 20px; }
@@ -28,11 +62,8 @@
             <a href="/stats" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
                 <span>📊</span> STATS
             </a>
-
             <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %>
-                <a href="/admin" class="bg-purple-900/50 hover:bg-purple-600 text-purple-200 border border-purple-500/30 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                    <span>⚡</span> HQ
-                </a>
+                <a href="/admin" class="bg-purple-900/50 hover:bg-purple-600 text-purple-200 border border-purple-500/30 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1"><span>⚡</span> HQ</a>
             <% } %>
             <a href="/logout" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center">EXIT</a>
         </div>
@@ -40,12 +71,14 @@
 
     <div class="mb-8">
         <p class="text-zinc-500 text-xs font-bold uppercase mb-1"><%= displayDate %></p>
-        <h2 class="text-2xl font-bold text-white mb-2">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
+        <h2 class="text-2xl font-bold text-white mb-4">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
         
-        <div class="bg-zinc-900/80 p-3 rounded-xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] inline-block min-w-[280px]">
-            <p id="dynamicQuote" class="text-xs text-cyan-400 italic font-medium transition-opacity duration-500">
-                "<%= foxQuotes[0] %>"
-            </p>
+        <div class="bg-zinc-900/80 p-3 rounded-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.15)] w-full overflow-hidden">
+            <div class="marquee-container">
+                <p id="dynamicQuote" class="text-xs purple-pink-gradient italic font-bold marquee-text">
+                    "<%= foxQuotes[0] %>"
+                </p>
+            </div>
         </div>
     </div>
 
@@ -57,9 +90,7 @@
                 <h3 class="text-lg font-black text-white leading-tight mb-4"><%= dailyTip.match %></h3>
                 <div class="bg-zinc-900/80 inline-block px-6 py-3 rounded-2xl border border-zinc-800 w-full">
                     <p class="text-[10px] text-zinc-500 uppercase font-bold mb-1">A Róka Tippje</p>
-                    <p class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-500 drop-shadow-sm">
-                        <%= dailyTip.prediction %>
-                    </p>
+                    <p class="text-xl font-black gradient-text"><%= dailyTip.prediction %></p>
                     <p class="text-xs font-bold text-white mt-1">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
                 </div>
             </div>
@@ -100,19 +131,16 @@
             setTimeout(() => { toast.classList.add('show'); }, 500);
             setTimeout(() => { toast.classList.remove('show'); }, 4000);
 
-            // DINAMIKUS IDÉZETEK JS
+            // DINAMIKUS ÚSZÓ IDÉZETEK JS
             const quotes = <%- JSON.stringify(foxQuotes) %>;
             const quoteElement = document.getElementById('dynamicQuote');
             let index = 0;
 
-            setInterval(() => {
+            // Amikor az animáció véget ér (kimegy a képből), cseréljük a szöveget
+            quoteElement.addEventListener('animationiteration', () => {
                 index = (index + 1) % quotes.length;
-                quoteElement.style.opacity = 0;
-                setTimeout(() => {
-                    quoteElement.innerText = '"' + quotes[index] + '"';
-                    quoteElement.style.opacity = 1;
-                }, 500);
-            }, 5000);
+                quoteElement.innerText = '"' + quotes[index] + '"';
+            });
         });
     </script>
 </body>
