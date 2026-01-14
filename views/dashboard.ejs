@@ -15,21 +15,20 @@
             -webkit-text-fill-color: transparent; 
             filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3));
         }
-        
-        /* LILA-RÓZSASZÍN KERET */
-        .purple-pink-border {
-            border-width: 2px;
-            border-style: solid;
-            border-image: linear-gradient(to right, #a855f7, #ec4899) 1;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+
+        /* VÉKONY LILA-RÓZSASZÍN KERET */
+        .thin-purple-border {
+            border: 1px solid transparent; 
+            background: linear-gradient(#111, #111) padding-box, 
+                        linear-gradient(to right, #a855f7, #ec4899) border-box;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.15);
         }
 
-        /* ÚJ: NARANCSSÁRGA SZÖVEG (Vakító!) */
-        .orange-neon-text {
-            color: #FF9F43; /* Élénk Narancs */
-            text-shadow: 0 0 8px rgba(255, 159, 67, 0.6); /* Neon ragyogás */
-            font-weight: 700;
-            letter-spacing: 0.5px;
+        /* NEON NARANCS SZÖVEG */
+        .orange-neon {
+            color: #FF9F43;
+            text-shadow: 0 0 5px rgba(255, 159, 67, 0.5);
+            font-weight: 600;
         }
 
         /* ÚSZÓ ANIMÁCIÓ (MARQUEE) */
@@ -37,20 +36,21 @@
             overflow: hidden;
             white-space: nowrap;
             position: relative;
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); /* Szebb szélek */
+            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
         }
         .marquee-text {
             display: inline-block;
             padding-left: 100%; 
-            animation: marquee 20s linear infinite; /* Lassítottam kicsit, hogy olvashatóbb legyen */
+            animation: marquee 20s linear infinite;
         }
         @keyframes marquee {
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
 
-        .fox-pulse { animation: pulse-fox 2s infinite; }
-        @keyframes pulse-fox { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        /* RÓKA PULZÁLÁS */
+        .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
+        @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); } 50% { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4)); } }
 
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
         .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
@@ -77,22 +77,22 @@
         </div>
     </header>
 
-    <div class="mb-8">
+    <div class="mb-8 relative">
         <p class="text-zinc-500 text-xs font-bold uppercase mb-1"><%= displayDate %></p>
-        <h2 class="text-2xl font-bold text-white mb-4">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
+        <h2 class="text-2xl font-bold text-white mb-6">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
         
-        <div class="bg-[#0a0a0a] p-3 rounded-xl purple-pink-border w-full overflow-hidden relative">
-            <div class="flex items-center gap-2 mb-2 border-b border-purple-500/20 pb-2">
-                <div class="text-xl fox-pulse">🦊</div> <p class="text-[10px] font-bold text-purple-300 uppercase tracking-widest">Bejövő Róka Üzenet...</p>
+        <div class="relative">
+            <div class="absolute -top-4 right-4 z-10 bg-[#050505] px-2 text-2xl fox-pulse cursor-default" title="Róka Üzenet">
+                🦊
             </div>
 
-            <div class="marquee-container">
-                <p id="dynamicQuote" class="text-sm orange-neon-text italic marquee-text">
-                    "<%= foxQuotes[0] %>"
-                </p>
+            <div class="thin-purple-border p-3 rounded-xl w-full overflow-hidden bg-[#111]/50">
+                <div class="marquee-container">
+                    <p id="dynamicQuote" class="text-xs orange-neon italic marquee-text">
+                        "<%= foxQuotes[0] %>"
+                    </p>
+                </div>
             </div>
-            
-            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-purple-500/5 to-transparent opacity-30 pointer-events-none animate-scan"></div>
         </div>
     </div>
 
@@ -108,12 +108,14 @@
                     <p class="text-xs font-bold text-white mt-1">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
                 </div>
             </div>
+            
             <div class="bg-purple-900/10 border border-purple-500/20 p-4 rounded-xl relative">
                 <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl">🦊</span>
                 <p class="text-xs text-[#F3E5AB] italic leading-relaxed mt-2 font-medium">
                     "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet... (Admin: Nyomj a Szöveg Újragenerálásra!)' %>"
                 </p>
             </div>
+            
             <div class="mt-4 flex justify-between items-center border-t border-white/5 pt-4">
                 <span class="text-[10px] text-zinc-500 font-bold uppercase">Ajánlott Tét</span>
                 <span class="text-sm font-bold text-white bg-zinc-800 px-3 py-1 rounded-lg"><%= dailyTip.recommendedStake %></span>
@@ -139,21 +141,16 @@
             setTimeout(() => { toast.classList.add('show'); }, 500);
             setTimeout(() => { toast.classList.remove('show'); }, 4000);
 
+            // DINAMIKUS ÚSZÓ SZÖVEG
             const quotes = <%- JSON.stringify(foxQuotes) %>;
             const quoteElement = document.getElementById('dynamicQuote');
             let index = 0;
 
-            // Amikor az animáció véget ér (kimegy a képből), cseréljük a szöveget
             quoteElement.addEventListener('animationiteration', () => {
                 index = (index + 1) % quotes.length;
                 quoteElement.innerText = '"' + quotes[index] + '"';
             });
         });
     </script>
-    <style>
-        /* Extra szkennelés animáció a doboz hátterében */
-        @keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
-        .animate-scan { animation: scan 4s linear infinite; }
-    </style>
 </body>
 </html>
