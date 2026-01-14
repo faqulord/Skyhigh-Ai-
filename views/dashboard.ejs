@@ -8,7 +8,15 @@
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; }
         .startup-card { background: #111; border: 1px solid #27272a; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
-        .gradient-text { background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* --- EZT JAVÍTOTTAM: PRÉMIUM ARANY SZÖVEG --- */
+        .gradient-text { 
+            background: linear-gradient(to right, #FCD34D, #F59E0B, #D97706); /* Arany Átmenet */
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3)); /* Enyhe ragyogás */
+        }
+        
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
         .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
         .toast.show { bottom: 20px; }
@@ -65,11 +73,11 @@
                     "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet... (Admin: Nyomj a Szöveg Újragenerálásra!)' %>"
                 </p>
             </div>
-            
             <div class="mt-4 flex justify-between items-center border-t border-white/5 pt-4">
                 <span class="text-[10px] text-zinc-500 font-bold uppercase">Ajánlott Tét</span>
                 <span class="text-sm font-bold text-white bg-zinc-800 px-3 py-1 rounded-lg">
-                    <%= dailyTip.recommendedStake %> </span>
+                    <%= dailyTip.recommendedStake %>
+                </span>
             </div>
         </div>
     <% } else { %>
