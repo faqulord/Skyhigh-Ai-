@@ -48,7 +48,34 @@
             <% } %>
         </div>
 
-        <div class="px-6 flex justify-between items-center opacity-40 text-[9px] font-bold uppercase italic">
+        <% if (pastTips && pastTips.length > 0) { %>
+            <div class="fox-card p-6 shadow-2xl mb-10 border-top-zinc-800" style="border-top-color: #27272a;">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-[10px] font-black uppercase text-zinc-400">Elmúlt Tippek</h2>
+                    <span class="text-[9px] bg-white/5 px-2 py-1 rounded text-zinc-500">Last 10</span>
+                </div>
+                
+                <div class="flex flex-col gap-3">
+                    <% pastTips.forEach(function(tip) { %>
+                        <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5">
+                            <div>
+                                <p class="text-[9px] text-zinc-500 font-bold mb-1"><%= tip.date %> | <%= tip.match %></p>
+                                <p class="text-xs font-bold text-white"><%= tip.prediction %> <span class="text-purple-400">(@<%= tip.odds %>)</span></p>
+                            </div>
+                            <div class="text-xl">
+                                <% if (tip.status === 'win') { %>
+                                    ✅
+                                <% } else { %>
+                                    ❌
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+
+        <div class="px-6 flex justify-between items-center opacity-40 text-[9px] font-bold uppercase italic pb-10">
             <p>Tőke: <%= user.startingCapital.toLocaleString() %> Ft</p>
             <a href="/logout">Kilépés</a>
         </div>
