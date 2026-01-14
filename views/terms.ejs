@@ -2,57 +2,88 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ÁSZF | Skyhigh AI</title>
+    <title>Szabályzat | Zsivány Róka</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; }
-        .legal-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-top: 3px solid #8b5cf6; }
-        .legal-content::-webkit-scrollbar { width: 4px; }
-        .legal-content::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        .thin-purple-border {
+            border: 1px solid transparent; 
+            background: linear-gradient(#111, #111) padding-box, 
+                        linear-gradient(to right, #a855f7, #ec4899) border-box;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); 
+        }
+
+        h2 { color: #fff; font-weight: 700; margin-top: 20px; margin-bottom: 10px; font-family: 'Orbitron', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        p, li { color: #a1a1aa; font-size: 12px; line-height: 1.6; margin-bottom: 10px; text-align: justify; }
+        ul { list-style-type: disc; padding-left: 20px; color: #a1a1aa; font-size: 12px; margin-bottom: 15px; }
+        
+        .highlight { color: #FF9F43; font-weight: bold; }
+        
+        /* Görgősáv stílus */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
     </style>
 </head>
-<body class="p-4 flex justify-center min-h-[100dvh]">
-    <div class="w-full max-w-md">
-        <div class="legal-card p-6 md:p-8 rounded-[2rem] shadow-2xl">
-            <div class="text-center mb-6">
-                <div class="text-4xl mb-2">🦊💜</div>
-                <h1 style="font-family: 'Orbitron';" class="text-sm text-purple-500 font-black uppercase tracking-widest italic">Felhasználási Feltételek</h1>
-            </div>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 relative">
 
-            <div class="legal-content h-[60dvh] overflow-y-auto pr-2 space-y-6 text-[10px] text-zinc-400 leading-relaxed italic">
-                <section>
-                    <h3 class="text-white font-bold uppercase mb-2 underline decoration-purple-500/50">1. A Szolgáltatás jellege</h3>
-                    <p>A Skyhigh AI (Rafinált Robot Róka) egy matematikai és statisztikai elemző szoftver. A rendszer prediktív algoritmusokat használ sportesemények elemzésére.</p>
-                </section>
-
-                <section>
-                    <h3 class="text-white font-bold uppercase mb-2 underline decoration-purple-500/50">2. Felelősségkorlátozás</h3>
-                    <p>A szoftver által generált „Master Tippek” valószínűségszámításon alapulnak, nem garantálnak biztos nyereményt. A sportfogadás kockázattal jár. Az üzemeltető nem vállal felelősséget semmilyen anyagi veszteségért. A felhasználó saját döntése és felelőssége alapján használja az adatokat.</p>
-                </section>
-
-                <section>
-                    <h3 class="text-white font-bold uppercase mb-2 underline decoration-purple-500/50">3. Nem Pénzügyi Tanácsadás</h3>
-                    <p>A szolgáltatás tartalma nem minősül befektetési vagy pénzügyi tanácsadásnak. Nem buzdítunk szerencsejátékra. A rendszer célja a statisztikai segítségnyújtás.</p>
-                </section>
-
-                <section>
-                    <h3 class="text-white font-bold uppercase mb-2 underline decoration-purple-500/50">4. Kifizetés és Hozzáférés</h3>
-                    <p>A licenc díja digitális tartalomhoz való hozzáférést biztosít. A sikeres regisztráció és aktiválás után elállásra vagy pénzvisszatérítésre nincs lehetőség (a digitális termékek természetéből adódóan).</p>
-                </section>
-
-                <section>
-                    <h3 class="text-white font-bold uppercase mb-2 underline decoration-purple-500/50">5. Korhatár</h3>
-                    <p>A szoftvert kizárólag 18. életévüket betöltött személyek használhatják.</p>
-                </section>
-            </div>
-
-            <div class="mt-8 pt-4 border-t border-white/5">
-                <button onclick="history.back()" class="w-full bg-zinc-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest border border-white/5 active:scale-95 transition">
-                    Vissza a regisztrációhoz
-                </button>
-            </div>
-        </div>
+    <div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10">
+        <div class="absolute bottom-[-20%] right-[-20%] w-[50%] h-[50%] bg-purple-900/10 blur-[100px] rounded-full"></div>
     </div>
+
+    <div class="text-center mb-6">
+        <div class="text-3xl mb-2">🦊📜</div>
+        <h1 class="text-xl font-bold uppercase tracking-widest text-white">Falka <span class="text-purple-500">Szabályzat</span></h1>
+        <p class="text-[10px] text-zinc-500">ÁSZF és Adatkezelés</p>
+    </div>
+
+    <div class="thin-purple-border p-6 rounded-2xl w-full max-w-2xl bg-[#0a0a0a]/95 backdrop-blur-sm h-[70vh] overflow-y-auto">
+        
+        <p class="italic text-center mb-6 text-zinc-400">Hatályos: 2026.01.14-től visszavonásig.</p>
+
+        <h2>1. Általános Rendelkezések</h2>
+        <p>Jelen Általános Szerződési Feltételek (továbbiakban: ÁSZF) szabályozza a Szolgáltató (magánszemélyként üzemeltetett szolgáltatás) és az Előfizető (továbbiakban: Felhasználó) közötti jogviszonyt. A "Zsivány Róka" (továbbiakban: Szolgáltatás) egy online információs és szórakoztató platform.</p>
+        <p>A regisztrációval és a szolgáltatás használatával a Felhasználó kijelenti, hogy elmúlt 18 éves, és teljes mértékben elfogadja jelen feltételeket.</p>
+
+        <h2>2. A Szolgáltatás Tárgya</h2>
+        <p>A Szolgáltató sporteseményekkel kapcsolatos statisztikai elemzéseket, véleményeket és tippeket ("szellemi termék") oszt meg a Felhasználóval. </p>
+        <p><span class="highlight">FONTOS:</span> A Szolgáltatás NEM minősül pénzügyi vagy befektetési tanácsadásnak. A megosztott információk kizárólag szórakoztató és edukációs célokat szolgálnak.</p>
+
+        <h2>3. Felelősség Kizárása</h2>
+        <p>A sportfogadás kockázatos tevékenység, amely a feltett tét teljes elvesztésével járhat. A Szolgáltató:</p>
+        <ul>
+            <li>NEM vállal garanciát a tippek sikerességére vagy a profitra.</li>
+            <li>NEM vállal felelősséget a Felhasználó esetleges anyagi veszteségeiért.</li>
+            <li>Kizárólag informál, a döntést a tét elhelyezéséről a Felhasználó saját felelősségére hozza meg.</li>
+        </ul>
+        <p>A múltbéli eredmények (statisztikák) nem jelentenek garanciát a jövőbeni teljesítményre.</p>
+
+        <h2>4. Fizetés és Előfizetés</h2>
+        <p>A Szolgáltatás igénybevétele előfizetéshez kötött. A fizetés online történik. Az Előfizető tudomásul veszi, hogy a befizetés a "Digitális Adattartalomhoz" (elemzésekhez) való hozzáférés ellenértéke.</p>
+        <p>Magánszemélyként történő értékesítés esetén a Szolgáltató nem köteles ÁFA-s számlát kiállítani, amennyiben alanyi adómentes státuszban végzi tevékenységét, de a befizetésről visszaigazolást küld.</p>
+
+        <h2>5. Elállási Jog és Visszatérítés</h2>
+        <p>A Fogyasztó és a vállalkozás közötti szerződések részletes szabályairól szóló 45/2014. (II. 26.) Korm. rendelet 29. § (1) bekezdés m) pontja alapján:</p>
+        <p><span class="highlight">A Felhasználó elveszíti elállási jogát</span>, mivel a Szolgáltató a digitális adattartalmat (tippek, elemzések) a vásárlás után azonnal elérhetővé teszi, és a teljesítés a Felhasználó kifejezett beleegyezésével megkezdődött.</p>
+        <p>Ez azt jelenti, hogy <strong>befizetés után pénzvisszafizetésre (refund) nincs lehetőség</strong>, még akkor sem, ha a tippek nem nyernek, vagy a Felhasználó meggondolja magát.</p>
+
+        <h2>6. Adatkezelés (GDPR)</h2>
+        <p>A Szolgáltató a Felhasználó adatait (Email, Név) bizalmasan kezeli, harmadik félnek nem adja ki. Az adatok kizárólag a belépéshez és a szolgáltatással kapcsolatos kommunikációhoz (pl. hírlevél) szükségesek.</p>
+        <p>A Felhasználó bármikor kérheti adatai törlését a fiókjának megszüntetésével.</p>
+
+        <h2>7. Záró Rendelkezések</h2>
+        <p>A Szolgáltató fenntartja a jogot a Felhasználó fiókjának azonnali, indoklás nélküli törlésére, amennyiben a Felhasználó megszegi a szabályzatot, vagy a közösségre nézve káros magatartást tanúsít (pl. a tippek jogosulatlan továbbosztása).</p>
+
+    </div>
+
+    <div class="mt-6 w-full max-w-xs">
+        <a href="/register" class="block w-full text-center bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded-xl font-bold uppercase text-xs transition border border-zinc-600">
+            ⬅ Vissza a Regisztrációhoz
+        </a>
+    </div>
+
 </body>
 </html>
