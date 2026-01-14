@@ -14,10 +14,10 @@ const OWNER_EMAIL = "stylefaqu@gmail.com";
 const BRAND_NAME = "Rafinált Róka"; 
 
 const foxQuotes = [
-    "A profitot nem a szerencse hozza, hanem a fegyelem. 🧠",
-    "Tétkezelés nélkül a legjobb tipp is semmit ér. ⚖️",
-    "A cél 40%. Minden lépésünket ez vezérli. 🎯",
-    "Hideg fej, forró oddsok, pontos tét. Ez a recept. 🔥"
+    "A bank nem ad, a banktól elvesszük. 🦊💰",
+    "Ma este símaszkban megyünk a lottózóba. 🏦",
+    "A fogadóiroda hibázott. Mi büntetünk. ⚖️",
+    "Hideg fej, arany zsákmány. Ez a Falka törvénye. 🔥"
 ];
 
 const transporter = nodemailer.createTransport({
@@ -82,7 +82,7 @@ async function analyzePerformance() {
 
 // --- CSATLAKOZÁS ---
 mongoose.connect(process.env.MONGO_URL)
-    .then(() => console.log(`🚀 ${BRAND_NAME} System Ready - WORKER FRIENDLY v20`))
+    .then(() => console.log(`🚀 ${BRAND_NAME} System Ready - GOLDEN HEIST v21`))
     .catch(err => console.error("MongoDB Hiba:", err));
 
 app.set('view engine', 'ejs');
@@ -92,7 +92,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'skyhigh_boss_system_secret_v20_worker',
+    secret: 'skyhigh_boss_system_secret_v21_gold',
     resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -101,7 +101,7 @@ app.use(session({
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getDbDate = () => new Date().toLocaleDateString('en-CA'); 
 
-// --- AI MOTOR (WORKER FRIENDLY) ---
+// --- AI MOTOR (BANKARABLÓ MÓD) ---
 async function runAiRobot() {
     await ChatMessage.deleteMany({}); // Tiszta lap
     
@@ -139,18 +139,13 @@ async function runAiRobot() {
         let validFixtures = [];
 
         if (fixtures.length > 0) {
-            // --- IDŐSZŰRÉS: 3 ÓRA + 16:00 UTÁNI KEZDÉS ---
+            // IDŐSZŰRÉS: 3 ÓRA + 16:00 UTÁNI KEZDÉS
             validFixtures = fixtures.filter(f => {
                 const matchDate = new Date(f.fixture.date);
-                
-                // 1. Biztonsági Puffer: Minimum 3 óra múlva
                 const isSafeBuffer = matchDate > threeHoursLater;
-                
-                // 2. Munkásbarát Idő: Csak 16:00 utáni meccsek (Budapest idő szerint)
                 const hunTimeStr = matchDate.toLocaleTimeString('hu-HU', { timeZone: 'Europe/Budapest', hour: '2-digit', hour12: false });
                 const hunHour = parseInt(hunTimeStr.split(':')[0]); 
-                const isAfternoon = hunHour >= 16; // 16:00 vagy később (pl. 17, 18, 20...)
-
+                const isAfternoon = hunHour >= 16; 
                 return isSafeBuffer && isAfternoon;
             });
         }
@@ -172,7 +167,8 @@ async function runAiRobot() {
             return `[${timeStr}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`;
         }).join("\n");
 
-        // --- 1. ELEMZÉS PROMPT ---
+        // --- 1. PROFI MATEMATIKUS (NEKED) ---
+        // Ez marad szigorú, hogy jó döntést hozzon!
         const analysisPrompt = `
             SZEREP: Profi Sportfogadó Stratéga.
             NYELV: KIZÁRÓLAG MAGYARUL VÁLASZOLJ!
@@ -183,7 +179,7 @@ async function runAiRobot() {
             MINIMUM ODDS: 1.50 (Ha kisebb, keress duplát!)
             
             KÖTELEZŐ FORMAT (JSON):
-            { "league": "...", "match": "Hazai - Vendég", "prediction": "Tipp", "odds": "1.XX", "reasoning": "Jelentem Főnök! [MAGYAR ELEMZÉS]...", "profitPercent": 5, "matchTime": "ÓÓ:PP", "matchDate": "ÉÉÉÉ.HH.NN", "bookmaker": "...", "stake": "${stakeAdvice}" }
+            { "league": "...", "match": "Hazai - Vendég", "prediction": "Tipp", "odds": "1.XX", "reasoning": "Jelentem Főnök! [MATEMATIKAI ELEMZÉS]...", "profitPercent": 5, "matchTime": "ÓÓ:PP", "matchDate": "ÉÉÉÉ.HH.NN", "bookmaker": "...", "stake": "${stakeAdvice}" }
         `;
 
         const aiRes = await openai.chat.completions.create({
@@ -194,18 +190,24 @@ async function runAiRobot() {
 
         const result = JSON.parse(aiRes.choices[0].message.content);
         
-        // --- 2. MARKETING PROMPT ---
+        // --- 2. BANKRABLÓ RÓKA (TAGOKNAK) ---
+        // Ez lesz a vicces, zsivány szöveg!
         const marketingPrompt = `
             Eredeti elemzés: "${result.reasoning}"
             Meccs: ${result.match}
             Tét: ${result.stake}
             Dátum: ${result.matchDate}
             Idő: ${result.matchTime}
+            Odds: ${result.odds}
             
-            FELADAT: Írd át a tagoknak MAGYARUL.
-            STÍLUS: Rafinált Róka (Laza, emojik).
+            FELADAT: Írd át ezt a szöveget a Tagoknak (A Falkának).
+            KARAKTER: Te vagy a "Zsivány Róka", aki épp bankot rabol (a fogadóirodát fosztja ki).
+            STÍLUS: 
+            - Használj ilyen szavakat: "Lottózó", "Készpénzfelvétel", "Símaszkot fel", "Kiraboljuk őket", "Ez ajándék pénz".
+            - Legyél nagyon magabiztos és vicces.
+            - DE az adatok (Dátum, Idő, Tét) legyenek halálosan pontosak!
             
-            KÖTELEZŐ:
+            KÖTELEZŐ ELEMEK:
             1. "📅 Dátum: ${result.matchDate}"
             2. "⏰ Kezdés: ${result.matchTime}"
             3. "💰 Tét: ${result.stake}"
@@ -213,7 +215,7 @@ async function runAiRobot() {
         
         const marketingRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Marketing Copywriter." }, { role: "user", content: marketingPrompt }] 
+            messages: [{ role: "system", content: "Creative Copywriter." }, { role: "user", content: marketingPrompt }] 
         });
 
         await Tip.findOneAndUpdate({ date: getDbDate() }, { 
@@ -226,7 +228,7 @@ async function runAiRobot() {
             isReal: isRealData
         }, { upsert: true });
 
-        await logToChat('Róka', `${statusLog}\n\n✅ **TIPP KIVÁLASZTVA**\n\n🎯 ${result.match}\n⏰ ${result.matchDate} ${result.matchTime}\n📊 ${result.prediction} (@${result.odds})\n\nRészletek a Vezérlőpulton.`);
+        await logToChat('Róka', `${statusLog}\n\n✅ **ZSÁKMÁNY KIVÁLASZTVA**\n\n🎯 ${result.match}\n⏰ ${result.matchDate} ${result.matchTime}\n📊 ${result.prediction} (@${result.odds})\n💰 ${result.stake}\n\nA "rablási terv" a Vezérlőpulton van.`);
         return true;
 
     } catch (e) {
