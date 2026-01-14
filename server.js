@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - MAIL & BOSS MODE ACTIVE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - STARTUP EDITION`));
 
 // --- ADATMODELLEK ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -132,10 +132,13 @@ app.get('/pricing', async (req, res) => {
     res.render('pricing', { user });
 });
 
-// ADMIN PANEL LEKÉRDEZÉS (JAVÍTVA A CRASH ELLEN)
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
+    
+    // ÚJ: Lekérjük az elmúlt 5 nap tippjeit is szerkesztésre
+    const recentTips = await Tip.find().sort({ date: -1 }).limit(5);
+    
     const stats = await MonthlyStat.find().sort({ month: -1 });
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(50);
     
@@ -149,7 +152,7 @@ app.get('/admin', checkAdmin, async (req, res) => {
         return { date: t.date, match: t.match, status: t.status, dailyProfit: dailyRes, totalRunning: runningProfit };
     });
     
-    res.render('admin', { users, currentTip, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
+    res.render('admin', { users, currentTip, recentTips, stats, chatHistory, calculatorData, dbDate: getDbDate(), brandName: BRAND_NAME });
 });
 
 app.post('/admin/chat', checkAdmin, async (req, res) => {
@@ -169,14 +172,12 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
     res.json({ reply });
 });
 
-// EMAIL PISZKOZAT GENERÁLÁS (AI)
 app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     const topic = req.body.topic;
     const emailPrompt = `
         Te vagy a ${BRAND_NAME} marketing zsenije. 
         Írj egy RÖVID, LELKESÍTŐ, PROFI emailt a csoporttagoknak erről a témáról: "${topic}".
         A levél tárgyát (Subject) is írd meg az első sorba.
-        Ne legyen túl hosszú. Ösztönözze őket a kitartásra és a profitra.
         Csak a levél szövegét írd ki.
     `;
     const aiRes = await openai.chat.completions.create({ 
@@ -185,14 +186,11 @@ app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     res.json({ draft: aiRes.choices[0].message.content });
 });
 
-// EMAIL KÜLDÉS MINDENKINEK
 app.post('/admin/send-email', checkAdmin, async (req, res) => {
     const { subject, messageBody } = req.body;
-    
     try {
         const recipients = await User.find({ hasLicense: true });
         const emails = recipients.map(u => u.email);
-
         if(emails.length === 0) return res.redirect('/admin');
 
         await transporter.sendMail({
@@ -203,12 +201,10 @@ app.post('/admin/send-email', checkAdmin, async (req, res) => {
             text: messageBody,
             html: messageBody.replace(/\n/g, '<br>') 
         });
-
         await new ChatMessage({ sender: 'System', text: `📧 Hírlevél sikeresen kiküldve ${emails.length} tagnak!` }).save();
         res.redirect('/admin');
     } catch (e) {
         console.error("Email hiba:", e);
-        await new ChatMessage({ sender: 'System', text: `❌ Hiba a levélküldésben: Ellenőrizd az SMTP beállításokat!` }).save();
         res.redirect('/admin');
     }
 });
