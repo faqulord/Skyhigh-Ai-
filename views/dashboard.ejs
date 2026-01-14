@@ -9,12 +9,18 @@
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; }
         .startup-card { background: #111; border: 1px solid #27272a; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
         
-        /* --- EZT JAVÍTOTTAM: PRÉMIUM ARANY SZÖVEG --- */
+        /* A TIPP SZÖVEG (ERŐS ARANY GRADIENS) */
         .gradient-text { 
-            background: linear-gradient(to right, #FCD34D, #F59E0B, #D97706); /* Arany Átmenet */
+            background: linear-gradient(to right, #FCD34D, #F59E0B, #D97706);
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
-            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3)); /* Enyhe ragyogás */
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3)); 
+        }
+
+        /* A MAGYARÁZAT SZÖVEG (PRÉMIUM PEZSGŐ ARANY) */
+        .premium-text {
+            color: #fef3c7; /* Halvány Pezsgő */
+            text-shadow: 0 0 15px rgba(252, 211, 77, 0.15); /* Nagyon finom ragyogás */
         }
         
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
@@ -67,12 +73,15 @@
                     <p class="text-xs font-bold text-white mt-1">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
                 </div>
             </div>
+            
             <div class="bg-purple-900/10 border border-purple-500/20 p-4 rounded-xl relative">
                 <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl">🦊</span>
-                <p class="text-xs text-zinc-300 italic leading-relaxed mt-2">
+                
+                <p class="text-sm italic leading-relaxed mt-2 font-medium premium-text">
                     "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet... (Admin: Nyomj a Szöveg Újragenerálásra!)' %>"
                 </p>
             </div>
+            
             <div class="mt-4 flex justify-between items-center border-t border-white/5 pt-4">
                 <span class="text-[10px] text-zinc-500 font-bold uppercase">Ajánlott Tét</span>
                 <span class="text-sm font-bold text-white bg-zinc-800 px-3 py-1 rounded-lg">
