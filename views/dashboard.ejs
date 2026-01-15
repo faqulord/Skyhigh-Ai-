@@ -7,108 +7,121 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; overflow-x: hidden; }
-        .thin-purple-border { border: 1px solid transparent; background: linear-gradient(#111, #111) padding-box, linear-gradient(to right, #a855f7, #ec4899) border-box; box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); }
-        .orange-neon { color: #FF9F43; text-shadow: 0 0 5px rgba(255, 159, 67, 0.5); font-weight: 600; }
+        .thin-purple-border { border: 1px solid transparent; background: linear-gradient(#111, #111) padding-box, linear-gradient(to right, #a855f7, #ec4899) border-box; box-shadow: 0 0 25px rgba(168, 85, 247, 0.25); }
+        .orange-neon { color: #FF9F43; text-shadow: 0 0 8px rgba(255, 159, 67, 0.6); font-weight: 700; }
+        .orange-neon-xl { color: #FF9F43; text-shadow: 0 0 15px rgba(255, 159, 67, 0.8), 0 0 30px rgba(255, 159, 67, 0.4); }
+        .purple-pink-text-gradient { background: linear-gradient(to right, #a855f7, #ff77e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+        .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
+        @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.7)); } }
         .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
-        #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(10px); }
+        #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; backdrop-filter: blur(20px); }
+        .modal-content { max-height: 90vh; overflow-y: auto; }
+        .btn-pulse { animation: btn-p 1.5s infinite; }
+        @keyframes btn-p { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 159, 67, 0.6); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body class="p-5 max-w-lg mx-auto">
+
     <header class="flex justify-between items-center mb-6 pt-2">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl">🦊</div>
-            <div><h1 class="text-sm font-bold text-white uppercase">Rafinált Róka</h1></div>
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-2xl shadow-lg fox-glow">🦊</div>
+            <div><h1 class="text-base font-black text-white uppercase">Rafinált Róka</h1><p class="text-[10px] text-zinc-500 font-black tracking-[0.2em] uppercase">Private AI Club</p></div>
         </div>
         <div class="flex gap-2">
             <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">STATS</a>
             <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %><a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">HQ</a><% } %>
-            <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold">EXIT</a>
+            <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold">KILÉPÉS</a>
         </div>
     </header>
 
-    <div class="mb-8 p-[1px] rounded-xl bg-gradient-to-r from-purple-600/50 to-pink-600/50">
-        <div class="bg-black/90 rounded-xl py-3 px-4 flex justify-between items-center">
-            <div class="flex flex-col"><span class="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Kezdésig</span></div>
+    <div class="mb-8 p-[1px] rounded-xl bg-gradient-to-r from-purple-600/50 to-pink-600/50 shadow-lg">
+        <div class="bg-black/90 rounded-xl py-3 px-5 flex justify-between items-center">
+            <div class="flex flex-col"><span class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Kezdésig</span></div>
             <div class="timer-glow text-xl font-black orange-neon" id="countdownDisplay">00:00:00</div>
         </div>
     </div>
 
-    <div class="thin-purple-border bg-[#0a0a0a] p-5 mb-8 rounded-2xl relative overflow-hidden">
-        <div class="flex justify-between items-start mb-4">
-            <div><h4 class="text-[9px] text-purple-400 font-black uppercase tracking-widest mb-1">Személyi Bankár</h4><p class="text-xl font-bold text-white">Egyenleg: <span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span></p></div>
-            <button onclick="openManifesto()" class="bg-orange-500 text-black text-[9px] font-black px-3 py-2 rounded-lg uppercase tracking-widest">OLVASS EL ❗</button>
+    <div class="thin-purple-border bg-[#0a0a0a] p-6 mb-8 rounded-3xl relative overflow-hidden shadow-2xl">
+        <div class="flex justify-between items-start mb-5">
+            <div>
+                <h4 class="text-[10px] text-purple-400 font-black uppercase tracking-widest mb-1">A Te Vagyonod</h4>
+                <p class="text-2xl font-black text-white tracking-tighter"><span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span></p>
+            </div>
+            <button onclick="openManifesto()" class="bg-orange-500 text-black text-[10px] font-black px-4 py-2.5 rounded-xl btn-pulse uppercase tracking-widest shadow-lg">OLVASS EL ❗</button>
         </div>
+
         <div class="bg-zinc-900/60 p-3 rounded-xl border border-white/5 mb-4 flex justify-between items-center">
-            <span class="text-[10px] text-zinc-400 uppercase font-bold">Havi Termelés:</span>
+            <span class="text-[10px] text-zinc-400 uppercase font-bold">Havi Profit:</span>
             <span class="text-sm font-black <%= monthlyProfit >= 0 ? 'text-green-500' : 'text-red-500' %>"><%= monthlyProfit > 0 ? '+' : '' %><%= monthlyProfit.toLocaleString() %> Ft</span>
         </div>
-        <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-zinc-900/40 p-3 rounded-xl border border-white/5"><p class="text-[9px] text-zinc-500 uppercase font-bold mb-1">Napi Tét</p><p class="text-sm font-black text-white"><%= suggestedStake.toLocaleString() %> Ft</p></div>
-            <div class="bg-zinc-900/40 p-3 rounded-xl border border-white/5"><p class="text-[9px] text-zinc-500 uppercase font-bold mb-1">Mód</p><p class="text-sm font-black orange-neon uppercase"><%= strategyMode %></p></div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-inner"><p class="text-[10px] text-zinc-500 uppercase font-black mb-1 tracking-widest">Napi Téted</p><p class="text-base font-black text-white"><%= suggestedStake.toLocaleString() %> Ft</p></div>
+            <div class="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-inner"><p class="text-[10px] text-zinc-500 uppercase font-black mb-1 tracking-widest">Fokozat</p><p class="text-base font-black orange-neon uppercase"><%= strategyMode %></p></div>
         </div>
-        <button onclick="toggleBankEdit()" class="w-full text-[9px] text-zinc-500 font-bold hover:text-white py-1">BANK MÓDOSÍTÁSA ▲</button>
-        <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-4 rounded-xl border border-white/5"><input type="number" name="amount" placeholder="Ft" class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm w-full outline-none text-white font-bold mb-2"><button class="w-full bg-purple-600 text-white font-black py-3 rounded-lg text-[10px] uppercase">Mentés</button></form>
+        
+        <button onclick="toggleBankEdit()" class="w-full text-[10px] text-zinc-600 font-black hover:text-white transition py-2 border-t border-white/5 mt-2">PÉNZTÁRCA BEÁLLÍTÁSA ▲</button>
+        <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-5 rounded-2xl border border-white/5 animate-fade-in">
+            <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase tracking-widest">Mennyi pénzzel szállsz be?</p>
+            <input type="number" name="amount" placeholder="pl. 50000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500">
+            <button class="w-full bg-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase shadow-xl tracking-widest">Mentés</button>
+        </form>
     </div>
 
     <% if (dailyTip && dailyTip.isPublished) { %>
-        <div class="thin-purple-border bg-[#111] p-6 mb-8 rounded-2xl overflow-hidden relative">
+        <div class="thin-purple-border bg-[#111] p-7 mb-8 rounded-3xl relative overflow-hidden shadow-2xl">
             <div class="text-center">
-                <p class="text-[10px] text-zinc-500 font-bold uppercase mb-2 tracking-widest"><%= dailyTip.league %></p>
-                <h3 class="text-lg font-black text-white leading-tight mb-4"><%= dailyTip.match %></h3>
-                <div class="bg-zinc-900/80 p-4 rounded-2xl border border-zinc-800 w-full mb-4"><p class="text-2xl font-black orange-neon tracking-widest"><%= dailyTip.prediction %></p><p class="text-[10px] font-bold text-white mt-1 uppercase">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p></div>
-                <div class="bg-black/40 p-4 rounded-xl border border-zinc-800 italic"><p class="text-xs text-purple-300 leading-relaxed">"<%= dailyTip.memberMessage %>"</p></div>
+                <p class="text-[11px] text-zinc-500 font-black uppercase mb-3 tracking-widest"><%= dailyTip.league %></p>
+                <h3 class="text-xl font-black text-white mb-5"><%= dailyTip.match %></h3>
+                <div class="bg-zinc-900/80 p-6 rounded-[2rem] border border-white/5 w-full mb-5 shadow-inner">
+                    <p class="text-3xl font-black orange-neon-xl tracking-widest"><%= dailyTip.prediction %></p>
+                    <p class="text-sm font-black text-white mt-2 uppercase tracking-[0.3em]">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
+                </div>
+                <div class="bg-black/40 p-5 rounded-2xl border border-zinc-800/50 italic relative">
+                     <span class="absolute -top-3 left-6 text-xl">🦊</span>
+                    <p class="text-sm purple-pink-text-gradient leading-relaxed font-medium">"<%= dailyTip.memberMessage %>"</p>
+                </div>
             </div>
         </div>
     <% } %>
 
-    <div id="manifestoModal" class="flex items-center justify-center p-4">
-        <div class="thin-purple-border bg-[#0a0a0a] w-full max-w-md p-6 rounded-3xl modal-content relative">
-            <button onclick="closeManifesto()" class="absolute top-4 right-6 text-zinc-600 font-bold text-2xl">×</button>
-            <div class="text-center mb-6"><h2 class="orbitron text-xl font-black orange-neon uppercase tracking-widest">A Zsivány Kiáltvány</h2></div>
-            <div class="space-y-4 text-xs leading-relaxed text-zinc-300 font-medium">
-                <p class="border-l-2 border-purple-500 pl-3">Ez egy matematikailag alátámasztott, fix 2 éves terv, ami személyre szabottan a te tőkéddel számol.</p>
-                <div class="bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
-                    <p class="text-[9px] text-zinc-500 uppercase font-black text-center mb-3">Csúcstechnológia & Élő Adatok</p>
-                    <p>Én mesterséges intelligencia vagyok. Minden nap élő adatokból dolgozom. A napi tétedet a bankodhoz igazítom, hogy soha ne tudj kiesni a játékból. Ez a Bankár Mód lényege.</p>
+    <div id="manifestoModal" class="flex items-center justify-center p-5">
+        <div class="thin-purple-border bg-[#0a0a0a] w-full max-w-md p-8 rounded-[2.5rem] modal-content relative">
+            <button onclick="closeManifesto()" class="absolute top-5 right-7 text-zinc-600 font-bold text-3xl hover:text-white transition">×</button>
+            
+            <div class="text-center mb-8">
+                <div class="fox-pulse text-6xl mb-4">🦊</div>
+                <h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">Hogyan működök?</h2>
+                <p class="text-[10px] text-zinc-500 font-black tracking-widest uppercase mt-2">Mesterséges Intelligencia. Éles Adatok.</p>
+            </div>
+            
+            <div class="space-y-6 text-sm leading-relaxed text-zinc-300 font-medium">
+                
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
+                    <p class="text-white font-bold mb-2">1. Technológia Bérlés, nem Tippmix</p>
+                    <p class="text-xs text-zinc-400">Te nem egy csoportba léptél be. Konkrétan <strong>kibéreltél egy felhő alapú Mesterséges Intelligenciát</strong> (ez vagyok én, a Róka). 0-24-ben figyelem a globális piacot, és miközben te alszol, én számolok.</p>
                 </div>
-                 <div class="bg-purple-900/10 p-4 rounded-2xl border border-purple-500/20">
-                    <p class="text-[9px] text-purple-400 uppercase font-black text-center mb-3">2 Éves Matematikai Terv</p>
-                    <div class="space-y-2">
-                        <div class="flex justify-between"><span>1. év:</span><span class="text-white font-black">~450.000 Ft</span></div>
-                        <div class="flex justify-between"><span>2. év:</span><span class="text-white font-black">~2.100.000 Ft</span></div>
+
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
+                    <p class="text-white font-bold mb-2">2. Full Bankroll Kezelés</p>
+                    <p class="text-xs text-zinc-400 mb-2">Nem neked kell agyalnod. Én <strong>személyre szabottan</strong>, a te pénztárcádhoz igazítva számolom ki a napi tétet a matematika törvényei szerint.</p>
+                </div>
+
+                <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl shadow-lg">
+                    <p class="text-purple-300 font-bold mb-2">3. FIX BANKROBBANTÁS 🛡️</p>
+                    <p class="text-xs text-zinc-300">Mivel minden döntésem tiszta Matekra van építve, egyetlen dolgod van: <strong>szigorúan követni a szabályokat.</strong> Ha ezt megteszed, a statisztika törvénye szerint <strong class="text-white">fixen bankot robbantunk.</strong></p>
+                    <div class="bg-black/40 p-3 rounded-xl border border-zinc-800 mt-3 space-y-2 text-xs">
+                        <div class="flex justify-between"><span>1. év:</span><span class="text-white font-black">~1.800.000 Ft</span></div>
+                        <div class="flex justify-between"><span>2. év:</span><span class="text-white font-black">~32.000.000 Ft</span></div>
                     </div>
                 </div>
-                <p class="text-center text-[10px] text-zinc-500 uppercase font-black">Szabály: Csak kövesd a napi tétet.</p>
-            </div>
-            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-4 rounded-2xl mt-6 uppercase text-xs tracking-widest">MEGÉRTETTEM. VADÁSSZUNK! 🦊</button>
-        </div>
-    </div>
 
-    <script>
-        function openManifesto() { document.getElementById('manifestoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-        function closeManifesto() { document.getElementById('manifestoModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
-        function toggleBankEdit() { document.getElementById('bankForm').classList.toggle('hidden'); }
-        function startTimer() {
-            const countdownDisplay = document.getElementById('countdownDisplay');
-            const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
-            const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
-            function update() {
-                const now = new Date();
-                let targetDate = new Date();
-                if (hasTip && matchTimeStr) {
-                    const [h, m] = matchTimeStr.split(':');
-                    targetDate.setHours(parseInt(h), parseInt(m), 0, 0);
-                    if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ"; return; }
-                } else { targetDate.setHours(11,0,0,0); if(now > targetDate) targetDate.setDate(targetDate.getDate()+1); }
-                const diff = targetDate - now;
-                const hrs = Math.floor(diff/3600000);
-                const min = Math.floor((diff%3600000)/60000);
-                const sec = Math.floor((diff%60000)/1000);
-                countdownDisplay.innerText = `${hrs.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
-            }
-            setInterval(update, 1000); update();
-        }
-        window.addEventListener('load', startTimer);
-    </script>
-</body>
-</html>
+                <div class="bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
+                    <p class="text-white font-bold mb-1 text-xs">Szabadság Garancia</p>
+                    <p class="text-[10px] text-zinc-500">Ha pihensz vagy lejár az előfizetésed, én megjegyzem, hol tartottál. A pénzed és a stratégiád megvár. Onnan folytatjuk, ahol abbahagytad.</p>
+                </div>
+
+                <p class="text-center text-[10px] text-zinc-500 font-black uppercase tracking-widest py-2">Én vagyok az Agy. Te vagy a Kéz. Kezdjük.</p>
+            </div>
+            
+            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-
