@@ -10,22 +10,13 @@
         body { background: #000000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .tech-card { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         .hidden { display: none !important; }
-        
-        /* OLDALSÁV (SIDEBAR) */
         #sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #09090b; border-right: 1px solid #222; z-index: 50; padding-top: 80px; transform: translateX(-100%); transition: transform 0.3s ease; }
         #sidebar.open { transform: translateX(0); }
-        /* Desktopon mindig látszik */
         @media (min-width: 1024px) { #sidebar { transform: translateX(0); } }
-
-        /* SÖTÉTÍTÉS MOBILON (OVERLAY) */
         #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 40; backdrop-filter: blur(5px); }
         #overlay.show { display: block; }
-
-        /* MENÜ GOMBOK */
         .menu-item { display: flex; align-items: center; gap: 15px; width: 100%; padding: 18px 25px; color: #666; font-size: 11px; font-weight: 800; text-transform: uppercase; border-left: 3px solid transparent; transition: all 0.2s; cursor: pointer; }
         .menu-item:hover, .menu-item.active { color: #fff; background: #111; border-left-color: #c084fc; }
-        
-        /* CHAT */
         .chat-container { height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #050505; border: 1px solid #222; border-radius: 12px; }
         .msg { padding: 10px 15px; border-radius: 12px; font-size: 12px; max-width: 80%; }
         .msg-me { align-self: flex-end; background: #2563eb; color: white; } 
@@ -34,45 +25,31 @@
     </style>
 
     <script>
-        // MENÜ NYITÁS / ZÁRÁS
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('overlay');
-            sb.classList.toggle('open');
-            ov.classList.toggle('show');
-        }
-
-        // FÜL VÁLTÁS
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
         function switchTab(id) {
             document.querySelectorAll('.page-section').forEach(e => e.classList.add('hidden'));
             document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + id).classList.remove('hidden');
             document.getElementById('btn-' + id).classList.add('active');
-            
-            // Mobilon zárjuk be a menüt kattintás után
             if(window.innerWidth < 1024) { toggleSidebar(); }
             window.scrollTo(0,0);
         }
     </script>
 </head>
 <body class="min-h-screen">
-
     <div id="overlay" onclick="toggleSidebar()"></div>
 
     <nav id="sidebar">
         <div class="px-6 mb-6">
             <h2 class="text-white font-black text-xl tracking-widest uppercase">HQ <span class="text-purple-500">CONTROL</span></h2>
-            <p class="text-[10px] text-zinc-500">Bankár Rendszer v40</p>
+            <p class="text-[10px] text-zinc-500">v41 Full System</p>
         </div>
         <div onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-item active"><span>📊</span> VEZÉRLŐPULT</div>
         <div onclick="switchTab('marketing')" id="btn-marketing" class="menu-item"><span>📢</span> MARKETING</div>
         <div onclick="switchTab('users')" id="btn-users" class="menu-item"><span>👥</span> TAGOK & LICENSZ</div>
         <div onclick="switchTab('chat')" id="btn-chat" class="menu-item"><span>🤖</span> RÓKA AGYA</div>
         <div onclick="switchTab('finance')" id="btn-finance" class="menu-item"><span>💰</span> PÉNZÜGY</div>
-        
-        <div class="absolute bottom-10 left-0 w-full px-6">
-            <a href="/logout" class="block w-full text-center border border-red-900/50 text-red-500 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-red-900/20 transition">Kijelentkezés</a>
-        </div>
+        <div class="absolute bottom-10 left-0 w-full px-6"><a href="/logout" class="block w-full text-center border border-red-900/50 text-red-500 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-red-900/20 transition">Kijelentkezés</a></div>
     </nav>
 
     <header class="fixed top-0 left-0 w-full bg-black/90 border-b border-zinc-800 p-4 z-40 flex justify-between items-center h-[70px] backdrop-blur-md lg:hidden">
@@ -87,16 +64,12 @@
         
         <div id="tab-dashboard" class="page-section">
             <h2 class="text-xl font-black mb-6 text-white border-l-4 border-purple-500 pl-4">Stratégia Központ</h2>
-            
             <div class="tech-card p-6 border-t-2 border-t-orange-500">
-                <div class="flex justify-between items-center mb-5 text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
-                    <span>Aktuális Mód:</span>
-                    <span class="orange-neon text-sm"><%= strategyMode.toUpperCase() %></span>
-                </div>
+                <div class="flex justify-between items-center mb-5 text-[11px] font-bold text-zinc-500 uppercase tracking-widest"><span>Aktuális Mód:</span><span class="orange-neon text-sm"><%= strategyMode.toUpperCase() %></span></div>
                 <form action="/admin/update-settings" method="POST" class="grid grid-cols-3 gap-3">
-                    <button name="mode" value="recovery" class="py-4 rounded-xl text-[10px] font-black border transition hover:scale-105 <%= strategyMode === 'recovery' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500' %>">🛡️ ÓVATOS (1.5%)</button>
-                    <button name="mode" value="normal" class="py-4 rounded-xl text-[10px] font-black border transition hover:scale-105 <%= strategyMode === 'normal' ? 'bg-purple-600 border-purple-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500' %>">🦊 NORMÁL (3%)</button>
-                    <button name="mode" value="aggressive" class="py-4 rounded-xl text-[10px] font-black border transition hover:scale-105 <%= strategyMode === 'aggressive' ? 'bg-orange-600 border-orange-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500' %>">🔥 ZSIVÁNY (6%)</button>
+                    <button name="mode" value="recovery" class="py-4 rounded-xl text-[10px] font-black border transition hover:scale-105 <%= strategyMode === 'recovery' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500' %>">🛡️ ÓVATOS</button>
+                    <button name="mode" value="normal" class="py-4 rounded-xl text-[10px] font-black border transition hover:scale-105 <%= strategyMode === 'normal' ? 'bg-purple-600 border-purple-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500' %>">🦊 NORMÁL</button>
+                    <button name="mode" value="aggressive" class="py-4 rounded-xl text-[10px] font-black border transition hover:scale-105 <%= strategyMode === 'aggressive' ? 'bg-orange-600 border-orange-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500' %>">🔥 ZSIVÁNY</button>
                 </form>
             </div>
 
@@ -113,10 +86,17 @@
                             <p class="text-green-500 text-[10px] font-bold uppercase mt-2">✅ Publikálva</p>
                         <% } %>
                     </div>
+                    
+                    <div class="border-t border-zinc-800 pt-4 mb-4">
+                        <p class="text-[10px] text-zinc-500 font-bold uppercase mb-2">Nem tetszik a szöveg? Írd át:</p>
+                        <form action="/admin/refine-text" method="POST">
+                            <button class="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded-lg text-[10px] font-bold uppercase border border-zinc-700">📝 Szöveg AI Finomítása</button>
+                        </form>
+                    </div>
 
                     <div class="grid grid-cols-2 gap-4 mt-6 border-t border-zinc-800 pt-6">
-                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos NYERŐ? A rendszer azonnal jóváírja a pénzt!')"><input type="hidden" name="status" value="win"><button class="w-full bg-green-900/40 hover:bg-green-600 border border-green-500 text-green-500 hover:text-white py-4 rounded-xl text-xs font-black uppercase transition">WIN ✅</button></form>
-                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos VESZTES? A rendszer levonja a pénzt!')"><input type="hidden" name="status" value="loss"><button class="w-full bg-red-900/40 hover:bg-red-600 border border-red-500 text-red-500 hover:text-white py-4 rounded-xl text-xs font-black uppercase transition">LOSS ❌</button></form>
+                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos NYERŐ?')"><input type="hidden" name="status" value="win"><button class="w-full bg-green-900/40 hover:bg-green-600 border border-green-500 text-green-500 hover:text-white py-4 rounded-xl text-xs font-black uppercase transition">WIN ✅</button></form>
+                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos VESZTES?')"><input type="hidden" name="status" value="loss"><button class="w-full bg-red-900/40 hover:bg-red-600 border border-red-500 text-red-500 hover:text-white py-4 rounded-xl text-xs font-black uppercase transition">LOSS ❌</button></form>
                     </div>
                 <% } else { %>
                     <div class="text-center py-10">
@@ -129,12 +109,23 @@
 
         <div id="tab-marketing" class="page-section hidden">
             <h2 class="text-xl font-black mb-6 text-white border-l-4 border-pink-500 pl-4">Marketing</h2>
+            
             <div class="tech-card p-6">
+                <h3 class="text-xs font-bold mb-4 uppercase text-zinc-500 tracking-widest">Instagram & Social</h3>
                 <div class="flex gap-3 mb-4">
                     <button onclick="generateSocial('win')" class="flex-1 bg-zinc-800 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-green-900 text-white">🏆 NYERŐ POSZT</button>
                     <button onclick="generateSocial('motivation')" class="flex-1 bg-zinc-800 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-pink-900 text-white">🔥 MOTIVÁCIÓ</button>
                 </div>
-                <textarea id="social-result" rows="5" class="w-full bg-black border border-zinc-800 rounded-xl p-4 text-xs text-white font-mono" placeholder="Ide generálja a szöveget..."></textarea>
+                <textarea id="social-result" rows="4" class="w-full bg-black border border-zinc-800 rounded-xl p-4 text-xs text-white font-mono" placeholder="Insta szöveg..."></textarea>
+            </div>
+
+            <div class="tech-card p-6">
+                <h3 class="text-xs font-bold mb-4 uppercase text-zinc-500 tracking-widest">Hírlevél (Email)</h3>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="email-topic" class="flex-1 bg-black border border-zinc-800 rounded-xl p-3 text-xs text-white" placeholder="Téma (pl. Nagy nyerés tegnap)...">
+                    <button onclick="draftEmail()" class="bg-blue-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase">ÍRÁS ✍️</button>
+                </div>
+                 <textarea id="email-result" rows="5" class="w-full bg-black border border-zinc-800 rounded-xl p-4 text-xs text-white font-mono" placeholder="AI vázlat itt jelenik meg..."></textarea>
             </div>
         </div>
 
@@ -181,23 +172,30 @@
             <h2 class="text-xl font-black mb-6 text-white border-l-4 border-yellow-500 pl-4">Pénzügyi Zárás</h2>
             <div class="tech-card p-6 border border-red-900/40 bg-red-950/10">
                 <h3 class="text-sm font-black text-red-500 uppercase mb-2">Hónap Zárása</h3>
-                <p class="text-xs text-zinc-400 mb-4">Ez nullázza a havi profitot mindenkinél.</p>
                 <form action="/admin/reset-monthly" method="POST" onsubmit="return confirm('Biztos nullázol?')"><button class="w-full bg-red-600 hover:bg-red-500 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg">🔄 ÚJ HÓNAP INDÍTÁSA</button></form>
             </div>
         </div>
-
     </main>
 
     <script>
         const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
+        
         async function talk() { 
             const i = document.getElementById('chat-in'); if(!i.value) return; const msgText = i.value; i.value = ''; 
             const win = document.getElementById('chat-win'); win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`; win.scrollTop = win.scrollHeight; 
             try { const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})}); const d = await r.json(); win.innerHTML += `<div class="msg msg-ai"><strong>Róka:</strong> ${d.reply}</div>`; win.scrollTop = win.scrollHeight; } catch (err) { alert("Hiba."); } 
         }
+
         async function generateSocial(type) { 
-            const textarea = document.getElementById('social-result'); textarea.value = "Generálás folyamatban... 🦊";
-            try { const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); const data = await res.json(); textarea.value = data.content; } catch(e) { textarea.value = "Hiba történt."; } 
+            const textarea = document.getElementById('social-result'); textarea.value = "Generálás... 🦊";
+            try { const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); const data = await res.json(); textarea.value = data.content; } catch(e) { textarea.value = "Hiba."; } 
+        }
+
+        async function draftEmail() { 
+            const topic = document.getElementById('email-topic').value; 
+            const textarea = document.getElementById('email-result');
+            if(!topic) return alert("Írj be egy témát!"); textarea.value = "Írás... 🦊";
+            try { const res = await fetch('/admin/draft-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic }) }); const data = await res.json(); textarea.value = data.draft; } catch(e) { textarea.value = "Hiba."; } 
         }
     </script>
 </body>
