@@ -1,209 +1,141 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const bcrypt = require('bcryptjs');
-const axios = require('axios');
-const { OpenAI } = require('openai');
-const app = express();
-
-const OWNER_EMAIL = "stylefaqu@gmail.com"; 
-const BRAND_NAME = "Zsivány Róka"; 
-
-// --- RÓKA ARANYKÖPÉSEK (Dashboardhoz) ---
-const FOX_QUOTES = [
-    "A buki már sírva ébredt ma reggel... 🦊",
-    "A tőke a fegyvered, a türelem a pajzsod!",
-    "Ma fosztogatunk, nem kérdezünk. 💰",
-    "Hideg fej, forró oddsok, tele zseb.",
-    "Ne tippelj. Vadássz! 🎯",
-    "A bankroll menedzsment nem játék, hanem törvény."
-];
-
-// --- MODELLEK ---
-const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
-    fullname: String, email: { type: String, unique: true, lowercase: true },
-    password: String, hasLicense: { type: Boolean, default: false },
-    isAdmin: { type: Boolean, default: false }, 
-    startingCapital: { type: Number, default: 0 },
-    currentBankroll: { type: Number, default: 0 },
-    monthlyProfit: { type: Number, default: 0 } 
-}));
-
-const Tip = mongoose.models.Tip || mongoose.model('Tip', new mongoose.Schema({
-    league: String, match: String, prediction: String, odds: String, 
-    reasoning: String, memberMessage: String, matchTime: String, 
-    status: { type: String, default: 'pending' }, 
-    isPublished: { type: Boolean, default: false },
-    date: { type: String, index: true }, isReal: { type: Boolean, default: false }
-}));
-
-const SystemSetting = mongoose.models.SystemSetting || mongoose.model('SystemSetting', new mongoose.Schema({
-    strategyMode: { type: String, default: 'normal' } 
-}));
-
-const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', new mongoose.Schema({
-    sender: String, text: String, timestamp: { type: Date, default: Date.now }
-}));
-
-// --- CONFIG ---
-const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V38 (START VERSION) - ONLINE`));
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-const checkAdmin = async (req, res, next) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const u = await User.findById(req.session.userId);
-    if (u && (u.isAdmin || u.email === OWNER_EMAIL)) return next();
-    res.redirect('/dashboard');
-};
-
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(session({
-    secret: 'fox_v38_final', resave: true, saveUninitialized: true,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } 
-}));
-
-// --- FŐ ÚTVONALAK ---
-
-app.get('/dashboard', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-    // Licensz ellenőrzés (kikapcsolhatod, ha nem kell)
-    // if (!user.hasLicense && !user.isAdmin) return res.send("Nincs aktív licenszed!");
-
-    const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-    let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
-    const bank = user.currentBankroll || user.startingCapital || 0;
-
-    res.render('dashboard', { 
-        user, dailyTip, suggestedStake: Math.round(bank * p), userBank: bank, strategyMode: settings.strategyMode,
-        monthlyProfit: user.monthlyProfit || 0,
-        foxQuotes: FOX_QUOTES // Átadjuk az üzeneteket
-    });
-});
-
-app.get('/admin', checkAdmin, async (req, res) => {
-    const users = await User.find().sort({ createdAt: -1 });
-    const currentTip = await Tip.findOne({ date: getDbDate() });
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-    const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(20);
-    res.render('admin', { users, currentTip, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME });
-});
-
-// --- ADMIN API ---
-
-// 1. LICENSZ KEZELÉS
-app.post('/admin/toggle-license', checkAdmin, async (req, res) => {
-    const u = await User.findById(req.body.userId);
-    if(u) { u.hasLicense = !u.hasLicense; await u.save(); }
-    res.redirect('/admin');
-});
-
-// 2. SOCIAL GENERATOR (JAVÍTVA: BIZTONSÁGOS PROMPT)
-app.post('/admin/social-content', checkAdmin, async (req, res) => {
-    // Itt a javítás! Nem "agresszív", hanem "magabiztos". Így nem tiltja le az AI.
-    const prompt = req.body.type === 'win' 
-        ? "Te vagy a Zsivány Róka. Írj egy nagyon magabiztos, dörzsölt Instagram posztot arról, hogy a stratégiánk ma is hatalmasat nyert! Használj emojikat (💰, 🦊). Stílus: profi, okos, a piac legyőzője. Csak a sikerről írj." 
-        : "Te vagy a Zsivány Róka. Írj egy motivációs posztot arról, hogy a fegyelem és a matematika hozza a pénzt, nem a szerencse.";
-    
-    try {
-        const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "user", content: prompt }] });
-        res.json({ content: aiRes.choices[0].message.content });
-    } catch(e) {
-        console.error("AI Hiba:", e);
-        res.json({ content: "Az AI éppen pihen. Próbáld újra később!" });
-    }
-});
-
-// 3. ROBOT FUTTATÁS (MULTI-PIAC AGY)
-app.post('/admin/run-robot', checkAdmin, async (req, res) => {
-    const targetDate = getDbDate();
-    const token = (process.env.SPORT_API_KEY || "").trim();
-    try {
-        const response = await axios.get(`https://api.football-data.org/v4/matches`, { headers: { 'X-Auth-Token': token } });
-        const matches = response.data.matches || [];
-        let fixtures = matches.filter(m => m.status === 'TIMED');
-        
-        if (fixtures.length === 0) return res.redirect('/admin');
-        
-        const matchData = fixtures.slice(0, 20).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name} (${m.competition.name})`).join("\n");
-        
-        // BIZTONSÁGOS DE OKOS PROMPT
-        const systemPrompt = `
-            Te vagy a Zsivány Róka. Keress ÉRTÉKET a mai kínálatban.
-            Szabályok:
-            1. Keress 70%+ valószínűségű kimenetelt (Gólok, BTTS, 1X2, DNB).
-            2. Válassz EGYETLEN tuti tippet.
-            JSON: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"", "matchTime":"HH:mm" }
-        `;
-
-        const aiRes = await openai.chat.completions.create({
-            model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: matchData }],
-            response_format: { type: "json_object" }
-        });
-        
-        const result = JSON.parse(aiRes.choices[0].message.content);
-        const marketingRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Rövid, dörzsölt üzenet a tagoknak." }, { role: "user", content: `Tipp: ${result.prediction}` }] });
-        
-        await Tip.findOneAndUpdate({ date: targetDate }, { ...result, memberMessage: marketingRes.choices[0].message.content, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, { upsert: true });
-    } catch (e) { console.error(e); }
-    res.redirect('/admin');
-});
-
-// --- EGYÉB FUNKCIÓK ---
-app.post('/admin/update-settings', checkAdmin, async (req, res) => { await SystemSetting.findOneAndUpdate({}, { strategyMode: req.body.mode }, { upsert: true }); res.redirect('/admin'); });
-app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
-app.post('/admin/chat', checkAdmin, async (req, res) => {
-    try {
-        const { message } = req.body;
-        await new ChatMessage({ sender: 'Főnök', text: message }).save();
-        const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Rövid, stratégiai válasz." }, { role: "user", content: message }] });
-        const reply = aiRes.choices[0].message.content;
-        await new ChatMessage({ sender: 'Róka', text: reply }).save();
-        res.json({ reply });
-    } catch(e) { res.json({ reply: "Hiba a mátrixban." }); }
-});
-
-app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
-    const tip = await Tip.findOne({ date: getDbDate() });
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-    if (!tip || tip.status !== 'pending') return res.redirect('/admin');
-    let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
-    const users = await User.find({ isAdmin: false });
-    for (let u of users) {
-        let b = u.currentBankroll || u.startingCapital || 0;
-        if (b > 0) {
-            let s = b * p;
-            let profit = req.body.status === 'win' ? s * (parseFloat(tip.odds) - 1) : -s;
-            u.currentBankroll = Math.round(b + profit);
-            u.monthlyProfit = (u.monthlyProfit || 0) + Math.round(profit);
-            await u.save();
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner HQ | <%= brandName %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #000000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .tech-card { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .hidden { display: none !important; }
+        #sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #09090b; border-right: 1px solid #222; z-index: 50; padding-top: 80px; }
+        .menu-item { display: flex; align-items: center; gap: 15px; width: 100%; padding: 18px 25px; color: #666; font-size: 11px; font-weight: 800; text-transform: uppercase; border-left: 3px solid transparent; }
+        .menu-item:hover, .menu-item.active { color: #fff; background: #111; border-left-color: #c084fc; }
+        .chat-container { height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #050505; border: 1px solid #222; border-radius: 12px; }
+        .msg { padding: 10px 15px; border-radius: 12px; font-size: 12px; max-width: 80%; }
+        .msg-me { align-self: flex-end; background: #2563eb; } .msg-ai { align-self: flex-start; background: #222; border: 1px solid #333; }
+        .orange-neon { color: #FF9F43; }
+    </style>
+    <script>
+        function switchTab(id) {
+            document.querySelectorAll('.page-section').forEach(e => e.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.getElementById('btn-' + id).classList.add('active');
         }
-    }
-    tip.status = req.body.status; await tip.save(); res.redirect('/admin');
-});
+    </script>
+</head>
+<body class="min-h-screen">
+    <nav id="sidebar" class="hidden lg:block">
+        <div class="px-6 mb-6"><h2 class="text-white font-black text-xl tracking-widest uppercase">HQ <span class="text-purple-500">CONTROL</span></h2></div>
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-item active"><span>📊</span> VEZÉRLŐPULT</button>
+        <button onclick="switchTab('marketing')" id="btn-marketing" class="menu-item"><span>📢</span> MARKETING</button>
+        <button onclick="switchTab('users')" id="btn-users" class="menu-item"><span>👥</span> TAGOK & LICENSZ</button>
+        <button onclick="switchTab('chat')" id="btn-chat" class="menu-item"><span>🤖</span> RÓKA AGYA</button>
+        <button onclick="switchTab('finance')" id="btn-finance" class="menu-item"><span>💰</span> PÉNZÜGY</button>
+        <a href="/logout" class="absolute bottom-10 left-0 w-full text-center text-red-500 py-3 text-[10px] font-black uppercase">Kijelentkezés</a>
+    </nav>
 
-app.post('/admin/reset-monthly', checkAdmin, async (req, res) => { await User.updateMany({}, { monthlyProfit: 0 }); res.redirect('/admin'); });
-app.post('/user/update-bank', async (req, res) => { const amount = parseInt(req.body.amount); if (!isNaN(amount)) await User.findByIdAndUpdate(req.session.userId, { startingCapital: amount, currentBankroll: amount }); res.redirect('/dashboard'); });
-app.post('/auth/login', async (req, res) => { const u = await User.findOne({ email: req.body.email.toLowerCase() }); if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hiba"); });
-app.get('/login', (req, res) => res.render('login'));
-app.get('/', (req, res) => res.render('index'));
-app.get('/logout', (req, res) => { req.session.destroy(() => { res.redirect('/'); }); });
-app.get('/stats', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-    const tips = await Tip.find({ date: { $gte: startOfMonth }, status: { $ne: 'pending' } }).sort({ date: -1 });
-    let wins = tips.filter(t => t.status === 'win').length;
-    let losses = tips.filter(t => t.status === 'loss').length;
-    res.render('stats', { user, tips, wins, losses, monthlyProfit: user.monthlyProfit || 0 });
-});
+    <header class="lg:hidden fixed top-0 w-full bg-black border-b border-zinc-800 p-4 z-40 flex justify-between">
+        <span class="font-black">ZSIVÁNY HQ</span>
+        <a href="/dashboard" class="text-xs font-bold text-purple-500">DASHBOARD ➤</a>
+    </header>
 
-app.listen(process.env.PORT || 8080);
+    <main class="pt-[70px] lg:pt-[20px] px-4 pb-10 w-full lg:pl-[280px] max-w-6xl mx-auto">
+        
+        <div id="tab-dashboard" class="page-section pt-10">
+            <h2 class="text-xl font-black mb-6 border-l-4 border-purple-500 pl-4">Vezérlőpult</h2>
+            <div class="tech-card p-6">
+                <p class="text-xs text-zinc-500 font-bold uppercase mb-4">Stratégia: <span class="orange-neon"><%= strategyMode.toUpperCase() %></span></p>
+                <form action="/admin/update-settings" method="POST" class="grid grid-cols-3 gap-3">
+                    <button name="mode" value="recovery" class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[10px] font-black hover:border-blue-500">🛡️ ÓVATOS</button>
+                    <button name="mode" value="normal" class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[10px] font-black hover:border-purple-500">🦊 NORMÁL</button>
+                    <button name="mode" value="aggressive" class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[10px] font-black hover:border-orange-500">🔥 ZSIVÁNY</button>
+                </form>
+            </div>
+
+            <div class="tech-card p-6">
+                <% if (currentTip) { %>
+                    <h3 class="text-xl font-black"><%= currentTip.match %></h3>
+                    <p class="text-purple-400 font-bold text-sm mb-4"><%= currentTip.prediction %> (@<%= currentTip.odds %>)</p>
+                    <% if(!currentTip.isPublished) { %>
+                        <form action="/admin/publish-tip" method="POST" class="mb-4"><input type="hidden" name="tipId" value="<%= currentTip._id %>"><button class="w-full bg-blue-600 py-3 rounded-xl font-black text-xs uppercase">📢 PUBLIKÁLÁS</button></form>
+                    <% } %>
+                    <div class="grid grid-cols-2 gap-4">
+                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos WIN?')"><input type="hidden" name="status" value="win"><button class="w-full bg-green-900/40 border border-green-500 text-green-500 py-3 rounded-xl font-black text-xs">WIN ✅</button></form>
+                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos LOSS?')"><input type="hidden" name="status" value="loss"><button class="w-full bg-red-900/40 border border-red-500 text-red-500 py-3 rounded-xl font-black text-xs">LOSS ❌</button></form>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-6"><div class="text-4xl mb-2">🤖</div><form action="/admin/run-robot" method="POST"><button class="bg-white text-black px-6 py-3 rounded-xl font-black text-xs uppercase">🚀 Elemzés Indítása</button></form></div>
+                <% } %>
+            </div>
+        </div>
+
+        <div id="tab-marketing" class="page-section hidden pt-10">
+            <h2 class="text-xl font-black mb-6 border-l-4 border-pink-500 pl-4">Marketing</h2>
+            <div class="tech-card p-6">
+                <div class="flex gap-3 mb-4">
+                    <button onclick="generateSocial('win')" class="flex-1 bg-zinc-800 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-green-900">🏆 NYERŐ POSZT</button>
+                    <button onclick="generateSocial('motivation')" class="flex-1 bg-zinc-800 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-pink-900">🔥 MOTIVÁCIÓ</button>
+                </div>
+                <textarea id="social-result" rows="5" class="w-full bg-black border border-zinc-800 rounded-xl p-4 text-xs text-white" placeholder="Ide generálja a szöveget..."></textarea>
+            </div>
+        </div>
+
+        <div id="tab-users" class="page-section hidden pt-10">
+            <h2 class="text-xl font-black mb-6 border-l-4 border-green-500 pl-4">Tagok</h2>
+            <div class="grid gap-3">
+                <% users.forEach(u => { %> 
+                    <div class="tech-card p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="w-full">
+                            <p class="font-bold text-sm"><%= u.fullname %> <span class="text-[10px] text-zinc-500"><%= u.email %></span></p>
+                            <p class="text-[10px] text-zinc-400">Bank: <%= u.currentBankroll %> | Havi: <%= u.monthlyProfit %></p>
+                            <span class="text-[9px] font-black uppercase px-2 py-1 rounded <%= u.hasLicense ? 'bg-green-900 text-green-400' : 'bg-red-900 text-red-400' %>"><%= u.hasLicense ? 'AKTÍV' : 'INAKTÍV' %></span>
+                        </div>
+                        <form action="/admin/toggle-license" method="POST" class="w-full sm:w-auto">
+                            <input type="hidden" name="userId" value="<%= u._id %>">
+                            <button class="w-full px-4 py-3 rounded-xl text-[10px] font-black uppercase border <%= u.hasLicense ? 'border-red-500 text-red-500' : 'border-green-500 text-green-500' %>"><%= u.hasLicense ? 'ELVÉTEL ⛔' : 'AKTIVÁLÁS ✅' %></button>
+                        </form>
+                    </div> 
+                <% }) %>
+            </div>
+        </div>
+        
+        <div id="tab-chat" class="page-section hidden pt-10">
+            <h2 class="text-xl font-black mb-6 border-l-4 border-blue-500 pl-4">Róka Agya</h2>
+            <div class="tech-card p-4 h-[500px] flex flex-col">
+                <div id="chat-win" class="chat-container flex-1 mb-4 custom-scrollbar">
+                    <% chatHistory.forEach(msg => { %> <div class="msg <%= msg.sender === 'Főnök' ? 'msg-me' : 'msg-ai' %>"><strong class="block mb-1 text-[10px] opacity-50 uppercase"><%= msg.sender %></strong> <%= msg.text %></div> <% }) %>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-700 rounded-xl px-4 py-3 text-xs text-white" placeholder="Írj..." onkeypress="if(event.key === 'Enter') talk()">
+                    <button onclick="talk()" class="bg-purple-600 px-6 py-3 rounded-xl font-bold">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-finance" class="page-section hidden pt-10">
+            <h2 class="text-xl font-black mb-6 border-l-4 border-yellow-500 pl-4">Pénzügyi Zárás</h2>
+            <div class="tech-card p-6 border border-red-900/40 bg-red-950/10">
+                <h3 class="text-sm font-black text-red-500 uppercase mb-2">Hónap Zárása</h3>
+                <p class="text-xs text-zinc-400 mb-4">Csak hónap elsején használd!</p>
+                <form action="/admin/reset-monthly" method="POST" onsubmit="return confirm('Biztos nullázod a havi profitot?')"><button class="w-full bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase">🔄 ÚJ HÓNAP INDÍTÁSA</button></form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
+        async function talk() { 
+            const i = document.getElementById('chat-in'); if(!i.value) return; const msgText = i.value; i.value = ''; 
+            const win = document.getElementById('chat-win'); win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`; win.scrollTop = win.scrollHeight; 
+            try { const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})}); const d = await r.json(); win.innerHTML += `<div class="msg msg-ai"><strong>Róka:</strong> ${d.reply}</div>`; win.scrollTop = win.scrollHeight; } catch (err) { alert("Hiba."); } 
+        }
+        async function generateSocial(type) { 
+            const textarea = document.getElementById('social-result'); textarea.value = "Generálás... 🦊";
+            try { const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); const data = await res.json(); textarea.value = data.content; } catch(e) { textarea.value = "Hiba történt."; } 
+        }
+    </script>
+</body>
+</html>
