@@ -9,8 +9,6 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
-
-// --- 🦊 FALKA ÜZENETEK (ÚJ, KEMÉNYEBB!) ---
 const FOX_QUOTES = [
     "FALKA FIGYELEM! Ma nem kérünk... Elveszünk! 🦊💰",
     "A buki a zsákmány, mi vagyunk a vadászok. Töltsd a puskát! 🎯",
@@ -22,7 +20,6 @@ const FOX_QUOTES = [
     "Amíg ők izgulnak, addig a mi pénzünk fial. 📈"
 ];
 
-// --- MODELLEK ---
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, 
@@ -51,7 +48,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V52 (FALKA EDITION) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V53 (REG FIX) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -66,12 +63,12 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v52_pack', resave: true, saveUninitialized: true,
+    secret: 'fox_v53_regfix', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- DASHBOARD (TULAJ VÉDELEMMEL) ---
+// --- DASHBOARD ---
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
@@ -159,8 +156,50 @@ app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findB
 app.post('/admin/reset-monthly', checkAdmin, async (req, res) => { await User.updateMany({}, { monthlyProfit: 0 }); res.redirect('/admin'); });
 app.post('/admin/chat', checkAdmin, async (req, res) => { try { const { message } = req.body; await new ChatMessage({ sender: 'Főnök', text: message }).save(); const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Rövid válasz." }, { role: "user", content: message }] }); await new ChatMessage({ sender: 'Róka', text: aiRes.choices[0].message.content }).save(); res.json({ reply: aiRes.choices[0].message.content }); } catch(e) { res.json({ reply: "Hiba." }); } });
 app.post('/user/update-bank', async (req, res) => { const amount = parseInt(req.body.amount); if (!isNaN(amount)) await User.findByIdAndUpdate(req.session.userId, { startingCapital: amount, currentBankroll: amount }); res.redirect('/dashboard'); });
-app.post('/auth/login', async (req, res) => { const u = await User.findOne({ email: req.body.email.toLowerCase() }); if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hiba"); });
+
+// ==========================================
+// 🔐 AUTH (ITT VOLT A HIÁNYZÓ RÉSZ!)
+// ==========================================
+
+// REGISZTRÁCIÓ LOGIKA (EZ HIÁNYZOTT!)
+app.post('/auth/register', async (req, res) => {
+    try {
+        const { fullname, email, password } = req.body;
+        
+        // Ellenőrizzük, létezik-e már
+        const existing = await User.findOne({ email: email.toLowerCase() });
+        if (existing) return res.send("<body style='background:#000;color:white;'><h1>Hiba: Ez az email már foglalt!</h1><a href='/register' style='color:orange;'>Vissza</a></body>");
+
+        // Jelszó titkosítás
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Létrehozás
+        const newUser = await new User({
+            fullname,
+            email: email.toLowerCase(),
+            password: hashedPassword,
+            startingCapital: 0,
+            currentBankroll: 0,
+            hasLicense: false // Alapból nincs licensz, neked kell aktiválni Adminban!
+        }).save();
+
+        // Automata beléptetés
+        req.session.userId = newUser._id;
+        res.redirect('/dashboard');
+
+    } catch (e) {
+        console.error(e);
+        res.send("Hiba történt a regisztráció során.");
+    }
+});
+
+// LOGIN LOGIKA
+app.post('/auth/login', async (req, res) => { const u = await User.findOne({ email: req.body.email.toLowerCase() }); if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hiba: Rossz adatok."); });
+
+// OLDALAK
+app.get('/register', (req, res) => res.render('register')); // Ez hozza be az általad küldött oldalt
 app.get('/login', (req, res) => res.render('login'));
+app.get('/terms', (req, res) => res.render('terms'));
 app.get('/', (req, res) => res.render('index'));
 app.get('/logout', (req, res) => { req.session.destroy(() => { res.redirect('/'); }); });
 app.get('/stats', async (req, res) => { if (!req.session.userId) return res.redirect('/login'); const user = await User.findById(req.session.userId); const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]; const tips = await Tip.find({ date: { $gte: startOfMonth }, status: { $ne: 'pending' } }).sort({ date: -1 }); let wins = tips.filter(t => t.status === 'win').length; let losses = tips.filter(t => t.status === 'loss').length; res.render('stats', { user, tips, wins, losses, monthlyProfit: user.monthlyProfit || 0 }); });
