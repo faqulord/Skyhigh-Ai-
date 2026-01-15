@@ -121,4 +121,22 @@
             </div>
         </div>
 
-        <div id="
+        <div id="tab-finance" class="page-section hidden">
+            <h2 class="text-lg font-bold mb-4 text-zinc-400">Pénzügy</h2>
+            <div class="tech-card p-5 border border-red-900/30">
+                <h3 class="text-xs font-bold mb-2 text-red-500 uppercase">Hónap Zárása</h3>
+                <p class="text-[10px] text-zinc-500 mb-4">Ez lenullázza minden tag "Havi Profit" mutatóját. Csak hónap elsején használd!</p>
+                <form action="/admin/reset-monthly" method="POST" onsubmit="return confirm('Biztos indítod az új hónapot?')">
+                    <button class="w-full bg-red-900/20 text-red-500 border border-red-900/50 py-3 rounded-xl font-bold text-xs uppercase">🔄 ÚJ HÓNAP INDÍTÁSA</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
+        async function talk() { const i = document.getElementById('chat-in'); if(!i.value) return; const msgText = i.value; i.value = ''; win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`; win.scrollTop = win.scrollHeight; try { const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})}); const d = await r.json(); win.innerHTML += `<div class="msg msg-ai"><strong>Róka:</strong> ${d.reply}</div>`; win.scrollTop = win.scrollHeight; } catch (err) { console.error(err); } }
+        async function generateSocial(type) { const btn = event.target; const originalText = btn.innerText; btn.innerText = "..."; try { const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); const data = await res.json(); document.getElementById('social-result').value = data.content; } catch(e) { alert('Hiba!'); } btn.innerText = originalText; }
+        async function draftEmail() { const topic = document.getElementById('email-topic').value; if(!topic) return alert("Írj témát!"); try { const res = await fetch('/admin/draft-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic }) }); const data = await res.json(); alert("Vázlat kész! (Console logban)"); console.log(data.draft); } catch(e) { alert("AI Hiba"); } }
+    </script>
+</body>
+</html>
