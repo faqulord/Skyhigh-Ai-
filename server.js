@@ -14,7 +14,7 @@ const BRAND_NAME = "Zsivány Róka";
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
-    isAdmin: { type: Boolean, default: false }, 
+    licenseExpiresAt: { type: Date }, isAdmin: { type: Boolean, default: false }, 
     startingCapital: { type: Number, default: 0 },
     currentBankroll: { type: Number, default: 0 } 
 }));
@@ -35,13 +35,18 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
     sender: String, text: String, timestamp: { type: Date, default: Date.now }
 }));
 
+const MonthlyStat = mongoose.models.MonthlyStat || mongoose.model('MonthlyStat', new mongoose.Schema({
+    month: String, totalProfit: { type: Number, default: 0 }, winCount: { type: Number, default: 0 }, 
+    lossCount: { type: Number, default: 0 }, totalTips: { type: Number, default: 0 }, isPublished: { type: Boolean, default: false }
+}));
+
 // --- SEGÉDFÜGGVÉNYEK ---
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 Rendszer Online - v32.5`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 Rendszer Visszaállítva - v32.5`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- RÓKA AGYA: KETTŐS SZEMÉLYISÉG ---
+// --- RÓKA AGYA ---
 async function runAiRobot() {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
@@ -89,7 +94,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v32_secret', resave: true, saveUninitialized: true,
+    secret: 'fox_restore_secret', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
@@ -106,7 +111,7 @@ app.get('/dashboard', async (req, res) => {
     res.render('dashboard', { 
         user, dailyTip, suggestedStake: Math.round(bank * p), userBank: bank, strategyMode: settings.strategyMode,
         displayDate: new Date().toLocaleDateString('hu-HU'), 
-        foxQuotes: ["A buki már izzad.", "Pénz beszél, Róka vadászik."] 
+        foxQuotes: ["A buki már izzad.", "Pénz beszél, Róka vadászik.", "A tőke a lőszered!"] 
     });
 });
 
@@ -114,7 +119,7 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-    const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(10);
+    const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(20);
     res.render('admin', { users, currentTip, chatHistory, strategyMode: settings.strategyMode, dbDate: getDbDate(), brandName: BRAND_NAME, stats: [] });
 });
 
@@ -130,6 +135,7 @@ app.post('/admin/refine-text', checkAdmin, async (req, res) => {
         model: "gpt-4-turbo-preview",
         messages: [{ role: "system", content: "Legyél rövidebb!" }, { role: "user", content: tip.memberMessage }]
     });
+    // CSAK A SZÖVEGET FRISSÍTJÜK, A MATCHTIME MARAD!
     await Tip.findByIdAndUpdate(tip._id, { memberMessage: refined.choices[0].message.content });
     res.redirect('/admin');
 });
@@ -167,7 +173,6 @@ app.post('/auth/login', async (req, res) => {
     if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); }
     else res.send("Hiba");
 });
-
 app.get('/login', (req, res) => res.render('login'));
 app.get('/', (req, res) => res.render('index'));
 app.listen(process.env.PORT || 8080);
