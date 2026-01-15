@@ -15,13 +15,12 @@
         @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.7)); } }
         .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
         
-        /* JAVÍTOTT FUTÓ SZÖVEG (LASSABB!) */
+        /* FUTÓ SZÖVEG */
         .marquee-container { overflow: hidden; white-space: nowrap; position: relative; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 5px 0; border-radius: 10px; }
-        /* 60s = Lassabb sebesség */
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 60s linear infinite; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; letter-spacing: 1px; }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 45s linear infinite; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; letter-spacing: 1px; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* MODAL */
+        /* MODAL STÍLUS (KIÁLTVÁNY) */
         #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; backdrop-filter: blur(20px); align-items: center; justify-content: center; }
         .modal-content { max-height: 90vh; overflow-y: auto; width: 90%; max-width: 450px; }
         .btn-pulse { animation: btn-p 1.5s infinite; }
@@ -44,10 +43,8 @@
 
     <div class="marquee-container">
         <div class="marquee-text">
-            <% if (typeof foxQuotes !== 'undefined' && foxQuotes.length > 0) { %>
-                <% foxQuotes.forEach(quote => { %>
-                    <span class="mx-6 text-purple-400">★</span> <span class="text-white"><%= quote %></span>
-                <% }) %>
+            <% if (typeof foxQuotes !== 'undefined' && foxQuotes && foxQuotes.length > 0) { %>
+                <% foxQuotes.forEach(quote => { %> <span class="mx-6 text-purple-400">★</span> <span class="text-white"><%= quote %></span> <% }) %>
             <% } else { %>
                 <span class="mx-6">🦊 A Róka éppen vadászik...</span>
             <% } %>
@@ -108,25 +105,67 @@
     <div id="manifestoModal">
         <div class="thin-purple-border bg-[#0a0a0a] p-8 rounded-[2.5rem] modal-content relative">
             <button onclick="closeManifesto()" class="absolute top-5 right-7 text-zinc-600 font-bold text-3xl hover:text-white transition cursor-pointer">×</button>
-            <div class="text-center mb-8"><div class="fox-pulse text-6xl mb-4">🦊</div><h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">A Róka Törvénye</h2></div>
+            
+            <div class="text-center mb-8">
+                <div class="fox-pulse text-6xl mb-4">🦊</div>
+                <h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">A Róka Törvénye</h2>
+                <p class="text-[10px] text-zinc-500 font-black tracking-widest uppercase mt-2">Mesterséges Intelligencia. 0% Érzelem.</p>
+            </div>
+            
             <div class="space-y-6 text-sm leading-relaxed text-zinc-300 font-medium">
-                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg"><p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">1. A Kettős Énem</p><p class="text-xs text-zinc-400">Nem csak egy gép vagyok. Két személyiség dolgozik érted:</p><ul class="mt-2 space-y-1 list-none text-xs"><li>🔵 <strong>A Hidegvérű Elemző:</strong> Aki a felhőben 0-24-ben futtatja a statisztikákat.</li><li>🟠 <strong>A Zsivány Stratéga:</strong> Aki tudja, hogy a matek mellett a fegyelem a fegyver.</li></ul></div>
-                <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl shadow-lg"><p class="text-purple-300 font-bold mb-3 uppercase text-xs tracking-widest border-b border-purple-500/20 pb-2">3. Atomreaktor (300k Példa)</p><div class="bg-black/40 p-4 rounded-2xl border border-zinc-800 space-y-3 text-xs"><div class="flex justify-between items-center"><span class="text-zinc-500">Kezdő tőke:</span><span class="text-white font-bold">300.000 Ft</span></div><div class="border-t border-white/5 my-1"></div><div class="flex justify-between items-center"><span class="text-purple-400">1. év végén:</span><span class="text-white font-black text-sm">~5.400.000 Ft</span></div><div class="flex justify-between items-center"><span class="text-orange-400">2. év végén:</span><span class="orange-neon text-lg">~96.000.000 Ft</span></div></div><p class="text-[9px] text-zinc-500 mt-3 pt-2 border-t border-white/5 italic text-center">(Ajánlott minimum: 50.000 Ft)</p></div>
-                <div class="bg-red-900/10 border border-red-500/30 p-5 rounded-3xl shadow-lg"><p class="text-red-400 font-bold mb-2 uppercase text-xs tracking-widest border-b border-red-500/20 pb-2">⚠️ 4. A Bankár Törvénye</p><ul class="space-y-2 list-none text-xs"><li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>TILOS A TŐKÉHEZ NYÚLNI!</strong> Ha kiveszed, megállítod a gépezetet.</span></li><li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>PONTOS ÖSSZEGET ÍRJ BE!</strong> A matek akkor működik, ha a rendszer pontosan tudja, mid van.</span></li></ul></div>
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">1. A Kettős Énem</p>
+                    <p class="text-xs text-zinc-400">Nem csak egy gép vagyok. Két személyiség dolgozik érted:</p>
+                    <ul class="mt-2 space-y-1 list-none text-xs">
+                        <li>🔵 <strong>A Hidegvérű Elemző:</strong> Aki a felhőben 0-24-ben futtatja a statisztikákat.</li>
+                        <li>🟠 <strong>A Zsivány Stratéga:</strong> Aki tudja, hogy a matek mellett a fegyelem a fegyver.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">2. A Sportfogadás Csak Eszköz</p>
+                    <p class="text-xs text-zinc-400">Mi a sportfogadást csak <strong class="text-white">felhasználjuk arra, hogy a pénzed dolgozzon helyetted.</strong> A tőke a lőszer, én vagyok a mesterlövész.</p>
+                </div>
+
+                <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl shadow-lg">
+                    <p class="text-purple-300 font-bold mb-3 uppercase text-xs tracking-widest border-b border-purple-500/20 pb-2">3. Atomreaktor (300k Példa)</p>
+                    <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800 space-y-3 text-xs">
+                        <div class="flex justify-between items-center"><span class="text-zinc-500">Kezdő tőke:</span><span class="text-white font-bold">300.000 Ft</span></div>
+                        <div class="border-t border-white/5 my-1"></div>
+                        <div class="flex justify-between items-center"><span class="text-purple-400">1. év végén:</span><span class="text-white font-black text-sm">~5.400.000 Ft</span></div>
+                        <div class="flex justify-between items-center"><span class="text-orange-400">2. év végén:</span><span class="orange-neon text-lg">~96.000.000 Ft</span></div>
+                    </div>
+                    <p class="text-[9px] text-zinc-500 mt-3 pt-2 border-t border-white/5 italic text-center">(Ajánlott minimum: 50.000 Ft)</p>
+                </div>
+
+                <div class="bg-red-900/10 border border-red-500/30 p-5 rounded-3xl shadow-lg">
+                    <p class="text-red-400 font-bold mb-2 uppercase text-xs tracking-widest border-b border-red-500/20 pb-2">⚠️ 4. A Bankár Törvénye</p>
+                    <ul class="space-y-2 list-none text-xs">
+                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>TILOS A TŐKÉHEZ NYÚLNI!</strong> Ha kiveszed, megállítod a gépezetet.</span></li>
+                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>PONTOS ÖSSZEGET ÍRJ BE!</strong> A matek akkor működik, ha a rendszer pontosan tudja, mid van.</span></li>
+                    </ul>
+                </div>
+
                 <p class="text-center text-[10px] text-zinc-500 font-black uppercase tracking-widest py-2">Én számolok. A pénzed dolgozik. Te aratsz.</p>
             </div>
+            
             <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-6 uppercase text-xs tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] transition active:scale-95 cursor-pointer">ÉRTEM! INDULJON A PÉNZGYÁR! 🚀</button>
         </div>
     </div>
 
     <script>
-        function openManifesto() { const modal = document.getElementById('manifestoModal'); if(modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }
-        function closeManifesto() { const modal = document.getElementById('manifestoModal'); if(modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } }
+        function openManifesto() { 
+            const modal = document.getElementById('manifestoModal');
+            if(modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        }
+        function closeManifesto() { 
+            const modal = document.getElementById('manifestoModal');
+            if(modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }
+        }
         function toggleBankEdit() { document.getElementById('bankForm').classList.toggle('hidden'); }
         function startTimer() {
             const countdownDisplay = document.getElementById('countdownDisplay');
             if(!countdownDisplay) return;
-            // Biztonságos adattípus kezelés
             const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
             function update() {
                 const now = new Date();
