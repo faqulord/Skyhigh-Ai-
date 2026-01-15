@@ -13,7 +13,7 @@ const app = express();
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
 
-// --- MODELLEK (VÁLTOZATLAN) ---
+// --- MODELLEK ---
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -38,113 +38,92 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
     sender: String, text: String, timestamp: { type: Date, default: Date.now }
 }));
 
-// --- SEGÉDFÜGGVÉNYEK (VÁLTOZATLAN) ---
-const getDbDate = () => {
-    const d = new Date();
-    const year = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', year: 'numeric'});
-    const month = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', month: '2-digit'});
-    const day = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', day: '2-digit'});
-    return `${year}-${month}-${day}`;
-};
+// --- SEGÉDFÜGGVÉNYEK ---
+const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
 
 async function logToChat(sender, message) {
     const timeStr = new Date().toLocaleString('hu-HU', { timeZone: 'Europe/Budapest' });
     await new ChatMessage({ sender, text: `[${timeStr}] ${message}` }).save();
 }
 
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 ${BRAND_NAME} System Ready - NEW API ENGINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 System Ready - Zsivány Motor v30`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- RÓKA ELEMZÉS - ÚJ FOOTBALL-DATA.ORG MOTOR ---
+// --- RÓKA ELEMZÉS (RÖVIDEBB, PONTOSABB) ---
 async function runAiRobot() {
     await ChatMessage.deleteMany({});
     const targetDate = getDbDate();
-    
-    const key = (process.env.SPORT_API_KEY || "").trim();
-    const keyHint = key ? `${key.substring(0, 5)}***` : "HIÁNYZIK!";
-    await logToChat('System', `🛠️ Vizsgálat: ÚJ API Kulcs (${keyHint}) | Dátum: ${targetDate}`);
+    const token = (process.env.SPORT_API_KEY || "").trim();
 
     try {
-        // ÚJ API HÍVÁS A FOOTBALL-DATA.ORG SZERVERÉRE
         const response = await axios.get(`https://api.football-data.org/v4/matches`, {
-            headers: { 'X-Auth-Token': key },
-            timeout: 15000
+            headers: { 'X-Auth-Token': token }
         });
 
-        let matches = response.data.matches || [];
-        await logToChat('System', `📡 Új API válasz: ${matches.length} meccs érkezett a ligákból.`);
-
-        // 13:00 - 23:59 SZŰRÉS BUDAPESTI IDŐ SZERINT
+        const matches = response.data.matches || [];
+        // Csak a 13:00 utáni, még el nem kezdődött meccsek
         let validFixtures = matches.filter(m => {
             const matchDate = new Date(m.utcDate);
             const hunHour = parseInt(matchDate.toLocaleTimeString('hu-HU', { timeZone: 'Europe/Budapest', hour: '2-digit', hour12: false }));
-            return hunHour >= 13 && hunHour <= 23;
+            return hunHour >= 13 && hunHour <= 23 && m.status === 'TIMED';
         });
 
+        await logToChat('System', `📡 Adat érkezett: ${validFixtures.length} alkalmas meccs.`);
+
         if (validFixtures.length === 0) {
-            await logToChat('Róka', `⚠️ Ma nincs több 13:00 utáni kiemelt meccs a kínálatban.`);
+            await logToChat('Róka', `⚠️ Ma már nincs több zsivány meccs a listán.`);
             return false;
         }
 
-        const matchData = validFixtures.slice(0, 40).map(m => {
+        const matchData = validFixtures.slice(0, 30).map(m => {
             const time = new Date(m.utcDate).toLocaleTimeString('hu-HU', {timeZone:'Europe/Budapest', hour:'2-digit', minute:'2-digit'});
             return `[${time}] ${m.homeTeam.name} vs ${m.awayTeam.name} (${m.competition.name})`;
         }).join("\n");
 
-        // --- OKOSABB AI PROMPT (BÁRMILYEN KIMENETELRE) ---
-        const analysisPrompt = `
-            SZEREP: Profi Matematikai Sportelemző Robot.
-            FELADAT: Válaszd ki az EGYETLEN LEGBIZTOSABB kimenetelt. 
-            STÍLUS: Nem csak győztest tippelsz. Nézz gól-arányt, szöglet esélyt, BTTS-t vagy bármit, ami a legnagyobb profitot hozza.
-            MÓD: Havi profit maximalizálása.
-            FORMAT (JSON): { 
-                "league": "...", 
-                "match": "Hazai - Vendég", 
-                "prediction": "Tipp (pl: Több mint 2.5 gól / Hazai győzelem / Több szöglet)", 
-                "odds": "1.XX", 
-                "reasoning": "Rövid matematikai/szakmai indoklás", 
-                "profitPercent": 5, 
-                "matchTime": "ÓÓ:PP", 
-                "matchDate": "${targetDate}", 
-                "bookmaker": "Bet365", 
-                "stake": "3%" 
-            }
-        `;
-
+        // AI ELEMZÉS - SZIGORÚBB INSTRUKCIÓKKAL
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: analysisPrompt }, { role: "user", content: `Kínálat:\n${matchData}` }],
+            messages: [{ 
+                role: "system", 
+                content: `Te vagy a Zsivány Róka, egy dörzsölt sportelemző. 
+                Válaszd ki a legbiztosabb kimenetelt (lehet gól, szöglet, győzelem).
+                FONTOS: Legyél lényegre törő, ne dumálj sokat!
+                JSON FORMAT: { "league": "...", "match": "...", "prediction": "...", "odds": "1.XX", "reasoning": "Matek indoklás 1 mondatban.", "matchTime": "ÓÓ:PP" }`
+            }, { role: "user", content: `Kínálat:\n${matchData}` }],
             response_format: { type: "json_object" }
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
 
-        // MARKETING SZÖVEG GENERÁLÁSA (RÓKA STÍLUSBAN)
-        const marketingPrompt = `Meccs: ${result.match}. Tipp: ${result.prediction}. Indoklás: ${result.reasoning}. Írd át Zsivány Róka stílusban, viccesen, magabiztosan. Kezdd így: 📅 MA ${result.matchTime} - ...`;
+        // MARKETING SZÖVEG - RÖVID ÉS ÜTŐS
+        const mDate = new Date().toLocaleDateString('hu-HU');
         const marketingRes = await openai.chat.completions.create({
              model: "gpt-4-turbo-preview",
-             messages: [{ role: "system", content: "Profi Marketing Copywriter (Fox Persona)." }, { role: "user", content: marketingPrompt }] 
+             messages: [{ 
+                 role: "system", 
+                 content: "Zsivány Róka stílus. Rövid, magabiztos, 1 zsivány vicc a végén. Max 3-4 rövid bekezdés." 
+             }, { 
+                 role: "user", 
+                 content: `Írd meg a tagoknak: Dátum: ${mDate}, Idő: ${result.matchTime}, Meccs: ${result.match}, Tipp: ${result.prediction}.` 
+             }] 
         });
 
         await Tip.findOneAndUpdate({ date: targetDate }, { 
             ...result, 
             memberMessage: marketingRes.choices[0].message.content,
-            date: targetDate, 
-            isPublished: false, 
-            isReal: true 
+            date: targetDate, isPublished: false, isReal: true 
         }, { upsert: true });
 
-        await logToChat('Róka', `✅ ELEMZÉS KÉSZ: ${result.match} (${result.prediction}) kiválasztva.`);
+        await logToChat('Róka', `✅ Kész! Választott: ${result.match}`);
         return true;
 
     } catch (e) {
-        await logToChat('System', `⚠️ HIBA az új API-val: ${e.message}`);
-        console.error(e);
+        await logToChat('System', `⚠️ HIBA: ${e.message}`);
         return false;
     }
 }
 
-// --- ÚTVONALAK (VÁLTOZATLAN) ---
+// --- ADMIN ÉS FELHASZNÁLÓI ÚTVONALAK ---
 const checkAdmin = async (req, res, next) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
@@ -157,10 +136,25 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'v29_new_provider_fix', resave: true, saveUninitialized: true,
+    secret: 'v30_fox_brain', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
+
+// ÚJ! SZÖVEG FINOMÍTÓ ÚTVONAL (Hogy ne legyen fehér lap)
+app.post('/admin/refine-text', checkAdmin, async (req, res) => {
+    const tip = await Tip.findOne({ date: getDbDate() });
+    if (!tip) return res.redirect('/admin');
+
+    const refined = await openai.chat.completions.create({
+        model: "gpt-4-turbo-preview",
+        messages: [{ role: "system", content: "Zsivány Róka vagy. Vedd rövidebbre és poénosabbra ezt a szöveget!" }, { role: "user", content: tip.memberMessage }]
+    });
+
+    tip.memberMessage = refined.choices[0].message.content;
+    await tip.save();
+    res.redirect('/admin');
+});
 
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
