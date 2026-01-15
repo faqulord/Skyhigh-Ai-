@@ -10,19 +10,19 @@ const app = express();
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
 
-// --- 🦊 ÚJ, ZSIVÁNY ARANYKÖPÉSEK (VICCESEBB!) ---
+// --- 🦊 FALKA ÜZENETEK (ÚJ, KEMÉNYEBB!) ---
 const FOX_QUOTES = [
-    "A buki már hívta a papot... Ma temetjük az irodát! ⚰️",
-    "Nem tippelünk, hanem fosztogatunk. Ez a különbség. 💰",
-    "A te pénzed alszik, az enyém éppen fial. 🦊",
-    "Hideg fej, forró oddsok, tele zseb. Ez a reggelim.",
-    "A statisztika a fegyverem, a türelem a pajzsom.",
-    "Ne dolgozz a pénzért. Küldd el a pénzt dolgozni!",
-    "Ma nem kérdezünk. Ma elveszszük, ami jár. 🚀",
-    "Nyugi, a Róka a felhőből figyel. ☁️👁️"
+    "FALKA FIGYELEM! Ma nem kérünk... Elveszünk! 🦊💰",
+    "A buki a zsákmány, mi vagyunk a vadászok. Töltsd a puskát! 🎯",
+    "Ez nem tippmixelés, ez befektetés. A tőke a lőszer! 💣",
+    "Bárhol játszhatod, a matek mindenhol ugyanaz: A Ház mindig veszít ellenünk. 📉",
+    "Ne dolgozz a pénzért... Küldd el a pénzt dolgozni a Róka tippjével! 💸",
+    "A statisztika nem hazudik. A bukméker igen. Mi a mateknak hiszünk. 📊",
+    "Hideg fej, forró oddsok, tele zseb. Ez a Róka törvénye. 🦊",
+    "Amíg ők izgulnak, addig a mi pénzünk fial. 📈"
 ];
 
-// --- ADATBÁZIS MODELLEK ---
+// --- MODELLEK ---
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, 
@@ -51,7 +51,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V51 (FINAL BOSS) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V52 (FALKA EDITION) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -66,7 +66,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v51_final', resave: true, saveUninitialized: true,
+    secret: 'fox_v52_pack', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
@@ -76,7 +76,6 @@ app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     
-    // HA NEM A TULAJ, AKKOR ELLENŐRIZZÜK A LEJÁRATOT
     if (user.email !== OWNER_EMAIL && !user.isAdmin) {
         if (user.licenseExpiresAt && new Date() > new Date(user.licenseExpiresAt)) {
             user.hasLicense = false;
@@ -85,9 +84,8 @@ app.get('/dashboard', async (req, res) => {
         if (!user.hasLicense) {
             return res.send(`
                 <body style="background:#000; color:white; font-family:sans-serif; text-align:center; padding-top:50px;">
-                    <h1 style="color:#ef4444;">⛔ LEJÁRT A VADÁSZATI ENGEDÉLYED</h1>
+                    <h1 style="color:#ef4444;">⛔ A VADÁSZATI ENGEDÉLYED LEJÁRT</h1>
                     <p>A tagságod inaktív.</p>
-                    <p>Lejárat dátuma: ${user.licenseExpiresAt ? new Date(user.licenseExpiresAt).toLocaleDateString('hu-HU') : 'Ismeretlen'}</p>
                     <a href="/logout" style="color:#a855f7; text-decoration:none; font-weight:bold;">Kijelentkezés</a>
                 </body>
             `);
@@ -101,8 +99,7 @@ app.get('/dashboard', async (req, res) => {
 
     res.render('dashboard', { 
         user, dailyTip, suggestedStake: Math.round(bank * p), userBank: bank, strategyMode: settings.strategyMode, 
-        monthlyProfit: user.monthlyProfit || 0, foxQuotes: FOX_QUOTES,
-        ownerEmail: OWNER_EMAIL // Átadjuk, hogy a frontend tudja, ki a főnök
+        monthlyProfit: user.monthlyProfit || 0, foxQuotes: FOX_QUOTES, ownerEmail: OWNER_EMAIL 
     });
 });
 
@@ -114,7 +111,7 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME });
 });
 
-// --- API FUNKCIÓK ---
+// --- ADMIN API ---
 app.post('/admin/manage-sub', checkAdmin, async (req, res) => {
     const { userId, action } = req.body;
     const u = await User.findById(userId);
@@ -131,8 +128,8 @@ app.post('/admin/manage-sub', checkAdmin, async (req, res) => {
 
 app.post('/admin/social-content', checkAdmin, async (req, res) => {
     const prompt = req.body.type === 'win' 
-        ? "Te vagy a Zsivány Róka. Írj egy nagyon magabiztos, dörzsölt Instagram posztot arról, hogy a mai tippünk hatalmasat nyert! Használj emojikat (💰, 🦊). Stílus: profi, okos. Ne említs illegális dolgokat." 
-        : "Te vagy a Zsivány Róka. Írj egy motivációs posztot arról, hogy a fegyelem és a matematika hozza a pénzt.";
+        ? "Te vagy a Zsivány Róka. Írj egy dörzsölt, domináns Instagram posztot arról, hogy ma is kifosztottuk a bankot! Emojik: 🦊💰. Stílus: falka vezér." 
+        : "Te vagy a Zsivány Róka. Írj egy posztot arról, hogy a sportfogadás nem játék, hanem üzlet.";
     try { const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "user", content: prompt }] }); res.json({ content: aiRes.choices[0].message.content }); } catch(e) { res.json({ content: "Hiba az AI-nál." }); }
 });
 
@@ -147,10 +144,10 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
         let fixtures = matches.filter(m => m.status === 'TIMED');
         if (fixtures.length === 0) return res.redirect('/admin');
         const matchData = fixtures.slice(0, 20).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name} (${m.competition.name})`).join("\n");
-        const systemPrompt = `Te vagy a Zsivány Róka. Keress 70%+ valószínűségű tippet (Gólok, 1X2, DNB). JSON: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"", "matchTime":"HH:mm" }`;
+        const systemPrompt = `Te vagy a Zsivány Róka. Keress 75%+ valószínűségű tippet (Gólok, 1X2, DNB). JSON: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"", "matchTime":"HH:mm" }`;
         const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: matchData }], response_format: { type: "json_object" } });
         const result = JSON.parse(aiRes.choices[0].message.content);
-        const marketingRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Rövid, dörzsölt üzenet." }, { role: "user", content: `Tipp: ${result.prediction}` }] });
+        const marketingRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Rövid, dörzsölt üzenet a Falkának." }, { role: "user", content: `Tipp: ${result.prediction}` }] });
         await Tip.findOneAndUpdate({ date: targetDate }, { ...result, memberMessage: marketingRes.choices[0].message.content, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, { upsert: true });
     } catch (e) { console.error(e); } res.redirect('/admin');
 });
