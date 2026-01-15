@@ -52,11 +52,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 
 // --- SEGÉDFÜGGVÉNYEK ---
 const getDbDate = () => {
-    const d = new Date();
-    const year = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', year: 'numeric'});
-    const month = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', month: '2-digit'});
-    const day = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', day: '2-digit'});
-    return `${year}-${month}-${day}`;
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
 };
 
 async function logToChat(sender, message) {
@@ -67,29 +63,26 @@ async function logToChat(sender, message) {
 mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 System Ready`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- RÓKA ELEMZÉS (MAXIMÁLIS HIBAKERESÉSSEL) ---
+// --- RÓKA ELEMZÉS (HIBAKERESŐVEL) ---
 async function runAiRobot() {
     await ChatMessage.deleteMany({});
     const targetDate = getDbDate();
     
-    // DEBUG: Ellenőrizzük, látja-e a kulcsot a rendszer
-    const key = process.env.SPORT_API_KEY || "";
-    const keyHint = key ? `${key.substring(0, 4)}****` : "HIÁNYZIK!";
-    await logToChat('System', `🛠️ API kulcs ellenőrzése: ${keyHint}`);
+    const key = (process.env.SPORT_API_KEY || "").trim();
+    const keyDisplay = key ? `${key.substring(0, 5)}***` : "HIÁNYZIK!";
+    await logToChat('System', `🛠️ Vizsgálat: API Kulcs (${keyDisplay}) | Dátum: ${targetDate}`);
 
     try {
         const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${targetDate}`, {
             headers: { 
-                'x-apisports-key': key.trim(), 
+                'x-apisports-key': key, 
                 'x-apisports-host': 'v3.football.api-sports.io' 
             },
             timeout: 10000
         });
 
-        // Ha az API válaszában hiba van (pl. limit vagy rossz kulcs)
         if (response.data.errors && Object.keys(response.data.errors).length > 0) {
-            const errorText = JSON.stringify(response.data.errors);
-            await logToChat('System', `❌ API VÁLASZ HIBA: ${errorText}`);
+            await logToChat('System', `❌ API HIBA: ${JSON.stringify(response.data.errors)}`);
             return false;
         }
 
@@ -103,7 +96,7 @@ async function runAiRobot() {
         });
 
         if (validFixtures.length === 0) {
-            await logToChat('Róka', `⚠️ Ma nincs több 13:00 utáni meccs a kínálatban.`);
+            await logToChat('Róka', `⚠️ Ma már nincs 13:00 utáni meccs a kínálatban.`);
             return false;
         }
 
@@ -114,7 +107,7 @@ async function runAiRobot() {
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Válaszd ki a legbiztosabb meccset a profit érdekében." }, { role: "user", content: `Kínálat:\n${matchData}` }],
+            messages: [{ role: "system", content: "Válaszd ki a legbiztosabb meccset a havi profit maximalizálása érdekében." }, { role: "user", content: `Kínálat:\n${matchData}` }],
             response_format: { type: "json_object" }
         });
 
@@ -146,7 +139,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'v29_final_secret', resave: true, saveUninitialized: true,
+    secret: 'v29_secret_fix', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
@@ -158,10 +151,12 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, chatHistory, dbDate: getDbDate(), brandName: BRAND_NAME, recentTips: [], stats: [], calculatorData: [] });
 });
 
+// GOMBOK (EREDETI ÚTVONALAK)
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { await runAiRobot(); res.redirect('/admin'); });
 app.post('/admin/delete-today', checkAdmin, async (req, res) => { await Tip.findOneAndDelete({ date: getDbDate() }); res.redirect('/admin'); });
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
 
+// DASHBOARD ÉS BELÉPÉS
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
