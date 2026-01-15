@@ -65,7 +65,7 @@
         <button onclick="toggleBankEdit()" class="w-full text-[10px] text-zinc-600 font-black hover:text-white transition py-2 border-t border-white/5 mt-2">PÉNZTÁRCA BEÁLLÍTÁSA ▲</button>
         <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-5 rounded-2xl border border-white/5 animate-fade-in">
             <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase tracking-widest">Írd be a PONTOS tőkédet:</p>
-            <input type="number" name="amount" placeholder="pl. 300000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500">
+            <input type="number" name="amount" placeholder="pl. 50000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500">
             <button class="w-full bg-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase shadow-xl tracking-widest">Mentés</button>
         </form>
     </div>
@@ -118,6 +118,10 @@
                         <div class="flex justify-between items-center"><span class="text-purple-400">1. év végén:</span><span class="text-white font-black text-sm">~5.400.000 Ft</span></div>
                         <div class="flex justify-between items-center"><span class="text-orange-400">2. év végén:</span><span class="orange-neon text-lg">~96.000.000 Ft</span></div>
                     </div>
+                    
+                    <p class="text-[9px] text-zinc-500 mt-3 pt-2 border-t border-white/5 italic text-center">
+                        (A 300.000 Ft csak egy példa. A rendszer <strong class="text-white">50.000 Ft-tól</strong> már hatékonyan működik, ez az ajánlott minimum.)
+                    </p>
                 </div>
 
                 <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
