@@ -48,7 +48,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V57 (GOLD) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V58 (PACKAGES) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -63,12 +63,12 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v57_gold', resave: true, saveUninitialized: true,
+    secret: 'fox_v58_pack', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- DASHBOARD (FIZETŐS KAPUVAL + TELEGRAMMAL) ---
+// --- DASHBOARD (CSOMAG AJÁNLATTAL) ---
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
@@ -79,44 +79,57 @@ app.get('/dashboard', async (req, res) => {
             await user.save();
         }
         
-        // HA NINCS LICENSZ -> FIZETŐS OLDAL
+        // HA NINCS LICENSZ -> CSOMAG VÁLASZTÓ OLDAL
         if (!user.hasLicense) {
             return res.send(`
                 <!DOCTYPE html>
                 <html lang="hu">
                 <head>
                     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Aktiválás | Zsivány Róka</title>
+                    <title>Válassz Csomagot | Zsivány Róka</title>
                     <script src="https://cdn.tailwindcss.com"></script>
                     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-                    <style>body{background:#050505;color:#fff;font-family:'Inter',sans-serif;}.orange-neon{color:#FF9F43;}</style>
+                    <style>
+                        body{background:#050505;color:#fff;font-family:'Inter',sans-serif;}
+                        .orange-neon{color:#FF9F43; text-shadow: 0 0 10px rgba(255, 159, 67, 0.4);}
+                        .btn-pulse { animation: pulse 2s infinite; }
+                        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+                    </style>
                 </head>
                 <body class="p-6 flex flex-col items-center justify-center min-h-screen text-center">
                     
-                    <div class="text-6xl mb-6">🔒</div>
-                    <h1 class="text-xl font-black text-red-600 uppercase tracking-[0.2em] mb-2 font-orbitron">Aktiválás Szükséges</h1>
-                    <p class="text-xs text-zinc-500 mb-8 max-w-xs">A rendszer eléréséhez érvényes licensz szükséges.</p>
+                    <h1 class="text-xl font-black text-white uppercase tracking-[0.2em] mb-2 font-orbitron">Csatlakozz a Falkához</h1>
+                    <p class="text-xs text-zinc-500 mb-8">Az elemzések eléréséhez válassz tagságot.</p>
 
-                    <div class="bg-[#111] p-8 rounded-3xl border border-zinc-800 max-w-sm w-full shadow-2xl mb-8 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-pink-600"></div>
-                        <p class="text-sm font-bold text-white leading-relaxed uppercase tracking-wide">
-                            Mesterséges felhő alapú<br>
-                            <span class="text-purple-500">élő sportfogadási elemzés</span><br>
-                            fix stratégiával.
-                        </p>
-                        
-                        <div class="mt-8 flex flex-col gap-3">
-                            <a href="https://revolut.me/csaba6da3" target="_blank" class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs hover:bg-gray-200 transition flex items-center justify-center gap-2">
-                                💳 FIZETÉS (REVOLUT)
-                            </a>
+                    <div class="bg-gradient-to-b from-[#111] to-[#0a0a0a] p-1 rounded-3xl w-full max-w-sm shadow-[0_0_40px_rgba(255,159,67,0.15)] mb-8">
+                        <div class="bg-[#0a0a0a] rounded-[1.4rem] p-6 relative overflow-hidden">
                             
-                            <a href="https://t.me/SHANNA444" target="_blank" class="w-full bg-[#24A1DE] text-white py-4 rounded-xl font-black uppercase text-xs hover:bg-[#1c8lb5] transition flex items-center justify-center gap-2">
-                                ✈️ ÍRJ RÁM (TELEGRAM)
-                            </a>
-                        </div>
+                            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">Ajánlott</div>
 
-                        <div class="mt-4 border-t border-zinc-800 pt-4">
-                            <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest">SUPPORT 24/7</p>
+                            <h2 class="text-lg font-black text-white uppercase mb-1">VIP Havi Tagság</h2>
+                            <p class="text-xs text-zinc-500 mb-6">Teljes hozzáférés a Róka rendszeréhez.</p>
+
+                            <div class="text-3xl font-black orange-neon mb-6 font-orbitron">
+                                19.990 Ft <span class="text-xs text-zinc-600 font-normal">/ 30 Nap</span>
+                            </div>
+
+                            <ul class="text-left text-xs text-zinc-300 space-y-3 mb-8 pl-2">
+                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Napi Prémium AI Elemzés</li>
+                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Automata Bankroll Kalkulátor</li>
+                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Stratégia & Pénzügyi Terv</li>
+                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 0-24 Support</li>
+                            </ul>
+                            
+                            <div class="flex flex-col gap-3">
+                                <a href="https://revolut.me/csaba6da3" target="_blank" class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs hover:bg-gray-200 transition flex items-center justify-center gap-2 shadow-lg btn-pulse">
+                                    💳 FIZETÉS (REVOLUT)
+                                </a>
+                                <a href="https://t.me/SHANNA444" target="_blank" class="w-full bg-[#24A1DE] text-white py-4 rounded-xl font-black uppercase text-xs hover:bg-[#1c8lb5] transition flex items-center justify-center gap-2">
+                                    ✈️ SEGÍTSÉG (TELEGRAM)
+                                </a>
+                            </div>
+                            
+                            <p class="text-[9px] text-zinc-600 mt-4 text-center">A fizetés után az Admin jóváhagyja a fiókod.</p>
                         </div>
                     </div>
 
