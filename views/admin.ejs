@@ -33,6 +33,7 @@
         <button onclick="switchTab('marketing')" id="btn-marketing" class="menu-item"><span>📢</span> MARKETING</button>
         <button onclick="switchTab('users')" id="btn-users" class="menu-item"><span>👥</span> TAGOK & LICENSZ</button>
         <button onclick="switchTab('chat')" id="btn-chat" class="menu-item"><span>🤖</span> RÓKA AGYA</button>
+        <button onclick="switchTab('finance')" id="btn-finance" class="menu-item"><span>💰</span> PÉNZÜGY</button>
         <a href="/logout" class="absolute bottom-10 left-0 w-full text-center text-red-500 py-3 text-[10px] font-black uppercase">Kijelentkezés</a>
     </nav>
 
@@ -68,11 +69,6 @@
                 <% } else { %>
                     <div class="text-center py-6"><div class="text-4xl mb-2">🤖</div><form action="/admin/run-robot" method="POST"><button class="bg-white text-black px-6 py-3 rounded-xl font-black text-xs uppercase">🚀 Elemzés Indítása</button></form></div>
                 <% } %>
-            </div>
-            
-             <div class="tech-card p-6 border border-red-900/40">
-                <h3 class="text-sm font-black text-red-500 uppercase mb-2">Hónap Zárása</h3>
-                <form action="/admin/reset-monthly" method="POST" onsubmit="return confirm('Biztos nullázod a havi profitot?')"><button class="w-full bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase">🔄 ÚJ HÓNAP INDÍTÁSA</button></form>
             </div>
         </div>
 
@@ -118,6 +114,15 @@
                 </div>
             </div>
         </div>
+
+        <div id="tab-finance" class="page-section hidden pt-10">
+            <h2 class="text-xl font-black mb-6 border-l-4 border-yellow-500 pl-4">Pénzügyi Zárás</h2>
+            <div class="tech-card p-6 border border-red-900/40 bg-red-950/10">
+                <h3 class="text-sm font-black text-red-500 uppercase mb-2">Hónap Zárása</h3>
+                <p class="text-xs text-zinc-400 mb-4">Csak hónap elsején használd!</p>
+                <form action="/admin/reset-monthly" method="POST" onsubmit="return confirm('Biztos nullázod a havi profitot?')"><button class="w-full bg-red-600 text-white py-3 rounded-xl font-black text-xs uppercase">🔄 ÚJ HÓNAP INDÍTÁSA</button></form>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -129,7 +134,7 @@
         }
         async function generateSocial(type) { 
             const textarea = document.getElementById('social-result'); textarea.value = "Generálás... 🦊";
-            try { const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); const data = await res.json(); textarea.value = data.content; } catch(e) { textarea.value = "Hiba."; } 
+            try { const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); const data = await res.json(); textarea.value = data.content; } catch(e) { textarea.value = "Hiba történt."; } 
         }
     </script>
 </body>
