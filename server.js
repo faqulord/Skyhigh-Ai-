@@ -13,18 +13,6 @@ const app = express();
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
 
-// --- RÓKA DUMÁK (EREDETI) ---
-const foxQuotes = [
-    "📞 Hallod Főnök? A bukméker már remeg, ha meglátja a logónkat! 🦊💦",
-    "🍗 Ma este nem vacsorázunk... ma este LAKOMÁZUNK a buki pénzéből!",
-    "🥷 Hozd a símaszkot, a mai meccsek őrizetlenül hagyták a kasszát!",
-    "💼 Nem szerencsejátékosok vagyunk. Mi 'Vagyon-Átcsoportosító Szakemberek' vagyunk.",
-    "🦊 A Róka nem alszik. A Róka figyeli az oddsokat, amíg te pihensz.",
-    "🥂 Bontsd a pezsgőt, Főnök! A mai elemzés tűzforró lett! 🔥",
-    "🥊 Balhorog a bukinak, jobbegyenes a profitnak. K.O.!",
-    "👑 Ne elégedj meg az apróval. Te a Falka tagja vagy. Neked a trón jár!"
-];
-
 // --- MODELLEK ---
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
@@ -52,7 +40,11 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 
 // --- SEGÉDFÜGGVÉNYEK ---
 const getDbDate = () => {
-    return new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
+    const d = new Date();
+    const year = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', year: 'numeric'});
+    const month = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', month: '2-digit'});
+    const day = d.toLocaleDateString('en-US', {timeZone: 'Europe/Budapest', day: '2-digit'});
+    return `${year}-${month}-${day}`;
 };
 
 async function logToChat(sender, message) {
@@ -63,22 +55,18 @@ async function logToChat(sender, message) {
 mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 System Ready`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- RÓKA ELEMZÉS (HIBAKERESŐVEL) ---
 async function runAiRobot() {
     await ChatMessage.deleteMany({});
     const targetDate = getDbDate();
     
     const key = (process.env.SPORT_API_KEY || "").trim();
-    const keyDisplay = key ? `${key.substring(0, 5)}***` : "HIÁNYZIK!";
-    await logToChat('System', `🛠️ Vizsgálat: API Kulcs (${keyDisplay}) | Dátum: ${targetDate}`);
+    const keyHint = key ? `${key.substring(0, 5)}***` : "HIÁNYZIK!";
+    await logToChat('System', `🛠️ Vizsgálat: API Kulcs (${keyHint}) | Dátum: ${targetDate}`);
 
     try {
         const response = await axios.get(`https://v3.football.api-sports.io/fixtures?date=${targetDate}`, {
-            headers: { 
-                'x-apisports-key': key, 
-                'x-apisports-host': 'v3.football.api-sports.io' 
-            },
-            timeout: 10000
+            headers: { 'x-apisports-key': key, 'x-apisports-host': 'v3.football.api-sports.io' },
+            timeout: 15000
         });
 
         if (response.data.errors && Object.keys(response.data.errors).length > 0) {
@@ -96,13 +84,13 @@ async function runAiRobot() {
         });
 
         if (validFixtures.length === 0) {
-            await logToChat('Róka', `⚠️ Ma már nincs 13:00 utáni meccs a kínálatban.`);
+            await logToChat('Róka', `⚠️ Ma már nincs több 13:00 utáni meccs a kínálatban.`);
             return false;
         }
 
         const matchData = validFixtures.slice(0, 40).map(f => {
             const time = new Date(f.fixture.date).toLocaleTimeString('hu-HU', {timeZone:'Europe/Budapest', hour:'2-digit', minute:'2-digit'});
-            return `[ID:${f.fixture.id}] ${time} - ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`;
+            return `[${time}] ${f.teams.home.name} vs ${f.teams.away.name} (${f.league.name})`;
         }).join("\n");
 
         const aiRes = await openai.chat.completions.create({
@@ -121,28 +109,28 @@ async function runAiRobot() {
         return true;
 
     } catch (e) {
-        await logToChat('System', `⚠️ HIBA: Az API nem válaszol. Ellenőrizd a kulcsot a Railway-en! (${e.message})`);
+        await logToChat('System', `⚠️ HIBA: Az API nem válaszol. Ellenőrizd a fiókod állapotát! (${e.message})`);
         return false;
     }
 }
 
-// --- ADMIN ÉS ALAP ÚTVONALAK ---
+// Útvonalak (Run robot, delete, publish, login, dashboard)
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({
+    secret: 'v29_final_fix', resave: true, saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
+    cookie: { maxAge: 1000 * 60 * 60 * 24 }
+}));
+
 const checkAdmin = async (req, res, next) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     if (user && (user.isAdmin || user.email === OWNER_EMAIL)) return next();
     res.redirect('/dashboard');
 };
-
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(session({
-    secret: 'v29_secret_fix', resave: true, saveUninitialized: true,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }
-}));
 
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
@@ -151,17 +139,15 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, chatHistory, dbDate: getDbDate(), brandName: BRAND_NAME, recentTips: [], stats: [], calculatorData: [] });
 });
 
-// GOMBOK (EREDETI ÚTVONALAK)
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { await runAiRobot(); res.redirect('/admin'); });
 app.post('/admin/delete-today', checkAdmin, async (req, res) => { await Tip.findOneAndDelete({ date: getDbDate() }); res.redirect('/admin'); });
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
 
-// DASHBOARD ÉS BELÉPÉS
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
-    res.render('dashboard', { user, dailyTip, recommendedStake: 1000, displayDate: new Date().toLocaleDateString('hu-HU'), foxQuotes, streak: 0 });
+    res.render('dashboard', { user, dailyTip, recommendedStake: 1000, displayDate: new Date().toLocaleDateString('hu-HU'), foxQuotes: ["A Róka elemez."], streak: 0 });
 });
 
 app.post('/auth/login', async (req, res) => {
