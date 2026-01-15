@@ -9,7 +9,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
-const FOX_QUOTES = ["A buki már sírva ébredt ma reggel... 🦊", "A tőke a fegyvered!", "Ma fosztogatunk, nem kérdezünk. 💰", "Hideg fej, forró oddsok."];
+const FOX_QUOTES = ["A buki már sírva ébredt... 🦊", "A tőke a fegyvered!", "Ma fosztogatunk. 💰", "Hideg fej, forró oddsok."];
 
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
@@ -37,7 +37,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V40 (FINAL FIXED) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V41 (FULL) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -52,12 +52,39 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v40_final_secure', resave: true, saveUninitialized: true,
+    secret: 'fox_v41_full', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- ROUTOK ---
+// --- FUNKCIÓK ---
+
+// 1. SZÖVEG FINOMÍTÓ (EZ HIÁNYZOTT!)
+app.post('/admin/refine-text', checkAdmin, async (req, res) => {
+    const tip = await Tip.findOne({ date: getDbDate() });
+    if (!tip) return res.redirect('/admin');
+    try {
+        const refined = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [{ role: "system", content: "Írd át ezt a szöveget rövidebbre, dörzsöltebbre, Róka stílusban!" }, { role: "user", content: tip.memberMessage }]
+        });
+        await Tip.findByIdAndUpdate(tip._id, { memberMessage: refined.choices[0].message.content });
+    } catch(e) { console.error(e); }
+    res.redirect('/admin');
+});
+
+// 2. EMAIL RENDSZER (EZ HIÁNYZOTT!)
+app.post('/admin/draft-email', checkAdmin, async (req, res) => {
+    try {
+        const aiRes = await openai.chat.completions.create({ 
+            model: "gpt-4-turbo-preview", 
+            messages: [{ role: "system", content: "Írj egy rövid, figyelemfelkeltő hírlevél vázlatot a megadott témában. Stílus: Zsivány Róka." }, { role: "user", content: req.body.topic }] 
+        });
+        res.json({ draft: aiRes.choices[0].message.content });
+    } catch(e) { res.json({ draft: "Hiba az AI-nál." }); }
+});
+
+// 3. ROBOT
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
@@ -67,25 +94,22 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
         let fixtures = matches.filter(m => m.status === 'TIMED' || m.status === 'SCHEDULED');
         if (fixtures.length === 0) return res.redirect('/admin');
         const matchData = fixtures.slice(0, 20).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name} (${m.competition.name})`).join("\n");
-        // JAVÍTVA: Biztonságos prompt
         const systemPrompt = `Te vagy a Zsivány Róka. Keress 70%+ valószínűségű tippet. JSON: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"", "matchTime":"HH:mm" }`;
         const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: matchData }], response_format: { type: "json_object" } });
         const result = JSON.parse(aiRes.choices[0].message.content);
-        const marketingRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Írj egy dörzsölt, profi üzenetet (nem agresszív)." }, { role: "user", content: `Tipp: ${result.prediction}` }] });
+        const marketingRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Írj egy dörzsölt üzenetet." }, { role: "user", content: `Tipp: ${result.prediction}` }] });
         await Tip.findOneAndUpdate({ date: targetDate }, { ...result, memberMessage: marketingRes.choices[0].message.content, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, { upsert: true });
     } catch (e) { console.error(e); }
     res.redirect('/admin');
 });
 
-// JAVÍTVA: Marketing Generátor (Biztonságos szavakkal)
+// 4. EGYÉB ADMIN
 app.post('/admin/social-content', checkAdmin, async (req, res) => {
-    const prompt = req.body.type === 'win' 
-        ? "Te vagy a Zsivány Róka. Írj egy nagyon magabiztos, dörzsölt Instagram posztot arról, hogy a mai tippünk hatalmasat nyert! Használj emojikat (💰, 🦊). Stílus: profi, okos. Ne említs illegális dolgokat, csak tiszta profitot." 
-        : "Te vagy a Zsivány Róka. Írj egy motivációs posztot arról, hogy a fegyelem és a matematika hozza a pénzt, nem a szerencse.";
+    const prompt = req.body.type === 'win' ? "Zsivány Róka stílus: Írj egy magabiztos posztot a nyerésről!" : "Zsivány Róka stílus: Írj egy motivációs posztot a fegyelemről.";
     try {
         const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "user", content: prompt }] });
         res.json({ content: aiRes.choices[0].message.content });
-    } catch(e) { res.json({ content: "Hiba történt." }); }
+    } catch(e) { res.json({ content: "Hiba." }); }
 });
 
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
