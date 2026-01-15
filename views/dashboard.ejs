@@ -14,8 +14,10 @@
         .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
         @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.7)); } }
         .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
-        #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; backdrop-filter: blur(20px); }
-        .modal-content { max-height: 90vh; overflow-y: auto; }
+        
+        /* MODAL STÍLUS JAVÍTVA */
+        #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; backdrop-filter: blur(20px); align-items: center; justify-content: center; }
+        .modal-content { max-height: 90vh; overflow-y: auto; width: 90%; max-width: 450px; }
         .btn-pulse { animation: btn-p 1.5s infinite; }
         @keyframes btn-p { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 159, 67, 0.6); } 100% { transform: scale(1); } }
     </style>
@@ -47,7 +49,7 @@
                 <h4 class="text-[10px] text-purple-400 font-black uppercase tracking-widest mb-1">A Te Vagyonod</h4>
                 <p class="text-2xl font-black text-white tracking-tighter"><span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span></p>
             </div>
-            <button onclick="openManifesto()" class="bg-orange-500 text-black text-[10px] font-black px-4 py-2.5 rounded-xl btn-pulse uppercase tracking-widest shadow-lg">OLVASS EL ❗</button>
+            <button type="button" onclick="openManifesto()" class="bg-orange-500 text-black text-[10px] font-black px-4 py-2.5 rounded-xl btn-pulse uppercase tracking-widest shadow-lg cursor-pointer hover:bg-orange-400">OLVASS EL ❗</button>
         </div>
 
         <div class="bg-zinc-900/60 p-3 rounded-xl border border-white/5 mb-4 flex justify-between items-center">
@@ -85,9 +87,9 @@
         </div>
     <% } %>
 
-    <div id="manifestoModal" class="flex items-center justify-center p-5">
-        <div class="thin-purple-border bg-[#0a0a0a] w-full max-w-md p-8 rounded-[2.5rem] modal-content relative">
-            <button onclick="closeManifesto()" class="absolute top-5 right-7 text-zinc-600 font-bold text-3xl hover:text-white transition">×</button>
+    <div id="manifestoModal">
+        <div class="thin-purple-border bg-[#0a0a0a] p-8 rounded-[2.5rem] modal-content relative">
+            <button onclick="closeManifesto()" class="absolute top-5 right-7 text-zinc-600 font-bold text-3xl hover:text-white transition cursor-pointer">×</button>
             
             <div class="text-center mb-8">
                 <div class="fox-pulse text-6xl mb-4">🦊</div>
@@ -98,8 +100,8 @@
             <div class="space-y-6 text-sm leading-relaxed text-zinc-300 font-medium">
                 
                 <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
-                    <p class="text-white font-bold mb-2">1. Technológia Bérlés, nem Tippmix</p>
-                    <p class="text-xs text-zinc-400">Te nem egy csoportba léptél be. Konkrétan <strong>kibéreltél egy felhő alapú Mesterséges Intelligenciát</strong> (ez vagyok én, a Róka). 0-24-ben figyelem a globális piacot, és miközben te alszol, én számolok.</p>
+                    <p class="text-white font-bold mb-2">1. Technológia Bérlés</p>
+                    <p class="text-xs text-zinc-400">Te nem egy "tippmix csoportba" léptél be. Konkrétan <strong>kibéreltél egy felhő alapú Mesterséges Intelligenciát</strong> (ez vagyok én, a Róka). 0-24-ben figyelem a globális piacot, és miközben te alszol, én számolok.</p>
                 </div>
 
                 <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
@@ -124,4 +126,72 @@
                 <p class="text-center text-[10px] text-zinc-500 font-black uppercase tracking-widest py-2">Én vagyok az Agy. Te vagy a Kéz. Kezdjük.</p>
             </div>
             
-            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-
+            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-6 uppercase text-xs tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] transition active:scale-95 cursor-pointer">ÉRTEM! MEGYEK A PÉNZEMÉRT! 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        // MODAL KEZELÉS JAVÍTVA
+        function openManifesto() { 
+            const modal = document.getElementById('manifestoModal');
+            if(modal) {
+                modal.style.display = 'flex'; 
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeManifesto() { 
+            const modal = document.getElementById('manifestoModal');
+            if(modal) {
+                modal.style.display = 'none'; 
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function toggleBankEdit() { 
+            document.getElementById('bankForm').classList.toggle('hidden'); 
+        }
+
+        function startTimer() {
+            const countdownDisplay = document.getElementById('countdownDisplay');
+            // Biztonsági ellenőrzés
+            if(!countdownDisplay) return;
+
+            const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
+            const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
+            
+            function update() {
+                const now = new Date();
+                let targetDate = new Date();
+                
+                if (hasTip && matchTimeStr) {
+                    const parts = matchTimeStr.split(':');
+                    if(parts.length === 2) {
+                        targetDate.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+                        if (now > targetDate) { 
+                            countdownDisplay.innerText = "ÉLŐ"; 
+                            return; 
+                        }
+                    }
+                } else { 
+                    targetDate.setHours(11, 0, 0, 0); 
+                    if(now > targetDate) targetDate.setDate(targetDate.getDate() + 1); 
+                }
+                
+                const diff = targetDate - now;
+                if(diff < 0) { countdownDisplay.innerText = "00:00:00"; return; }
+                
+                const hrs = Math.floor(diff / 3600000);
+                const min = Math.floor((diff % 3600000) / 60000);
+                const sec = Math.floor((diff % 60000) / 1000);
+                
+                countdownDisplay.innerText = `${hrs.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            }
+            setInterval(update, 1000); 
+            update();
+        }
+
+        window.addEventListener('load', startTimer);
+    </script>
+</body>
+</html>
