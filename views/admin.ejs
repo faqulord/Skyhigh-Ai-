@@ -114,4 +114,105 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-6">
                         <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos NYERŐ a tipp?')"><input type="hidden" name="status" value="win"><button class="w-full bg-green-900/40 hover:bg-green-600 border border-green-500 text-green-500 hover:text-white py-4 rounded-xl text-xs font-black uppercase transition">WIN ✅</button></form>
-                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos VESZTES?')"><input type="hidden" name="status" value="loss">
+                        <form action="/admin/settle-tip" method="POST" onsubmit="return confirm('Biztos VESZTES?')"><input type="hidden" name="status" value="loss"><button class="w-full bg-red-900/40 hover:bg-red-600 border border-red-500 text-red-500 hover:text-white py-4 rounded-xl text-xs font-black uppercase transition">LOSS ❌</button></form>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-10">
+                        <div class="text-4xl mb-4">🤖</div><h3 class="text-white font-bold mb-2">A Róka pihen.</h3>
+                        <form action="/admin/run-robot" method="POST"><button class="bg-white hover:bg-zinc-200 text-black px-8 py-4 rounded-xl font-black uppercase text-xs shadow-[0_0_20px_rgba(255,255,255,0.3)] transition transform hover:scale-105">🚀 Elemzés Indítása</button></form>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <div id="tab-users" class="page-section hidden">
+            <h2 class="text-xl font-black mb-6 text-white border-l-4 border-green-500 pl-4">Aktív Vadászok</h2>
+            <div class="grid gap-3">
+                <% users.forEach(u => { 
+                    let p = strategyMode === 'aggressive' ? 0.06 : (strategyMode === 'recovery' ? 0.015 : 0.03);
+                    let bank = u.currentBankroll || u.startingCapital || 0;
+                    let mProfit = u.monthlyProfit || 0;
+                %> 
+                    <div class="tech-card p-5 flex flex-col sm:flex-row justify-between items-center hover:border-zinc-600 transition gap-4">
+                        <div class="w-full">
+                            <div class="flex justify-between items-start">
+                                <p class="text-sm font-bold text-white"><%= u.fullname %> <span class="text-zinc-600 text-[10px]"><%= u.email %></span></p>
+                                <span class="text-[9px] font-black uppercase px-2 py-1 rounded <%= u.hasLicense ? 'bg-green-900 text-green-400' : 'bg-red-900 text-red-400' %>">
+                                    <%= u.hasLicense ? 'AKTÍV LICENSZ' : 'NINCS LICENSZ' %>
+                                </span>
+                            </div>
+                            <div class="flex gap-3 mt-2">
+                                <p class="text-[10px] text-zinc-500">Bank: <span class="text-white"><%= bank.toLocaleString() %> Ft</span></p>
+                                <p class="text-[10px] font-bold <%= mProfit >= 0 ? 'text-green-500' : 'text-red-500' %>">Havi: <%= mProfit > 0 ? '+' : '' %><%= mProfit.toLocaleString() %> Ft</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <form action="/admin/toggle-license" method="POST" class="w-full">
+                                <input type="hidden" name="userId" value="<%= u._id %>">
+                                <button class="w-full sm:w-auto px-4 py-3 rounded-xl text-[10px] font-black uppercase border transition <%= u.hasLicense ? 'border-red-500 text-red-500 hover:bg-red-900/30' : 'border-green-500 text-green-500 hover:bg-green-900/30' %>">
+                                    <%= u.hasLicense ? 'ELVÉTEL ⛔' : 'AKTIVÁLÁS ✅' %>
+                                </button>
+                            </form>
+                        </div>
+                    </div> 
+                <% }) %>
+            </div>
+        </div>
+
+        <div id="tab-chat" class="page-section hidden">
+            <h2 class="text-xl font-black mb-6 text-white border-l-4 border-blue-500 pl-4">Stratégiai Megbeszélés</h2>
+            <div class="tech-card p-4 h-[500px] flex flex-col">
+                <div id="chat-win" class="chat-container flex-1 mb-4 custom-scrollbar">
+                    <% chatHistory.forEach(msg => { %> <div class="msg <%= msg.sender === 'Főnök' ? 'msg-me' : 'msg-ai' %>"><strong class="block mb-1 text-[10px] opacity-50 uppercase"><%= msg.sender %></strong> <%= msg.text %></div> <% }) %>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-700 rounded-xl px-4 py-3 text-xs text-white focus:border-purple-500 outline-none" placeholder="Kérdezz a Rókától..." onkeypress="if(event.key === 'Enter') talk()">
+                    <button onclick="talk()" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold transition">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-marketing" class="page-section hidden">
+            <h2 class="text-xl font-black mb-6 text-white border-l-4 border-pink-500 pl-4">Marketing Eszközök</h2>
+            <div class="tech-card p-6 mb-6">
+                <h3 class="text-xs font-bold mb-4 uppercase text-zinc-500 tracking-widest">Instagram & Social</h3>
+                <div class="flex gap-3 mb-4">
+                    <button onclick="generateSocial('win')" class="flex-1 bg-green-900/20 text-green-400 border border-green-900/50 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-green-900/40 transition">🏆 NYERŐ POSZT</button>
+                    <button onclick="generateSocial('motivation')" class="flex-1 bg-pink-900/20 text-pink-400 border border-pink-900/50 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-pink-900/40 transition">🔥 MOTIVÁCIÓ</button>
+                </div>
+                <textarea id="social-result" rows="5" class="w-full bg-black border border-zinc-800 rounded-xl p-4 text-xs text-white font-mono" placeholder="Itt jelenik meg a generált szöveg..."></textarea>
+            </div>
+        </div>
+
+        <div id="tab-finance" class="page-section hidden">
+            <h2 class="text-xl font-black mb-6 text-white border-l-4 border-yellow-500 pl-4">Pénzügyi Zárás</h2>
+            <div class="tech-card p-6 border border-red-900/40 bg-red-950/10">
+                <h3 class="text-sm font-black text-red-500 uppercase mb-2">Hónap Zárása</h3>
+                <p class="text-xs text-zinc-400 mb-6">Ez lenullázza minden tag "Havi Profit" mutatóját. <span class="text-white font-bold">Csak hónap elsején!</span></p>
+                <form action="/admin/reset-monthly" method="POST" onsubmit="return confirm('Biztos vagy benne?')"><button class="w-full bg-red-600 hover:bg-red-500 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg transition">🔄 ÚJ HÓNAP INDÍTÁSA</button></form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
+        async function talk() { 
+            const i = document.getElementById('chat-in'); if(!i.value) return; const msgText = i.value; i.value = ''; 
+            const win = document.getElementById('chat-win'); win.innerHTML += `<div class="msg msg-me"><strong>Főnök:</strong> ${msgText}</div>`; win.scrollTop = win.scrollHeight; 
+            try { 
+                const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})}); 
+                const d = await r.json(); win.innerHTML += `<div class="msg msg-ai"><strong>Róka:</strong> ${d.reply}</div>`; win.scrollTop = win.scrollHeight; 
+            } catch (err) { console.error(err); alert("Hiba a Róka kapcsolatban."); } 
+        }
+
+        async function generateSocial(type) { 
+            const textarea = document.getElementById('social-result'); textarea.value = "Generálás folyamatban... 🦊";
+            try { 
+                const res = await fetch('/admin/social-content', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ type }) }); 
+                const data = await res.json(); textarea.value = data.content; 
+            } catch(e) { textarea.value = "Hiba történt."; } 
+        }
+    </script>
+</body>
+</html>
