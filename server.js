@@ -191,4 +191,51 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
 
         await Tip.findOneAndUpdate({ date: targetDate }, { 
             ...result, memberMessage: marketingRes.choices[0].message.content,
-            date: targetDate, is
+            date: targetDate, isPublished: false, isReal: true, status: 'pending'
+        }, { upsert: true });
+    } catch (e) { console.error(e); }
+    res.redirect('/admin');
+});
+
+// Tipp publikálása
+app.post('/admin/publish-tip', checkAdmin, async (req, res) => { 
+    await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); 
+    res.redirect('/admin'); 
+});
+
+// Marketing & Chat
+app.post('/admin/chat', checkAdmin, async (req, res) => {
+    const { message } = req.body;
+    await new ChatMessage({ sender: 'Főnök', text: message }).save();
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Rövid, strategikus válasz." }, { role: "user", content: message }] });
+    const reply = aiRes.choices[0].message.content;
+    await new ChatMessage({ sender: 'Róka', text: reply }).save();
+    res.json({ reply });
+});
+
+app.post('/admin/social-content', checkAdmin, async (req, res) => {
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "user", content: req.body.type === 'win' ? "Instagram poszt nyerésről." : "Motivációs poszt." }] });
+    res.json({ content: aiRes.choices[0].message.content });
+});
+
+app.post('/admin/draft-email', checkAdmin, async (req, res) => {
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Rövid hírlevél." }, { role: "user", content: req.body.topic }] });
+    res.json({ draft: aiRes.choices[0].message.content });
+});
+
+// Bank frissítés User oldalról
+app.post('/user/update-bank', async (req, res) => {
+    const amount = parseInt(req.body.amount);
+    if (!isNaN(amount)) await User.findByIdAndUpdate(req.session.userId, { startingCapital: amount, currentBankroll: amount });
+    res.redirect('/dashboard');
+});
+
+// AUTH
+app.post('/auth/login', async (req, res) => {
+    const u = await User.findOne({ email: req.body.email.toLowerCase() });
+    if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); }
+    else res.send("Hiba");
+});
+app.get('/login', (req, res) => res.render('login'));
+app.get('/', (req, res) => res.render('index'));
+app.listen(process.env.PORT || 8080);
