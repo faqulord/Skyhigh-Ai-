@@ -48,7 +48,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V55 (EXCLUSIVE) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V57 (GOLD) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -63,55 +63,62 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v55_exclusive', resave: true, saveUninitialized: true,
+    secret: 'fox_v57_gold', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- DASHBOARD (EXKLUZÍV TILTÓ KÉPERNYŐVEL) ---
+// --- DASHBOARD (FIZETŐS KAPUVAL + TELEGRAMMAL) ---
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     
     if (user.email !== OWNER_EMAIL && !user.isAdmin) {
-        // Lejárat ellenőrzés
         if (user.licenseExpiresAt && new Date() > new Date(user.licenseExpiresAt)) {
             user.hasLicense = false;
             await user.save();
         }
         
-        // HA NINCS LICENSZ -> EXKLUZÍV ÜZENET
+        // HA NINCS LICENSZ -> FIZETŐS OLDAL
         if (!user.hasLicense) {
             return res.send(`
                 <!DOCTYPE html>
                 <html lang="hu">
                 <head>
                     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Hozzáférés Megtagadva | Zsivány Róka</title>
+                    <title>Aktiválás | Zsivány Róka</title>
                     <script src="https://cdn.tailwindcss.com"></script>
                     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-                    <style>body{background:#050505;color:#fff;font-family:'Inter',sans-serif;}</style>
+                    <style>body{background:#050505;color:#fff;font-family:'Inter',sans-serif;}.orange-neon{color:#FF9F43;}</style>
                 </head>
                 <body class="p-6 flex flex-col items-center justify-center min-h-screen text-center">
                     
                     <div class="text-6xl mb-6">🔒</div>
-                    <h1 class="text-xl font-black text-red-600 uppercase tracking-[0.2em] mb-8 font-orbitron">Rendszer Hozzáférés<br>Megtagadva</h1>
+                    <h1 class="text-xl font-black text-red-600 uppercase tracking-[0.2em] mb-2 font-orbitron">Aktiválás Szükséges</h1>
+                    <p class="text-xs text-zinc-500 mb-8 max-w-xs">A rendszer eléréséhez érvényes licensz szükséges.</p>
 
-                    <div class="bg-[#111] p-8 rounded-3xl border border-zinc-800 max-w-sm w-full shadow-[0_0_30px_rgba(0,0,0,0.8)] mb-8 relative overflow-hidden">
+                    <div class="bg-[#111] p-8 rounded-3xl border border-zinc-800 max-w-sm w-full shadow-2xl mb-8 relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-pink-600"></div>
                         <p class="text-sm font-bold text-white leading-relaxed uppercase tracking-wide">
                             Mesterséges felhő alapú<br>
                             <span class="text-purple-500">élő sportfogadási elemzés</span><br>
                             fix stratégiával.
                         </p>
+                        
+                        <div class="mt-8 flex flex-col gap-3">
+                            <a href="https://revolut.me/csaba6da3" target="_blank" class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs hover:bg-gray-200 transition flex items-center justify-center gap-2">
+                                💳 FIZETÉS (REVOLUT)
+                            </a>
+                            
+                            <a href="https://t.me/SHANNA444" target="_blank" class="w-full bg-[#24A1DE] text-white py-4 rounded-xl font-black uppercase text-xs hover:bg-[#1c8lb5] transition flex items-center justify-center gap-2">
+                                ✈️ ÍRJ RÁM (TELEGRAM)
+                            </a>
+                        </div>
+
                         <div class="mt-4 border-t border-zinc-800 pt-4">
-                            <p class="text-[10px] text-zinc-500 font-mono">STATUS: <span class="text-red-500">INACTIVE</span></p>
+                            <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest">SUPPORT 24/7</p>
                         </div>
                     </div>
-
-                    <p class="text-xs text-zinc-600 mb-8 max-w-xs leading-relaxed">
-                        Ez egy zárt rendszer. A belépéshez és az aktiváláshoz vedd fel a kapcsolatot a Tulajdonossal.
-                    </p>
 
                     <a href="/logout" class="text-zinc-500 text-[10px] font-bold uppercase hover:text-white transition border border-zinc-800 px-6 py-3 rounded-full">Kijelentkezés</a>
                 </body>
