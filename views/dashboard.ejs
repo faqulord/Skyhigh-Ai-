@@ -15,7 +15,7 @@
         @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.7)); } }
         .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
         
-        /* MODAL STÍLUS JAVÍTVA */
+        /* MODAL STÍLUS */
         #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; backdrop-filter: blur(20px); align-items: center; justify-content: center; }
         .modal-content { max-height: 90vh; overflow-y: auto; width: 90%; max-width: 450px; }
         .btn-pulse { animation: btn-p 1.5s infinite; }
@@ -64,8 +64,8 @@
         
         <button onclick="toggleBankEdit()" class="w-full text-[10px] text-zinc-600 font-black hover:text-white transition py-2 border-t border-white/5 mt-2">PÉNZTÁRCA BEÁLLÍTÁSA ▲</button>
         <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-5 rounded-2xl border border-white/5 animate-fade-in">
-            <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase tracking-widest">Mennyi pénzzel szállsz be?</p>
-            <input type="number" name="amount" placeholder="pl. 50000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500">
+            <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase tracking-widest">Írd be a PONTOS tőkédet:</p>
+            <input type="number" name="amount" placeholder="pl. 100000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500">
             <button class="w-full bg-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase shadow-xl tracking-widest">Mentés</button>
         </form>
     </div>
@@ -93,25 +93,40 @@
             
             <div class="text-center mb-8">
                 <div class="fox-pulse text-6xl mb-4">🦊</div>
-                <h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">Hogyan működök?</h2>
-                <p class="text-[10px] text-zinc-500 font-black tracking-widest uppercase mt-2">Mesterséges Intelligencia. Éles Adatok.</p>
+                <h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">Működési Elv</h2>
+                <p class="text-[10px] text-zinc-500 font-black tracking-widest uppercase mt-2">Mesterséges Intelligencia. 0% Érzelem.</p>
             </div>
             
             <div class="space-y-6 text-sm leading-relaxed text-zinc-300 font-medium">
+
+                <div class="bg-red-900/20 border border-red-500/50 p-4 rounded-2xl animate-pulse">
+                    <p class="text-red-500 font-black uppercase text-xs tracking-widest mb-1 text-center">⚠️ FIGYELEM: SZABÁLYOK BETARTÁSA KÖTELEZŐ!</p>
+                </div>
                 
                 <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
-                    <p class="text-white font-bold mb-2">1. Technológia Bérlés</p>
-                    <p class="text-xs text-zinc-400">Te nem egy "tippmix csoportba" léptél be. Konkrétan <strong>kibéreltél egy felhő alapú Mesterséges Intelligenciát</strong> (ez vagyok én, a Róka). 0-24-ben figyelem a globális piacot, és miközben te alszol, én számolok.</p>
-                </div>
-
-                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
-                    <p class="text-white font-bold mb-2">2. Full Bankroll Kezelés</p>
-                    <p class="text-xs text-zinc-400 mb-2">Nem neked kell agyalnod. Én <strong>személyre szabottan</strong>, a te pénztárcádhoz igazítva számolom ki a napi tétet a matematika törvényei szerint.</p>
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">1. Technológia Bérlés</p>
+                    <p class="text-xs text-zinc-400">Ez nem egy tippmix csoport. Te egy felhő alapú Mesterséges Intelligenciát béreltél ki. Én 0-24-ben elemzem a piacot, és akkor is számolok, amikor te alszol.</p>
                 </div>
 
                 <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl shadow-lg">
-                    <p class="text-purple-300 font-bold mb-2">3. FIX BANKROBBANTÁS 🛡️</p>
-                    <p class="text-xs text-zinc-300">Mivel minden döntésem tiszta Matekra van építve, egyetlen dolgod van: <strong>szigorúan követni a szabályokat.</strong> Ha ezt megteszed, a statisztika törvénye szerint <strong class="text-white">fixen bankot robbantunk.</strong></p>
+                    <p class="text-purple-300 font-bold mb-3 uppercase text-xs tracking-widest border-b border-purple-500/20 pb-2">2. A Bankár Törvénye</p>
+                    <ul class="space-y-3 list-none text-xs">
+                        <li class="flex gap-2">
+                            <span class="text-orange-500">➤</span>
+                            <span><strong>PONTOS TŐKÉT ADJ MEG!</strong> Ne kerekíts. Írd be fillérre pontosan a Pénztárca menüben, hogy a matek tűpontos legyen.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-orange-500">➤</span>
+                            <span><strong>TILOS A TŐKÉHEZ NYÚLNI!</strong> Ez a kamatos kamat elve. Ha kiveszed a pénzt, megállítod a gépezetet. Hagyj mindent bent, és a rendszer bankot robbant.</span>
+                        </li>
+                        <li class="mt-2 text-white italic font-bold text-center border-t border-white/5 pt-2">
+                            "Egyetlen bank sem tud annyi profitot termelni, mint én a sportfogadásból."
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">3. Fix Bankrobbantás</p>
                     <div class="bg-black/40 p-3 rounded-xl border border-zinc-800 mt-3 space-y-2 text-xs">
                         <div class="flex justify-between"><span>1. év:</span><span class="text-white font-black">~1.800.000 Ft</span></div>
                         <div class="flex justify-between"><span>2. év:</span><span class="text-white font-black">~32.000.000 Ft</span></div>
@@ -120,7 +135,7 @@
 
                 <div class="bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
                     <p class="text-white font-bold mb-1 text-xs">Szabadság Garancia</p>
-                    <p class="text-[10px] text-zinc-500">Ha pihensz vagy lejár az előfizetésed, én megjegyzem, hol tartottál. A pénzed és a stratégiád megvár. Onnan folytatjuk, ahol abbahagytad.</p>
+                    <p class="text-[10px] text-zinc-500">Bármikor pihenhetsz. A rendszer megjegyzi, hol tartottál. Onnan folytatjuk, ahol abbahagytad.</p>
                 </div>
 
                 <p class="text-center text-[10px] text-zinc-500 font-black uppercase tracking-widest py-2">Én vagyok az Agy. Te vagy a Kéz. Kezdjük.</p>
@@ -131,66 +146,39 @@
     </div>
 
     <script>
-        // MODAL KEZELÉS JAVÍTVA
         function openManifesto() { 
             const modal = document.getElementById('manifestoModal');
-            if(modal) {
-                modal.style.display = 'flex'; 
-                document.body.style.overflow = 'hidden';
-            }
+            if(modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
         }
-        
         function closeManifesto() { 
             const modal = document.getElementById('manifestoModal');
-            if(modal) {
-                modal.style.display = 'none'; 
-                document.body.style.overflow = 'auto';
-            }
+            if(modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }
         }
-
-        function toggleBankEdit() { 
-            document.getElementById('bankForm').classList.toggle('hidden'); 
-        }
-
+        function toggleBankEdit() { document.getElementById('bankForm').classList.toggle('hidden'); }
         function startTimer() {
             const countdownDisplay = document.getElementById('countdownDisplay');
-            // Biztonsági ellenőrzés
             if(!countdownDisplay) return;
-
             const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
             const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
-            
             function update() {
                 const now = new Date();
                 let targetDate = new Date();
-                
                 if (hasTip && matchTimeStr) {
                     const parts = matchTimeStr.split(':');
                     if(parts.length === 2) {
                         targetDate.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
-                        if (now > targetDate) { 
-                            countdownDisplay.innerText = "ÉLŐ"; 
-                            return; 
-                        }
+                        if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ"; return; }
                     }
-                } else { 
-                    targetDate.setHours(11, 0, 0, 0); 
-                    if(now > targetDate) targetDate.setDate(targetDate.getDate() + 1); 
-                }
-                
+                } else { targetDate.setHours(11, 0, 0, 0); if(now > targetDate) targetDate.setDate(targetDate.getDate() + 1); }
                 const diff = targetDate - now;
                 if(diff < 0) { countdownDisplay.innerText = "00:00:00"; return; }
-                
                 const hrs = Math.floor(diff / 3600000);
                 const min = Math.floor((diff % 3600000) / 60000);
                 const sec = Math.floor((diff % 60000) / 1000);
-                
                 countdownDisplay.innerText = `${hrs.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
             }
-            setInterval(update, 1000); 
-            update();
+            setInterval(update, 1000); update();
         }
-
         window.addEventListener('load', startTimer);
     </script>
 </body>
