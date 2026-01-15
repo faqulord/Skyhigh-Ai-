@@ -75,6 +75,27 @@
 
         <div id="tab-dashboard" class="page-section">
             <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-purple-500 pl-3">Vezérlőpult</h2>
+            
+            <div class="tech-card p-5 mb-6 border-t-2 border-t-orange-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Stratégia Vezérlés</h3>
+                    <span class="bg-orange-500/10 text-orange-500 text-[9px] px-2 py-1 rounded border border-orange-500/30 font-black uppercase tracking-tighter shadow-[0_0_10px_rgba(255,159,67,0.2)]">
+                        AKTÍV: <%= strategyMode.toUpperCase() %>
+                    </span>
+                </div>
+                <form action="/admin/update-settings" method="POST" class="grid grid-cols-3 gap-2">
+                    <button type="submit" name="mode" value="recovery" class="py-3 rounded-xl text-[9px] font-bold border transition <%= strategyMode === 'recovery' ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-zinc-900 border-zinc-700 text-zinc-500 hover:border-blue-500' %> uppercase">
+                        🛡️ Óvatos
+                    </button>
+                    <button type="submit" name="mode" value="normal" class="py-3 rounded-xl text-[9px] font-bold border transition <%= strategyMode === 'normal' ? 'bg-purple-600 border-purple-400 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-zinc-900 border-zinc-700 text-zinc-500 hover:border-purple-500' %> uppercase">
+                        🦊 Normal
+                    </button>
+                    <button type="submit" name="mode" value="aggressive" class="py-3 rounded-xl text-[9px] font-bold border transition <%= strategyMode === 'aggressive' ? 'bg-orange-600 border-orange-400 text-white shadow-[0_0_15px_rgba(255,159,67,0.4)]' : 'bg-zinc-900 border-zinc-700 text-zinc-500 hover:border-orange-500' %> uppercase">
+                        🔥 Zsivány
+                    </button>
+                </form>
+            </div>
+
             <div class="tech-card p-5 mb-6 border-t-2 border-t-purple-500">
                 <div class="flex justify-between items-start mb-4"><span class="text-[10px] font-bold text-zinc-500 uppercase">Mai Elemzés</span><span class="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-0.5 rounded border border-zinc-700"><%= dbDate %></span></div>
 
@@ -138,11 +159,7 @@
                         <div>
                             <p class="text-xs font-bold text-white"><%= u.fullname %></p>
                             <p class="text-[9px] text-zinc-500"><%= u.email %></p>
-                            
-                            <p class="text-[9px] orange-neon font-black mt-1">
-                                Bank: <%= (u.currentBankroll || u.startingCapital || 0).toLocaleString() %> Ft
-                            </p>
-
+                            <p class="text-[9px] orange-neon font-black mt-1">Bank: <%= (u.currentBankroll || u.startingCapital || 0).toLocaleString() %> Ft</p>
                             <% if(u.licenseExpiresAt && u.hasLicense) { %>
                                 <p class="text-[9px] text-purple-400 font-bold mt-1">Lejárat: <%= new Date(u.licenseExpiresAt).toLocaleDateString('hu-HU') %></p>
                             <% } %>
@@ -168,11 +185,6 @@
                 <div id="chat-win" class="chat-container overflow-y-auto mb-4 custom-scrollbar" style="height:350px"><% chatHistory.forEach(msg => { %> <div class="msg <%= msg.sender === 'Főnök' ? 'msg-me' : 'msg-ai' %>"><strong><%= msg.sender %>:</strong> <%= msg.text %></div> <% }) %></div>
                 <div class="flex gap-2"><input type="text" id="chat-in" class="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Írj..."><button onclick="talk()" class="bg-purple-600 text-white px-4 py-3 rounded-xl font-bold">➤</button></div>
             </div>
-        </div>
-
-        <div id="tab-finance" class="page-section hidden">
-            <h2 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3">Pénzügy</h2>
-            <div class="tech-card p-4 mb-6 border border-purple-500/30 bg-purple-900/10"><div class="flex justify-between items-center mb-3"><h3 class="text-xs font-bold text-white uppercase">Havi Zárás</h3></div><% if(stats && stats.length > 0) { %> <% stats.forEach(stat => { %> <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl mb-2 border border-zinc-800"><div><p class="text-xs font-bold text-white"><%= stat.month %></p><p class="text-[9px] text-zinc-500"><%= stat.totalTips %> tipp</p></div><% if (!stat.isPublished) { %> <form action="/admin/publish-stat" method="POST"><input type="hidden" name="statId" value="<%= stat._id %>"><button class="bg-blue-600 text-white text-[9px] px-3 py-2 rounded-lg font-bold uppercase hover:bg-blue-500">Publikál</button></form> <% } else { %> <span class="text-green-500 text-[9px] font-bold">Publikálva ✅</span> <% } %></div> <% }) %> <% } else { %> <p class="text-[10px] text-zinc-500 italic">Nincs adat.</p> <% } %></div>
         </div>
 
     </main>
