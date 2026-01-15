@@ -7,7 +7,7 @@ const axios = require('axios');
 const { OpenAI } = require('openai');
 const app = express();
 
-// FŐNÖK ADATAI (Ezt cseréld, ha másik email kell)
+// FŐNÖK ADATAI
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
 
@@ -18,7 +18,7 @@ const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema(
     isAdmin: { type: Boolean, default: false }, 
     startingCapital: { type: Number, default: 0 },
     currentBankroll: { type: Number, default: 0 },
-    monthlyProfit: { type: Number, default: 0 } // Havi tiszta haszon
+    monthlyProfit: { type: Number, default: 0 } 
 }));
 
 const Tip = mongoose.models.Tip || mongoose.model('Tip', new mongoose.Schema({
@@ -39,19 +39,18 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 
 // --- BEÁLLÍTÁSOK ---
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 Róka Motor v34 - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 Róka Motor v34.1 - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- ADMIN ELLENŐRZŐ (Middleware) ---
+// --- ADMIN ELLENŐRZŐ ---
 const checkAdmin = async (req, res, next) => {
     if (!req.session.userId) return res.redirect('/login');
     const u = await User.findById(req.session.userId);
-    // Ha admin VAGY a Főnök emailje:
     if (u && (u.isAdmin || u.email === OWNER_EMAIL)) return next();
     res.redirect('/dashboard');
 };
 
-// --- ÚTVONALAK ---
+// --- ALAP BEÁLLÍTÁSOK ---
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
@@ -59,8 +58,10 @@ app.use(express.json());
 app.use(session({
     secret: 'fox_v34_secure', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 órás belépés
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } 
 }));
+
+// --- FŐ ÚTVONALAK ---
 
 // 1. DASHBOARD
 app.get('/dashboard', async (req, res) => {
@@ -69,7 +70,6 @@ app.get('/dashboard', async (req, res) => {
     const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
     const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
     
-    // Bankár logika
     let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
     const bank = user.currentBankroll || user.startingCapital || 0;
     
@@ -79,12 +79,10 @@ app.get('/dashboard', async (req, res) => {
     });
 });
 
-// 2. STATISZTIKA (EZ HIÁNYZOTT!)
+// 2. STATISZTIKA
 app.get('/stats', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    
-    // Havi statisztika lekérése
     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
     const tips = await Tip.find({ date: { $gte: startOfMonth }, status: { $ne: 'pending' } }).sort({ date: -1 });
     
@@ -100,19 +98,23 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const currentTip = await Tip.findOne({ date: getDbDate() });
     const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(20);
-    
     res.render('admin', { users, currentTip, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME });
 });
 
-// --- FUNKCIÓK ---
+// 4. KIJELENTKEZÉS (EZ HIÁNYZOTT!)
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
+});
 
-// Beállítások mentése
+// --- ADMIN FUNKCIÓK ---
+
 app.post('/admin/update-settings', checkAdmin, async (req, res) => {
     await SystemSetting.findOneAndUpdate({}, { strategyMode: req.body.mode }, { upsert: true });
     res.redirect('/admin');
 });
 
-// Szöveg finomító AI
 app.post('/admin/refine-text', checkAdmin, async (req, res) => {
     const tip = await Tip.findOne({ date: getDbDate() });
     if (!tip) return res.redirect('/admin');
@@ -124,7 +126,6 @@ app.post('/admin/refine-text', checkAdmin, async (req, res) => {
     res.redirect('/admin');
 });
 
-// EREDMÉNY ELSZÁMOLÁSA (BANK + PROFIT)
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     const tip = await Tip.findOne({ date: getDbDate() });
     const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
@@ -135,11 +136,9 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     
     for (let u of users) {
         let b = u.currentBankroll || u.startingCapital || 0;
-        // Ha valakinek 0 a bankja, nem tudunk számolni, átugorjuk vagy 0 marad
         if (b > 0) {
-            let s = b * p; // Tét
+            let s = b * p;
             let profit = 0;
-
             if (req.body.status === 'win') {
                 profit = s * (parseFloat(tip.odds) - 1);
                 b += profit;
@@ -147,7 +146,6 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
                 profit = -s;
                 b -= s;
             }
-
             u.currentBankroll = Math.round(b);
             u.monthlyProfit = (u.monthlyProfit || 0) + Math.round(profit);
             await u.save();
@@ -158,13 +156,11 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     res.redirect('/admin');
 });
 
-// Havi Nullázó
 app.post('/admin/reset-monthly', checkAdmin, async (req, res) => {
     await User.updateMany({}, { monthlyProfit: 0 });
     res.redirect('/admin');
 });
 
-// Robot futtatás
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
@@ -172,21 +168,18 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
         const response = await axios.get(`https://api.football-data.org/v4/matches`, { headers: { 'X-Auth-Token': token } });
         const matches = response.data.matches || [];
         let fixtures = matches.filter(m => m.status === 'TIMED');
-        
-        // Ha nincs meccs, vagy hiba van, akkor is generálunk egy "PLACEHOLDER" tippet teszteléshez ha kell
-        // De most az éles logika:
         if (fixtures.length === 0) return res.redirect('/admin');
 
         const matchData = fixtures.slice(0, 10).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name} (${m.competition.name})`).join("\n");
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Te vagy a Zsivány Róka. Válassz egy tutit. JSON formátum: { \"league\":\"\", \"match\":\"\", \"prediction\":\"\", \"odds\":\"\", \"reasoning\":\"\", \"matchTime\":\"HH:mm\" }" }, { role: "user", content: matchData }],
+            messages: [{ role: "system", content: "Te vagy a Zsivány Róka. JSON: { \"league\":\"\", \"match\":\"\", \"prediction\":\"\", \"odds\":\"\", \"reasoning\":\"\", \"matchTime\":\"HH:mm\" }" }, { role: "user", content: matchData }],
             response_format: { type: "json_object" }
         });
         const result = JSON.parse(aiRes.choices[0].message.content);
         const marketingRes = await openai.chat.completions.create({
              model: "gpt-4-turbo-preview",
-             messages: [{ role: "system", content: "Rövid, dörzsölt, motiváló üzenet a tagoknak." }, { role: "user", content: `Meccs: ${result.match}, Tipp: ${result.prediction}` }] 
+             messages: [{ role: "system", content: "Rövid, dörzsölt, motiváló üzenet." }, { role: "user", content: `Meccs: ${result.match}, Tipp: ${result.prediction}` }] 
         });
 
         await Tip.findOneAndUpdate({ date: targetDate }, { 
@@ -197,13 +190,11 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
     res.redirect('/admin');
 });
 
-// Tipp publikálása
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => { 
     await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); 
     res.redirect('/admin'); 
 });
 
-// Marketing & Chat
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     const { message } = req.body;
     await new ChatMessage({ sender: 'Főnök', text: message }).save();
@@ -223,7 +214,6 @@ app.post('/admin/draft-email', checkAdmin, async (req, res) => {
     res.json({ draft: aiRes.choices[0].message.content });
 });
 
-// Bank frissítés User oldalról
 app.post('/user/update-bank', async (req, res) => {
     const amount = parseInt(req.body.amount);
     if (!isNaN(amount)) await User.findByIdAndUpdate(req.session.userId, { startingCapital: amount, currentBankroll: amount });
@@ -238,4 +228,5 @@ app.post('/auth/login', async (req, res) => {
 });
 app.get('/login', (req, res) => res.render('login'));
 app.get('/', (req, res) => res.render('index'));
+
 app.listen(process.env.PORT || 8080);
