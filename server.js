@@ -48,7 +48,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V58 (PACKAGES) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V60 (BRANDED PACKS) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -63,12 +63,12 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v58_pack', resave: true, saveUninitialized: true,
+    secret: 'fox_v60_branded', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- DASHBOARD (CSOMAG AJÁNLATTAL) ---
+// --- DASHBOARD (BRAND NEVEKKEL) ---
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
@@ -86,54 +86,61 @@ app.get('/dashboard', async (req, res) => {
                 <html lang="hu">
                 <head>
                     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Válassz Csomagot | Zsivány Róka</title>
+                    <title>Válassz Rangot | Zsivány Róka</title>
                     <script src="https://cdn.tailwindcss.com"></script>
                     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
                     <style>
                         body{background:#050505;color:#fff;font-family:'Inter',sans-serif;}
                         .orange-neon{color:#FF9F43; text-shadow: 0 0 10px rgba(255, 159, 67, 0.4);}
+                        .purple-glow{box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);}
                         .btn-pulse { animation: pulse 2s infinite; }
                         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
                     </style>
                 </head>
                 <body class="p-6 flex flex-col items-center justify-center min-h-screen text-center">
                     
-                    <h1 class="text-xl font-black text-white uppercase tracking-[0.2em] mb-2 font-orbitron">Csatlakozz a Falkához</h1>
-                    <p class="text-xs text-zinc-500 mb-8">Az elemzések eléréséhez válassz tagságot.</p>
+                    <h1 class="text-xl font-black text-white uppercase tracking-[0.2em] mb-1 font-orbitron">Építsd a Birodalmad</h1>
+                    <p class="text-[10px] text-zinc-500 mb-8 uppercase tracking-widest font-bold">Felhő alapú élő sportfogadó asszisztens</p>
 
-                    <div class="bg-gradient-to-b from-[#111] to-[#0a0a0a] p-1 rounded-3xl w-full max-w-sm shadow-[0_0_40px_rgba(255,159,67,0.15)] mb-8">
-                        <div class="bg-[#0a0a0a] rounded-[1.4rem] p-6 relative overflow-hidden">
-                            
-                            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">Ajánlott</div>
-
-                            <h2 class="text-lg font-black text-white uppercase mb-1">VIP Havi Tagság</h2>
-                            <p class="text-xs text-zinc-500 mb-6">Teljes hozzáférés a Róka rendszeréhez.</p>
-
-                            <div class="text-3xl font-black orange-neon mb-6 font-orbitron">
-                                19.990 Ft <span class="text-xs text-zinc-600 font-normal">/ 30 Nap</span>
-                            </div>
-
-                            <ul class="text-left text-xs text-zinc-300 space-y-3 mb-8 pl-2">
-                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Napi Prémium AI Elemzés</li>
-                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Automata Bankroll Kalkulátor</li>
-                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Stratégia & Pénzügyi Terv</li>
-                                <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 0-24 Support</li>
-                            </ul>
-                            
-                            <div class="flex flex-col gap-3">
-                                <a href="https://revolut.me/csaba6da3" target="_blank" class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs hover:bg-gray-200 transition flex items-center justify-center gap-2 shadow-lg btn-pulse">
-                                    💳 FIZETÉS (REVOLUT)
-                                </a>
-                                <a href="https://t.me/SHANNA444" target="_blank" class="w-full bg-[#24A1DE] text-white py-4 rounded-xl font-black uppercase text-xs hover:bg-[#1c8lb5] transition flex items-center justify-center gap-2">
-                                    ✈️ SEGÍTSÉG (TELEGRAM)
-                                </a>
-                            </div>
-                            
-                            <p class="text-[9px] text-zinc-600 mt-4 text-center">A fizetés után az Admin jóváhagyja a fiókod.</p>
+                    <div class="w-full max-w-sm space-y-4 mb-8">
+                        
+                        <div class="bg-[#111] border border-zinc-800 p-5 rounded-2xl relative">
+                            <h3 class="text-sm font-black text-white uppercase">🦊 Ravasz Róka</h3>
+                            <div class="text-xl font-black text-white my-1">19.990 Ft <span class="text-[10px] text-zinc-500 font-normal">/ 30 Nap</span></div>
+                            <p class="text-[10px] text-zinc-500">Az első zsákmány megszerzéséhez.</p>
                         </div>
+
+                        <div class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-500/50 p-5 rounded-2xl relative purple-glow transform scale-105">
+                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Legnépszerűbb</div>
+                            <h3 class="text-sm font-black text-white uppercase">🐺 Falka Tag</h3>
+                            <div class="text-2xl font-black orange-neon my-1">49.990 Ft <span class="text-[10px] text-zinc-400 font-normal">/ 3 Hónap</span></div>
+                            <p class="text-[10px] text-zinc-300">Aki tudja, hogy a türelem fizet.</p>
+                        </div>
+
+                        <div class="bg-[#111] border border-orange-500/30 p-5 rounded-2xl relative">
+                            <div class="absolute top-3 right-3 text-orange-500 text-xs">👑</div>
+                            <h3 class="text-sm font-black text-white uppercase">Zsivány Vezér</h3>
+                            <div class="text-xl font-black text-white my-1">89.990 Ft <span class="text-[10px] text-zinc-500 font-normal">/ 1 Év</span></div>
+                            <p class="text-[10px] text-zinc-500">Maximalistáknak. A teljes dominancia.</p>
+                        </div>
+
                     </div>
 
-                    <a href="/logout" class="text-zinc-500 text-[10px] font-bold uppercase hover:text-white transition border border-zinc-800 px-6 py-3 rounded-full">Kijelentkezés</a>
+                    <div class="w-full max-w-sm space-y-3 mb-8">
+                        <p class="text-xs text-zinc-400 mb-2">Válassz rangot és aktiváld:</p>
+                        <a href="https://revolut.me/csaba6da3" target="_blank" class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs hover:bg-gray-200 transition flex items-center justify-center gap-2 shadow-lg btn-pulse">
+                            💳 FIZETÉS (REVOLUT)
+                        </a>
+                    </div>
+
+                    <div class="border-t border-zinc-800 pt-6 w-full max-w-sm">
+                        <p class="text-xs text-zinc-500 mb-3">Kérdésed van a csatlakozásról?</p>
+                        <a href="https://t.me/SHANNA444" target="_blank" class="block w-full bg-[#24A1DE] text-white py-3 rounded-xl font-black uppercase text-[10px] hover:bg-[#1c8lb5] transition flex items-center justify-center gap-2">
+                            ✈️ ÍRJ RÁM (TELEGRAM)
+                        </a>
+                    </div>
+
+                    <a href="/logout" class="mt-8 text-zinc-600 text-[10px] font-bold uppercase hover:text-white transition">Kijelentkezés</a>
                 </body>
                 </html>
             `);
