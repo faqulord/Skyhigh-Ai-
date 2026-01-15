@@ -20,6 +20,7 @@
             <div><h1 class="text-sm font-bold text-white uppercase">Rafinált Róka</h1></div>
         </div>
         <div class="flex gap-2">
+            <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">STATS</a>
             <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %><a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">HQ</a><% } %>
             <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold">EXIT</a>
         </div>
@@ -36,6 +37,10 @@
         <div class="flex justify-between items-start mb-4">
             <div><h4 class="text-[9px] text-purple-400 font-black uppercase tracking-widest mb-1">Személyi Bankár</h4><p class="text-xl font-bold text-white">Egyenleg: <span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span></p></div>
             <button onclick="openManifesto()" class="bg-orange-500 text-black text-[9px] font-black px-3 py-2 rounded-lg uppercase tracking-widest">OLVASS EL ❗</button>
+        </div>
+        <div class="bg-zinc-900/60 p-3 rounded-xl border border-white/5 mb-4 flex justify-between items-center">
+            <span class="text-[10px] text-zinc-400 uppercase font-bold">Havi Termelés:</span>
+            <span class="text-sm font-black <%= monthlyProfit >= 0 ? 'text-green-500' : 'text-red-500' %>"><%= monthlyProfit > 0 ? '+' : '' %><%= monthlyProfit.toLocaleString() %> Ft</span>
         </div>
         <div class="grid grid-cols-2 gap-3 mb-4">
             <div class="bg-zinc-900/40 p-3 rounded-xl border border-white/5"><p class="text-[9px] text-zinc-500 uppercase font-bold mb-1">Napi Tét</p><p class="text-sm font-black text-white"><%= suggestedStake.toLocaleString() %> Ft</p></div>
@@ -59,20 +64,23 @@
     <div id="manifestoModal" class="flex items-center justify-center p-4">
         <div class="thin-purple-border bg-[#0a0a0a] w-full max-w-md p-6 rounded-3xl modal-content relative">
             <button onclick="closeManifesto()" class="absolute top-4 right-6 text-zinc-600 font-bold text-2xl">×</button>
-            <div class="text-center mb-6"><h2 class="orbitron text-xl font-black orange-neon uppercase tracking-widest">Zsivány Kiáltvány</h2></div>
+            <div class="text-center mb-6"><h2 class="orbitron text-xl font-black orange-neon uppercase tracking-widest">A Zsivány Kiáltvány</h2></div>
             <div class="space-y-4 text-xs leading-relaxed text-zinc-300 font-medium">
-                <p class="border-l-2 border-purple-500 pl-3">A Róka egy automata vagyonkezelő gép. 50.000 Ft-tól már elindíthatod a lavinát.</p>
+                <p class="border-l-2 border-purple-500 pl-3">Ez egy matematikailag alátámasztott, fix 2 éves terv, ami személyre szabottan a te tőkéddel számol.</p>
                 <div class="bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
-                    <p class="text-[9px] text-zinc-500 uppercase font-black text-center mb-3">Vagyonépítés (6%-os Zsivány módban)</p>
+                    <p class="text-[9px] text-zinc-500 uppercase font-black text-center mb-3">Csúcstechnológia & Élő Adatok</p>
+                    <p>Én mesterséges intelligencia vagyok. Minden nap élő adatokból dolgozom. A napi tétedet a bankodhoz igazítom, hogy soha ne tudj kiesni a játékból. Ez a Bankár Mód lényege.</p>
+                </div>
+                 <div class="bg-purple-900/10 p-4 rounded-2xl border border-purple-500/20">
+                    <p class="text-[9px] text-purple-400 uppercase font-black text-center mb-3">2 Éves Matematikai Terv</p>
                     <div class="space-y-2">
-                        <div class="flex justify-between"><span>1. év:</span><span class="text-white font-black">~1.800.000 Ft</span></div>
-                        <div class="flex justify-between"><span>2. év:</span><span class="text-white font-black">~32.000.000 Ft</span></div>
-                        <div class="flex justify-between text-orange-400 font-black"><span>3. év:</span><span class="orange-neon">~500.000.000 Ft</span></div>
+                        <div class="flex justify-between"><span>1. év:</span><span class="text-white font-black">~450.000 Ft</span></div>
+                        <div class="flex justify-between"><span>2. év:</span><span class="text-white font-black">~2.100.000 Ft</span></div>
                     </div>
                 </div>
-                <p class="text-center text-[10px] text-purple-400 font-black uppercase">A fegyelem gazdaggá tesz.</p>
+                <p class="text-center text-[10px] text-zinc-500 uppercase font-black">Szabály: Csak kövesd a napi tétet.</p>
             </div>
-            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-4 rounded-2xl mt-6 uppercase text-xs tracking-widest">VADÁSSZUNK! 🦊</button>
+            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-4 rounded-2xl mt-6 uppercase text-xs tracking-widest">MEGÉRTETTEM. VADÁSSZUNK! 🦊</button>
         </div>
     </div>
 
