@@ -9,13 +9,13 @@
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; overflow-x: hidden; }
         .thin-purple-border { border: 1px solid transparent; background: linear-gradient(#111, #111) padding-box, linear-gradient(to right, #a855f7, #ec4899) border-box; box-shadow: 0 0 25px rgba(168, 85, 247, 0.25); }
         .orange-neon { color: #FF9F43; text-shadow: 0 0 8px rgba(255, 159, 67, 0.6); font-weight: 700; }
-        .orange-neon-xl { color: #FF9F43; text-shadow: 0 0 15px rgba(255, 159, 67, 0.8), 0 0 30px rgba(255, 159, 67, 0.4); }
         .purple-pink-text-gradient { background: linear-gradient(to right, #a855f7, #ff77e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
         .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
         @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.7)); } }
         .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
+        /* LASSÍTOTT SZÖVEG (100s) */
         .marquee-container { overflow: hidden; white-space: nowrap; position: relative; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 5px 0; border-radius: 10px; }
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 60s linear infinite; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; letter-spacing: 1px; }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 100s linear infinite; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; letter-spacing: 1px; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; backdrop-filter: blur(20px); align-items: center; justify-content: center; }
         .modal-content { max-height: 90vh; overflow-y: auto; width: 90%; max-width: 450px; }
@@ -32,7 +32,7 @@
         </div>
         <div class="flex gap-2">
             <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">STATS</a>
-            <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %><a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">HQ</a><% } %>
+            <% if (user.isAdmin || user.email === ownerEmail) { %><a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">HQ</a><% } %>
             <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold">KILÉPÉS</a>
         </div>
     </header>
@@ -41,7 +41,7 @@
         <div class="marquee-text">
             <% if (typeof foxQuotes !== 'undefined' && foxQuotes && foxQuotes.length > 0) { %>
                 <% foxQuotes.forEach(quote => { %> <span class="mx-6 text-purple-400">★</span> <span class="text-white"><%= quote %></span> <% }) %>
-            <% } else { %> <span class="mx-6">🦊 A Róka éppen fosztogat...</span> <% } %>
+            <% } else { %> <span class="mx-6">🦊 A Róka éppen vadászik...</span> <% } %>
         </div>
     </div>
 
@@ -89,40 +89,40 @@
     <div id="manifestoModal">
         <div class="thin-purple-border bg-[#0a0a0a] p-8 rounded-[2.5rem] modal-content relative">
             <button onclick="closeManifesto()" class="absolute top-5 right-7 text-zinc-600 font-bold text-3xl hover:text-white transition cursor-pointer">×</button>
-            <div class="text-center mb-8"><div class="fox-pulse text-6xl mb-4">🦊</div><h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">A Rendszer Lelke</h2></div>
+            <div class="text-center mb-8"><div class="fox-pulse text-6xl mb-4">🦊</div><h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">A Róka Törvénye</h2><p class="text-[10px] text-zinc-500 mt-2">Fix Matek. 0% Szerencse.</p></div>
             
             <div class="space-y-6 text-sm leading-relaxed text-zinc-300 font-medium">
                 <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
-                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">1. Felhő Alapú Agy</p>
-                    <p class="text-xs text-zinc-400">Én nem egy ember vagyok, aki megérzésekre hagyatkozik. Én egy <strong class="text-white">Felhő alapú Mesterséges Intelligencia</strong> vagyok. 0-24-ben futok a szerveren, és nyers adatok alapján vadászom le azt az egyetlen hibát a rendszerben, ahol a bukméker téved.</p>
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">1. Miért fizetsz?</p>
+                    <p class="text-xs text-zinc-400">Nem tippeket veszel, hanem technológiát. Én egy <strong class="text-white">Felhő alapú Mesterséges Intelligencia</strong> vagyok. 0-24-ben elemzem az élő adatokat, és csak akkor szólok, ha matematikai hibát találok a bukmékernél. Ez a te előnyöd.</p>
                 </div>
 
                 <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
-                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">2. A Pénzed a Rabszolgád</p>
-                    <p class="text-xs text-zinc-400">Mi a sportfogadást csak eszközként használjuk. A lényeg a <strong class="text-white">Kamatos Kamat</strong>. Ahogy nyerünk, a nyereményt visszaforgatjuk, így a pénzed saját magát szorozza meg. Te alszol, a matek dolgozik.</p>
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">2. Bárhol Működik</p>
+                    <p class="text-xs text-zinc-400">Teljesen mindegy, hol játszol: <strong class="text-white">Online irodában vagy a sarki Lottózóban.</strong> A matematika univerzális. Mi csak eszközként használjuk a sportfogadást arra, hogy a pénzünk dolgozzon helyettünk, mint egy befektetésnél.</p>
                 </div>
 
                 <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl shadow-lg">
-                    <p class="text-purple-300 font-bold mb-3 uppercase text-xs tracking-widest border-b border-purple-500/20 pb-2">3. JÖVŐKÉP (2 ÉVES TERV)</p>
+                    <p class="text-purple-300 font-bold mb-3 uppercase text-xs tracking-widest border-b border-purple-500/20 pb-2">3. JÖVŐKÉP (HÓGOLYÓ EFFEKTUS)</p>
                     <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800 space-y-3 text-xs">
-                        <div class="flex justify-between items-center"><span class="text-zinc-500">Kezdő tőke (Példa):</span><span class="text-white font-bold">100.000 Ft</span></div>
+                        <div class="flex justify-between items-center"><span class="text-zinc-500">Kezdő tőke:</span><span class="text-white font-bold">100.000 Ft</span></div>
                         <div class="border-t border-white/5 my-1"></div>
-                        <div class="flex justify-between items-center"><span class="text-purple-400">6. Hónap:</span><span class="text-white font-black text-sm">~450.000 Ft</span></div>
+                        <div class="flex justify-between items-center"><span class="text-purple-400">Fél év múlva:</span><span class="text-white font-black text-sm">~450.000 Ft</span></div>
                         <div class="flex justify-between items-center"><span class="text-purple-400">1. Év Vége:</span><span class="text-white font-black text-sm">~1.800.000 Ft</span></div>
                         <div class="flex justify-between items-center"><span class="text-orange-400">2. Év Vége:</span><span class="orange-neon text-lg">~15.000.000 Ft+</span></div>
                     </div>
-                    <p class="text-[9px] text-zinc-500 mt-3 pt-2 border-t border-white/5 italic text-center">(Ha betartod a fegyelmet és nem veszed ki!)</p>
+                    <p class="text-[9px] text-zinc-500 mt-3 pt-2 border-t border-white/5 italic text-center">(Feltéve, ha nem veszed ki a pénzt!)</p>
                 </div>
 
                 <div class="bg-red-900/10 border border-red-500/30 p-5 rounded-3xl shadow-lg">
                     <p class="text-red-400 font-bold mb-2 uppercase text-xs tracking-widest border-b border-red-500/20 pb-2">⚠️ 4. VASFAGYELEM</p>
                     <ul class="space-y-2 list-none text-xs">
-                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>TILOS HOZZÁNYÚLNI!</strong> A tőke növekedéséhez idő kell. Ha kiveszed, megölöd a kamatos kamatot.</span></li>
-                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>MINDIG ANNYIT RAKJ, AMIT ÍROK!</strong> Ne többet, ne kevesebbet.</span></li>
+                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>A TŐKE SZENT!</strong> Nem nyúlunk hozzá, hagyjuk nőni.</span></li>
+                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>PONTOS TÉT!</strong> Mindig annyit rakj, amennyit a gép ír ki. Ez a siker kulcsa.</span></li>
                     </ul>
                 </div>
             </div>
-            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-6 uppercase text-xs tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] transition active:scale-95 cursor-pointer">ÉRTEM! ÉPÍTSÜK A VAGYONT! 🚀</button>
+            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-6 uppercase text-xs tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] transition active:scale-95 cursor-pointer">ÉRTEM! INDULJON A PÉNZGYÁR! 🚀</button>
         </div>
     </div>
 
