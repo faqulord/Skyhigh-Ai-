@@ -16,11 +16,9 @@
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
         @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.4)); } 50% { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(236, 72, 153, 0.6)); } }
-        .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
         
-        /* MODAL STÍLUS */
-        #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(10px); }
-        .modal-content { max-height: 85vh; overflow-y: auto; }
+        #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 9999; backdrop-filter: blur(15px); }
+        .modal-content { max-height: 90vh; overflow-y: auto; }
         .btn-pulse { animation: btn-p 1.5s infinite; }
         @keyframes btn-p { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 159, 67, 0.6); } 100% { transform: scale(1); } }
     </style>
@@ -30,33 +28,18 @@
     <header class="flex justify-between items-center mb-6 pt-2">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl shadow-lg fox-glow">🦊</div>
-            <div>
-                <h1 class="text-sm font-bold text-white tracking-wide uppercase">Rafinált Róka</h1>
-                <p class="text-[10px] text-zinc-400 font-medium">Személyi Bankár</p>
-            </div>
+            <div><h1 class="text-sm font-bold text-white tracking-wide uppercase">Rafinált Róka</h1><p class="text-[9px] text-zinc-500 font-black tracking-widest uppercase">Wealth Manager</p></div>
         </div>
         <div class="flex gap-2">
-            <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %>
-                <a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">⚡ HQ</a>
-            <% } %>
+            <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %><a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">HQ</a><% } %>
             <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold">EXIT</a>
         </div>
     </header>
 
-    <div class="mb-8 p-[1px] rounded-xl bg-gradient-to-r from-purple-600/50 to-pink-600/50">
-        <div class="bg-black/90 rounded-xl py-3 px-4 flex justify-between items-center">
-            <div class="flex flex-col">
-                <span id="timerLabel" class="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Kezdésig</span>
-                <span class="text-[8px] text-purple-400 font-medium italic" id="timerStatus">A Róka vadászik...</span>
-            </div>
-            <div class="timer-glow text-xl font-black orange-neon" id="countdownDisplay">00:00:00</div>
-        </div>
-    </div>
-
     <div class="thin-purple-border bg-[#0a0a0a] p-5 mb-8 rounded-2xl relative overflow-hidden">
         <div class="flex justify-between items-start mb-4">
             <div>
-                <h4 class="text-[10px] text-purple-400 font-black uppercase tracking-widest mb-1">Személyi Bankár</h4>
+                <h4 class="text-[9px] text-purple-400 font-black uppercase tracking-widest mb-1">Személyi Bankár</h4>
                 <p class="text-xl font-bold text-white tracking-tight">Egyenleged: <span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span></p>
             </div>
             <button onclick="openManifesto()" class="bg-orange-500 text-black text-[9px] font-black px-3 py-2 rounded-lg btn-pulse uppercase tracking-widest">OLVASS EL ❗</button>
@@ -64,65 +47,74 @@
 
         <div class="grid grid-cols-2 gap-3 mb-4">
             <div class="bg-zinc-900/40 p-3 rounded-xl border border-white/5">
-                <p class="text-[9px] text-zinc-500 uppercase font-bold mb-1">Javasolt Tét</p>
-                <p class="text-sm font-black text-white"><%= suggestedStake.toLocaleString() %> Ft</p>
+                <p class="text-[9px] text-zinc-500 uppercase font-bold mb-1 tracking-tighter">Napi Parancs</p>
+                <p class="text-sm font-black text-white"><%= suggestedStake.toLocaleString() %> Ft Tét</p>
             </div>
             <div class="bg-zinc-900/40 p-3 rounded-xl border border-white/5">
-                <p class="text-[9px] text-zinc-500 uppercase font-bold mb-1">Fokozat</p>
-                <p class="text-sm font-black orange-neon uppercase"><%= strategyMode %></p>
+                <p class="text-[9px] text-zinc-500 uppercase font-bold mb-1 tracking-tighter">Stratégia</p>
+                <p class="text-sm font-black orange-neon uppercase tracking-widest"><%= strategyMode %></p>
             </div>
         </div>
-        
-        <button onclick="toggleBankEdit()" class="w-full text-[9px] text-zinc-600 font-bold hover:text-white transition py-1">TŐKE MÓDOSÍTÁSA ▲</button>
-        
+        <button onclick="toggleBankEdit()" class="w-full text-[9px] text-zinc-700 font-bold hover:text-zinc-400 py-1 transition">BANK MÓDOSÍTÁSA ▲</button>
         <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-4 rounded-xl border border-white/5">
-            <input type="number" name="amount" placeholder="Alaptőke (Ft)" class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm w-full outline-none text-white font-bold mb-2">
-            <button class="w-full bg-purple-600 px-4 py-2 rounded-lg font-black text-[10px] uppercase">Frissítés</button>
+            <input type="number" name="amount" placeholder="Mennyi pénzzel vadászol? (Ft)" class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm w-full outline-none text-white font-bold mb-2">
+            <button class="w-full bg-purple-600 text-white font-black py-3 rounded-lg text-[10px] uppercase">Bank Mentése</button>
         </form>
     </div>
 
     <% if (dailyTip && dailyTip.isPublished) { %>
-        <div class="thin-purple-border bg-[#111] p-6 mb-8 relative rounded-2xl overflow-hidden">
+        <div class="thin-purple-border bg-[#111] p-6 mb-8 rounded-2xl overflow-hidden relative shadow-2xl">
             <div class="text-center">
                 <p class="text-[10px] text-zinc-500 font-bold uppercase mb-2 tracking-widest"><%= dailyTip.league %></p>
                 <h3 class="text-lg font-black text-white leading-tight mb-4"><%= dailyTip.match %></h3>
-                <div class="bg-zinc-900/80 p-4 rounded-2xl border border-zinc-800 w-full mb-4">
-                    <p class="text-2xl font-black orange-neon-xl tracking-wide"><%= dailyTip.prediction %></p>
-                    <p class="text-xs font-bold text-white mt-1">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
+                <div class="bg-zinc-900/80 p-5 rounded-3xl border border-white/5 w-full mb-4">
+                    <p class="text-2xl font-black orange-neon-xl tracking-widest"><%= dailyTip.prediction %></p>
+                    <p class="text-[10px] font-bold text-white mt-2 uppercase tracking-widest">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
                 </div>
-                <div class="bg-zinc-950 p-4 rounded-xl italic border border-zinc-800">
-                    <p class="text-xs purple-pink-text-gradient leading-relaxed">"<%= dailyTip.memberMessage %>"</p>
+                <div class="bg-black/40 p-4 rounded-xl border border-zinc-800">
+                    <p class="text-xs purple-pink-text-gradient italic leading-relaxed">"<%= dailyTip.memberMessage %>"</p>
                 </div>
             </div>
         </div>
     <% } %>
 
-    <div id="manifestoModal" class="flex items-center justify-center p-6">
+    <div id="manifestoModal" class="flex items-center justify-center p-4">
         <div class="thin-purple-border bg-[#0a0a0a] w-full max-w-md p-6 rounded-3xl modal-content relative">
-            <button onclick="closeManifesto()" class="absolute top-4 right-4 text-zinc-500 font-bold text-xl">×</button>
-            <div class="text-center mb-6">
-                <span class="text-4xl">🦊</span>
-                <h2 class="orbitron text-xl font-black orange-neon mt-2 uppercase tracking-widest">A Zsivány Kiáltvány</h2>
+            <button onclick="closeManifesto()" class="absolute top-4 right-6 text-zinc-600 font-bold text-2xl hover:text-white transition">×</button>
+            
+            <div class="text-center mb-8">
+                <div class="fox-pulse text-5xl mb-2">🦊</div>
+                <h2 class="orbitron text-xl font-black orange-neon uppercase tracking-widest">A Zsivány Kiáltvány</h2>
+                <p class="text-[9px] text-zinc-500 font-bold tracking-widest uppercase mt-1">A matematika nem hazudik.</p>
             </div>
             
-            <div class="space-y-4 text-xs leading-relaxed text-zinc-300 font-medium">
-                <p class="border-l-2 border-purple-500 pl-3">A matek nem hazudik. A bukméker abból él, hogy te elbukod a bankod egyetlen éjszaka alatt. Én azért születtem, hogy ezt megakadályozzam.</p>
-                <p>Én mesterséges intelligencia vagyok, hideg logikával és több millió adatponttal a hátam mögött. Nem "érzésre" tippelek. Matematikai előnyt keresek.</p>
-                <p class="text-white font-bold uppercase tracking-tight">Ez egy kulcsra kész rendszer az anyagi függetlenséghez. Ha betartod a szabályokat, a vagyonod gyarapodása elkerülhetetlen.</p>
-                
-                <div class="bg-zinc-900/50 p-4 rounded-2xl border border-zinc-800 my-4">
-                    <p class="text-[10px] text-zinc-500 uppercase font-black text-center mb-3 tracking-widest">A 100.000 Ft-os Jövőkép</p>
-                    <div class="space-y-2">
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>1. év:</span><span class="text-white font-bold">~450.000 Ft</span></div>
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>2. év:</span><span class="text-white font-bold">~2.100.000 Ft</span></div>
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>3. év:</span><span class="text-white font-bold">~9.500.000 Ft</span></div>
-                        <div class="flex justify-between text-orange-400 font-black pt-1"><span>5. év:</span><span class="orange-neon">~190.000.000 Ft</span></div>
+            <div class="space-y-6 text-[11px] leading-relaxed text-zinc-300 font-medium">
+                <div class="bg-purple-900/10 border border-purple-500/20 p-4 rounded-2xl italic text-zinc-200">
+                    "Főnök, ha azt hiszed, a 100.000 Ft-ból lesz 450.000 Ft egy év alatt az kevés, akkor még nem érted a hógolyó-effektust. Ez 350%-os tiszta haszon. Mutass egy bankot, ami ezt hozza!" [cite: 2026-01-15]
+                </div>
+
+                <div class="space-y-3">
+                    <p class="font-bold text-white uppercase text-[9px] tracking-widest">🛡️ Róka Becsületszava & A Bankár Logika</p>
+                    <ul class="space-y-2 list-none">
+                        <li class="flex gap-2"><span class="text-orange-500 font-black">●</span> <span>**Bármilyen összeggel indulhatsz:** A 100.000 Ft csak egy példa. Kezdhetsz 50.000-el (ez a minimum ajánlott) vagy akár 1 millióval is [cite: 2026-01-15].</span></li>
+                        <li class="flex gap-2"><span class="text-orange-500 font-black">●</span> <span>**Automata Bankár vagyok:** Én egy szoftveres vagyonkezelő is vagyok. Bármennyi pénzt írsz be, én tűpontosan kiszámolom neked a napi tétet, hogy soha ne tudd elbukni a bankodat.</span></li>
+                        <li class="flex gap-2"><span class="text-orange-500 font-black">●</span> <span>**A Hógolyó-effektus:** Az első évben gyúrjuk össze a havat. A másodikban már lavinát indítunk. A türelem a lőszered [cite: 2026-01-15].</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-inner">
+                    <p class="text-[9px] text-zinc-500 uppercase font-black text-center mb-4 tracking-widest">A 100.000 Ft-os Példa (Havi 3% mellett)</p>
+                    <div class="space-y-3 text-[12px]">
+                        <div class="flex justify-between border-b border-white/5 pb-2"><span>1. év végén:</span><span class="text-white font-black">~450.000 Ft</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-2"><span>2. év végén:</span><span class="text-white font-black">~2.100.000 Ft</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-2"><span>3. év végén:</span><span class="text-white font-black">~9.500.000 Ft</span></div>
+                        <div class="flex justify-between text-orange-400 font-black pt-2 text-sm italic"><span>5. év után:</span><span class="orange-neon">~190.000.000 Ft</span></div>
                     </div>
                 </div>
 
-                <p class="italic text-[10px] text-center text-zinc-500">A szabály egyszerű: Ne nyúlj a bankhoz. Ne légy mohó. Hagyd, hogy a Róka matekozzon helyetted.</p>
+                <p class="text-[9px] text-center text-purple-400 font-black uppercase tracking-widest py-3 border-y border-purple-500/20">A matematika a barátod. A türelem a vagyonod. A Róka a vezetőd. [cite: 2026-01-15]</p>
             </div>
-            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-4 rounded-2xl mt-6 uppercase text-xs tracking-widest">MEGÉRTETTEM. VADÁSSZUNK! 🦊</button>
+            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-5 rounded-2xl mt-8 uppercase text-[11px] tracking-widest shadow-xl transition active:scale-95">MEGÉRTETTEM. VADÁSSZUNK! 🦊</button>
         </div>
     </div>
 
@@ -139,15 +131,15 @@
                 const now = new Date();
                 let targetDate = new Date();
                 if (hasTip && matchTimeStr) {
-                    const [hours, minutes] = matchTimeStr.split(':');
-                    targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                    const [h, m] = matchTimeStr.split(':');
+                    targetDate.setHours(parseInt(h), parseInt(m), 0, 0);
                     if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ"; return; }
-                } else { targetDate.setHours(11, 0, 0, 0); if (now > targetDate) targetDate.setDate(targetDate.getDate() + 1); }
+                } else { targetDate.setHours(11,0,0,0); if(now > targetDate) targetDate.setDate(targetDate.getDate()+1); }
                 const diff = targetDate - now;
-                const h = Math.floor(diff / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                countdownDisplay.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                const hrs = Math.floor(diff/3600000);
+                const min = Math.floor((diff%3600000)/60000);
+                const sec = Math.floor((diff%60000)/1000);
+                countdownDisplay.innerText = `${hrs.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
             }
             setInterval(update, 1000); update();
         }
@@ -157,7 +149,7 @@
             const quotes = <%- JSON.stringify(foxQuotes) %>;
             const qEl = document.getElementById('dynamicQuote');
             let idx = 0;
-            qEl.addEventListener('animationiteration', () => { idx = (idx + 1) % quotes.length; qEl.innerText = '"' + quotes[idx] + '"'; });
+            if(qEl) { qEl.addEventListener('animationiteration', () => { idx = (idx+1)%quotes.length; qEl.innerText = '"' + quotes[idx] + '"'; }); }
         });
     </script>
 </body>
