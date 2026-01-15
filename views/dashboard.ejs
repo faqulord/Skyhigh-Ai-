@@ -31,11 +31,14 @@
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
         .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
         .toast.show { bottom: 20px; }
+
+        /* VISSZASZÁMLÁLÓ STÍLUS */
+        .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
     </style>
 </head>
 <body class="p-5 max-w-lg mx-auto">
 
-    <header class="flex justify-between items-center mb-8 pt-2">
+    <header class="flex justify-between items-center mb-6 pt-2">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl shadow-lg fox-glow">🦊</div>
             <div>
@@ -43,7 +46,7 @@
                 <p class="text-[10px] text-zinc-400 font-medium">Privát Csoport</p>
             </div>
         </div>
-        
+
         <div class="flex gap-2">
             <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1 hover:text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
                 <span>📊</span> STATS
@@ -54,17 +57,29 @@
                     <span>⚡</span> HQ
                 </a>
             <% } %>
-            
+
             <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center hover:text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
                 EXIT
             </a>
         </div>
     </header>
 
+    <div class="mb-8 p-[1px] rounded-xl bg-gradient-to-r from-purple-600/50 to-pink-600/50">
+        <div class="bg-black/90 rounded-xl py-3 px-4 flex justify-between items-center">
+            <div class="flex flex-col">
+                <span id="timerLabel" class="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Kezdésig hátralévő idő</span>
+                <span class="text-[8px] text-purple-400 font-medium italic" id="timerStatus">A Róka figyeli az órát...</span>
+            </div>
+            <div class="timer-glow text-xl font-black orange-neon" id="countdownDisplay">
+                00:00:00
+            </div>
+        </div>
+    </div>
+
     <div class="mb-10 relative"> 
         <p class="text-zinc-500 text-xs font-bold uppercase mb-1"><%= displayDate %></p>
         <h2 class="text-2xl font-bold text-white mb-6">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
-        
+
         <div class="relative mt-4">
             <div class="absolute -top-4 right-2 z-50 fox-pulse">
                 <div class="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-lg shadow-lg fox-glow border border-white/10">
@@ -98,7 +113,7 @@
             <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-xl relative shadow-inner mt-4">
                 <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl border border-zinc-800 rounded-full">🦊</span>
                 <p class="text-sm purple-pink-text-gradient italic leading-relaxed mt-2 tracking-wide">
-                    "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet... (Admin: Nyomj a Szöveg Újragenerálásra!)' %>"
+                    "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet...' %>"
                 </p>
             </div>
             
@@ -120,13 +135,70 @@
     </div>
 
     <div id="toast" class="toast"><span>🚀</span><span>Csúcstechnológia. Fix Profit.</span></div>
-    
+
     <script>
+        // --- DINAMIKUS VISSZASZÁMLÁLÓ LOGIKA ---
+        function startTimer() {
+            const countdownDisplay = document.getElementById('countdownDisplay');
+            const timerLabel = document.getElementById('timerLabel');
+            const timerStatus = document.getElementById('timerStatus');
+            
+            // Backend változók beolvasása
+            const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
+            const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
+            
+            function update() {
+                const now = new Date();
+                let targetDate = new Date();
+
+                if (hasTip && matchTimeStr) {
+                    // 1. HA VAN TIPP: A meccs kezdetéig számolunk
+                    timerLabel.innerText = "Kezdésig hátralévő idő";
+                    timerStatus.innerText = "Siess, a buki már izzad!";
+                    
+                    const [hours, minutes] = matchTimeStr.split(':');
+                    targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                    
+                    // Ha a meccs már elmúlt ma, ne mutassunk negatívot
+                    if (now > targetDate) {
+                        countdownDisplay.innerText = "ÉLŐ MECCS";
+                        timerStatus.innerText = "A vadászat elkezdődött!";
+                        return;
+                    }
+                } else {
+                    // 2. HA NINCS TIPP: A következő napi vadászatig (pl. holnap 11:00)
+                    timerLabel.innerText = "Következő tipp érkezik";
+                    timerStatus.innerText = "A Róka az oddsokat szaglássza...";
+                    
+                    targetDate.setHours(11, 0, 0, 0); // Alapértelmezett napi elemzés ideje
+                    if (now > targetDate) {
+                        targetDate.setDate(targetDate.getDate() + 1);
+                    }
+                }
+
+                const diff = targetDate - now;
+                const h = Math.floor(diff / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                countdownDisplay.innerText = 
+                    `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+
+            setInterval(update, 1000);
+            update();
+        }
+
         window.addEventListener('load', () => {
+            // Toast értesítés indítása
             const toast = document.getElementById('toast');
             setTimeout(() => { toast.classList.add('show'); }, 500);
             setTimeout(() => { toast.classList.remove('show'); }, 4000);
 
+            // Visszaszámláló indítása
+            startTimer();
+
+            // Zsivány idézetek léptetése
             const quotes = <%- JSON.stringify(foxQuotes) %>;
             const quoteElement = document.getElementById('dynamicQuote');
             let index = 0;
