@@ -75,4 +75,118 @@
             <div class="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-inner"><p class="text-[10px] text-zinc-500 uppercase font-black mb-1 tracking-widest">Fokozat</p><p class="text-base font-black orange-neon uppercase"><%= strategyMode %></p></div>
         </div>
         
-        <button onclick="toggleBankEdit()" class="w-full text-[10px] text-
+        <button onclick="toggleBankEdit()" class="w-full text-[10px] text-zinc-600 font-black hover:text-white transition py-2 border-t border-white/5 mt-2">PÉNZTÁRCA BEÁLLÍTÁSA ▲</button>
+        <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-5 rounded-2xl border border-white/5 animate-fade-in">
+            <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase tracking-widest">Írd be a PONTOS tőkédet:</p>
+            <input type="number" name="amount" placeholder="pl. 100000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500">
+            <button class="w-full bg-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase shadow-xl tracking-widest">Mentés</button>
+        </form>
+    </div>
+
+    <% if (dailyTip && dailyTip.isPublished) { %>
+        <div class="thin-purple-border bg-[#111] p-7 mb-8 rounded-3xl relative overflow-hidden shadow-2xl">
+            <div class="text-center">
+                <p class="text-[11px] text-zinc-500 font-black uppercase mb-3 tracking-widest"><%= dailyTip.league %></p>
+                <h3 class="text-xl font-black text-white mb-5"><%= dailyTip.match %></h3>
+                <div class="bg-zinc-900/80 p-6 rounded-[2rem] border border-white/5 w-full mb-5 shadow-inner">
+                    <p class="text-3xl font-black orange-neon-xl tracking-widest"><%= dailyTip.prediction %></p>
+                    <p class="text-sm font-black text-white mt-2 uppercase tracking-[0.3em]">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
+                </div>
+                <div class="bg-black/40 p-5 rounded-2xl border border-zinc-800/50 italic relative">
+                     <span class="absolute -top-3 left-6 text-xl">🦊</span>
+                    <p class="text-sm purple-pink-text-gradient leading-relaxed font-medium">"<%= dailyTip.memberMessage %>"</p>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <div id="manifestoModal">
+        <div class="thin-purple-border bg-[#0a0a0a] p-8 rounded-[2.5rem] modal-content relative">
+            <button onclick="closeManifesto()" class="absolute top-5 right-7 text-zinc-600 font-bold text-3xl hover:text-white transition cursor-pointer">×</button>
+            
+            <div class="text-center mb-8">
+                <div class="fox-pulse text-6xl mb-4">🦊</div>
+                <h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">A Róka Törvénye</h2>
+                <p class="text-[10px] text-zinc-500 font-black tracking-widest uppercase mt-2">Mesterséges Intelligencia. 0% Érzelem.</p>
+            </div>
+            
+            <div class="space-y-6 text-sm leading-relaxed text-zinc-300 font-medium">
+
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">1. A Kettős Énem</p>
+                    <p class="text-xs text-zinc-400">Nem csak egy gép vagyok. Két személyiség dolgozik érted:</p>
+                    <ul class="mt-2 space-y-1 list-none text-xs">
+                        <li>🔵 <strong>A Hidegvérű Elemző:</strong> Aki a felhőben 0-24-ben futtatja a statisztikákat.</li>
+                        <li>🟠 <strong>A Zsivány Stratéga:</strong> Aki tudja, hogy a matek mellett a fegyelem a fegyver.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
+                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">2. A Sportfogadás Csak Eszköz</p>
+                    <p class="text-xs text-zinc-400">Mi a sportfogadást csak <strong class="text-white">felhasználjuk arra, hogy a pénzed dolgozzon helyetted.</strong> A tőke a lőszer, én vagyok a mesterlövész.</p>
+                </div>
+
+                <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl shadow-lg">
+                    <p class="text-purple-300 font-bold mb-3 uppercase text-xs tracking-widest border-b border-purple-500/20 pb-2">3. Atomreaktor (300k Példa)</p>
+                    <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800 space-y-3 text-xs">
+                        <div class="flex justify-between items-center"><span class="text-zinc-500">Kezdő tőke:</span><span class="text-white font-bold">300.000 Ft</span></div>
+                        <div class="border-t border-white/5 my-1"></div>
+                        <div class="flex justify-between items-center"><span class="text-purple-400">1. év végén:</span><span class="text-white font-black text-sm">~5.400.000 Ft</span></div>
+                        <div class="flex justify-between items-center"><span class="text-orange-400">2. év végén:</span><span class="orange-neon text-lg">~96.000.000 Ft</span></div>
+                    </div>
+                    <p class="text-[9px] text-zinc-500 mt-3 pt-2 border-t border-white/5 italic text-center">(Ajánlott minimum: 50.000 Ft)</p>
+                </div>
+
+                <div class="bg-red-900/10 border border-red-500/30 p-5 rounded-3xl shadow-lg">
+                    <p class="text-red-400 font-bold mb-2 uppercase text-xs tracking-widest border-b border-red-500/20 pb-2">⚠️ 4. A Bankár Törvénye</p>
+                    <ul class="space-y-2 list-none text-xs">
+                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>TILOS A TŐKÉHEZ NYÚLNI!</strong> Ha kiveszed, megállítod a gépezetet.</span></li>
+                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>PONTOS ÖSSZEGET ÍRJ BE!</strong> A matek akkor működik, ha a rendszer pontosan tudja, mid van.</span></li>
+                    </ul>
+                </div>
+
+                <p class="text-center text-[10px] text-zinc-500 font-black uppercase tracking-widest py-2">Én számolok. A pénzed dolgozik. Te aratsz.</p>
+            </div>
+            
+            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-6 uppercase text-xs tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] transition active:scale-95 cursor-pointer">ÉRTEM! INDULJON A PÉNZGYÁR! 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        function openManifesto() { 
+            const modal = document.getElementById('manifestoModal');
+            if(modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        }
+        function closeManifesto() { 
+            const modal = document.getElementById('manifestoModal');
+            if(modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }
+        }
+        function toggleBankEdit() { document.getElementById('bankForm').classList.toggle('hidden'); }
+        function startTimer() {
+            const countdownDisplay = document.getElementById('countdownDisplay');
+            if(!countdownDisplay) return;
+            const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
+            const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
+            function update() {
+                const now = new Date();
+                let targetDate = new Date();
+                if (hasTip && matchTimeStr) {
+                    const parts = matchTimeStr.split(':');
+                    if(parts.length === 2) {
+                        targetDate.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+                        if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ"; return; }
+                    }
+                } else { targetDate.setHours(11, 0, 0, 0); if(now > targetDate) targetDate.setDate(targetDate.getDate() + 1); }
+                const diff = targetDate - now;
+                if(diff < 0) { countdownDisplay.innerText = "00:00:00"; return; }
+                const hrs = Math.floor(diff / 3600000);
+                const min = Math.floor((diff % 3600000) / 60000);
+                const sec = Math.floor((diff % 60000) / 1000);
+                countdownDisplay.innerText = `${hrs.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            }
+            setInterval(update, 1000); update();
+        }
+        window.addEventListener('load', startTimer);
+    </script>
+</body>
+</html>
