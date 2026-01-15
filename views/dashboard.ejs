@@ -7,33 +7,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 40px; overflow-x: hidden; }
-        
-        /* --- VÉKONY LILA-RÓZSASZÍN KERET (BRAND STANDARD) --- */
         .thin-purple-border {
             border: 1px solid transparent; 
             background: linear-gradient(#111, #111) padding-box, 
                         linear-gradient(to right, #a855f7, #ec4899) border-box;
             box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); 
         }
-
-        /* NEON NARANCS SZÖVEG */
         .orange-neon { color: #FF9F43; text-shadow: 0 0 5px rgba(255, 159, 67, 0.5); font-weight: 600; }
         .orange-neon-xl { color: #FF9F43; text-shadow: 0 0 15px rgba(255, 159, 67, 0.8), 0 0 30px rgba(255, 159, 67, 0.4); }
         .purple-pink-text-gradient { background: linear-gradient(to right, #a855f7, #ff77e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3)); }
-
         .marquee-container { overflow: hidden; white-space: nowrap; position: relative; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); }
         .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
         .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
         @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.4)); } 50% { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(236, 72, 153, 0.6)); } }
-        
         .fox-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); }
+        .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
         .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #7c3aed; color: white; padding: 12px 24px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; width: 90%; max-width: 350px; justify-content: center; }
         .toast.show { bottom: 20px; }
-
-        /* VISSZASZÁMLÁLÓ STÍLUS */
-        .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
     </style>
 </head>
 <body class="p-5 max-w-lg mx-auto">
@@ -46,21 +37,12 @@
                 <p class="text-[10px] text-zinc-400 font-medium">Privát Csoport</p>
             </div>
         </div>
-
         <div class="flex gap-2">
-            <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1 hover:text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                <span>📊</span> STATS
-            </a>
-
+            <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1 hover:text-white">📊 STATS</a>
             <% if (user.isAdmin || user.email === 'stylefaqu@gmail.com') { %>
-                <a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1 hover:text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                    <span>⚡</span> HQ
-                </a>
+                <a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center gap-1 hover:text-white">⚡ HQ</a>
             <% } %>
-
-            <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center hover:text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                EXIT
-            </a>
+            <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold transition flex items-center hover:text-white">EXIT</a>
         </div>
     </header>
 
@@ -70,31 +52,72 @@
                 <span id="timerLabel" class="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Kezdésig hátralévő idő</span>
                 <span class="text-[8px] text-purple-400 font-medium italic" id="timerStatus">A Róka figyeli az órát...</span>
             </div>
-            <div class="timer-glow text-xl font-black orange-neon" id="countdownDisplay">
-                00:00:00
-            </div>
+            <div class="timer-glow text-xl font-black orange-neon" id="countdownDisplay">00:00:00</div>
         </div>
     </div>
 
-    <div class="mb-10 relative"> 
+    <div class="mb-8 relative"> 
         <p class="text-zinc-500 text-xs font-bold uppercase mb-1"><%= displayDate %></p>
         <h2 class="text-2xl font-bold text-white mb-6">Szia, <span class="text-purple-400"><%= user.fullname.split(' ')[0] %></span>! 👋</h2>
 
         <div class="relative mt-4">
-            <div class="absolute -top-4 right-2 z-50 fox-pulse">
-                <div class="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-lg shadow-lg fox-glow border border-white/10">
-                    🦊
-                </div>
-            </div>
-
+            <div class="absolute -top-4 right-2 z-50 fox-pulse"><div class="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-lg shadow-lg fox-glow border border-white/10">🦊</div></div>
             <div class="thin-purple-border p-3 rounded-xl w-full overflow-hidden bg-[#0a0a0a] relative z-0">
-                <div class="marquee-container">
-                    <p id="dynamicQuote" class="text-xs orange-neon italic marquee-text">
-                        "<%= foxQuotes[0] %>"
-                    </p>
-                </div>
+                <div class="marquee-container"><p id="dynamicQuote" class="text-xs orange-neon italic marquee-text">"<%= foxQuotes[0] %>"</p></div>
             </div>
         </div>
+    </div>
+
+    <div class="thin-purple-border bg-[#0a0a0a] p-5 mb-8 rounded-2xl relative overflow-hidden">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <div class="flex items-center gap-1 mb-1">
+                    <span class="text-[9px] bg-purple-600/30 text-purple-400 px-2 py-0.5 rounded font-black uppercase tracking-tighter">Személyi Bankár</span>
+                </div>
+                <p class="text-xl font-bold text-white tracking-tight">Egyenleged: <span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span></p>
+            </div>
+            <button onclick="toggleBankEdit()" class="text-[9px] border border-zinc-800 text-zinc-500 px-2 py-1 rounded-lg hover:text-white transition">BANK MÓDOSÍTÁSA</button>
+        </div>
+
+        <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mb-6 bg-black/50 p-4 rounded-xl border border-white/5">
+            <p class="text-[10px] text-zinc-500 mb-3 uppercase font-bold tracking-wide">Induló tőke frissítése (Ft):</p>
+            <div class="flex gap-2">
+                <input type="number" name="amount" placeholder="pl. 100000" class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm w-full outline-none focus:border-purple-500 text-white font-bold">
+                <button class="bg-purple-600 px-4 py-2 rounded-lg font-black text-[10px] uppercase shadow-lg">Mentés</button>
+            </div>
+        </form>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-zinc-900/40 p-3 rounded-xl border border-white/5">
+                <p class="text-[9px] text-zinc-500 uppercase font-bold mb-1 tracking-widest">Napi Parancs</p>
+                <p class="text-sm font-black text-white"><%= suggestedStake.toLocaleString() %> Ft Tét</p>
+            </div>
+            <div class="bg-zinc-900/40 p-3 rounded-xl border border-white/5">
+                <p class="text-[9px] text-zinc-500 uppercase font-bold mb-1 tracking-widest">Stratégia</p>
+                <p class="text-sm font-black orange-neon">NORMAL (3%)</p>
+            </div>
+        </div>
+
+        <details class="group bg-zinc-900/20 rounded-xl overflow-hidden border border-white/5">
+            <summary class="p-3 text-[10px] text-zinc-500 font-black cursor-pointer uppercase list-none flex justify-between items-center hover:bg-white/5 transition">
+                <span>📈 A Zsivány Stratégia & Jövőkép</span>
+                <span class="group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div class="p-4 text-[11px] leading-relaxed text-zinc-400 space-y-4 border-t border-white/5">
+                <blockquote class="border-l-2 border-purple-500 pl-3 italic text-zinc-300">
+                    "A Bankod a fegyvertárad. Ha elszórod a lőszert (all-in), nem marad mivel vadászni. Hagyd a Rókát dolgozni, és csak nézd a gyarapodást."
+                </blockquote>
+                
+                <div class="bg-black/40 p-4 rounded-xl space-y-3 font-medium border border-white/5 text-[10px]">
+                    <p class="text-[9px] text-zinc-500 uppercase font-bold text-center mb-2 tracking-tighter">Várható egyenleg 100.000 Ft-os startnál:</p>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2"><span>1 év múlva</span><span class="text-white font-bold">~450.000 Ft</span></div>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2"><span>2 év múlva</span><span class="text-white font-bold">~2.100.000 Ft</span></div>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2"><span>3 év múlva</span><span class="text-white font-bold">~9.500.000 Ft</span></div>
+                    <div class="flex justify-between items-center text-orange-400 font-black"><span>5 év múlva</span><span class="orange-neon">~190.000.000 Ft</span></div>
+                </div>
+                <p class="text-[9px] text-center uppercase font-black text-purple-500 tracking-widest">SZABÁLY: A tőkéhez nyúlni tilos!</p>
+            </div>
+        </details>
     </div>
 
     <% if (dailyTip && dailyTip.isPublished) { %>
@@ -112,14 +135,9 @@
             
             <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-xl relative shadow-inner mt-4">
                 <span class="absolute -top-3 left-4 bg-[#111] px-2 text-xl border border-zinc-800 rounded-full">🦊</span>
-                <p class="text-sm purple-pink-text-gradient italic leading-relaxed mt-2 tracking-wide">
+                <p class="text-sm purple-pink-text-gradient italic leading-relaxed mt-2 tracking-wide text-center">
                     "<%= dailyTip.memberMessage ? dailyTip.memberMessage : 'A Róka épp fogalmazza az üzenetet...' %>"
                 </p>
-            </div>
-            
-            <div class="mt-4 flex justify-between items-center border-t border-white/5 pt-4">
-                <span class="text-[10px] text-zinc-500 font-bold uppercase">Ajánlott Tét</span>
-                <span class="text-sm font-bold text-white bg-zinc-800 px-3 py-1 rounded-lg"><%= dailyTip.recommendedStake %></span>
             </div>
         </div>
     <% } else { %>
@@ -137,72 +155,48 @@
     <div id="toast" class="toast"><span>🚀</span><span>Csúcstechnológia. Fix Profit.</span></div>
 
     <script>
-        // --- DINAMIKUS VISSZASZÁMLÁLÓ LOGIKA ---
+        function toggleBankEdit() { document.getElementById('bankForm').classList.toggle('hidden'); }
+        
         function startTimer() {
             const countdownDisplay = document.getElementById('countdownDisplay');
             const timerLabel = document.getElementById('timerLabel');
             const timerStatus = document.getElementById('timerStatus');
-            
-            // Backend változók beolvasása
             const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
             const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
             
             function update() {
                 const now = new Date();
                 let targetDate = new Date();
-
                 if (hasTip && matchTimeStr) {
-                    // 1. HA VAN TIPP: A meccs kezdetéig számolunk
                     timerLabel.innerText = "Kezdésig hátralévő idő";
                     timerStatus.innerText = "Siess, a buki már izzad!";
-                    
                     const [hours, minutes] = matchTimeStr.split(':');
                     targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-                    
-                    // Ha a meccs már elmúlt ma, ne mutassunk negatívot
-                    if (now > targetDate) {
-                        countdownDisplay.innerText = "ÉLŐ MECCS";
-                        timerStatus.innerText = "A vadászat elkezdődött!";
-                        return;
-                    }
+                    if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ MECCS"; timerStatus.innerText = "A vadászat elkezdődött!"; return; }
                 } else {
-                    // 2. HA NINCS TIPP: A következő napi vadászatig (pl. holnap 11:00)
                     timerLabel.innerText = "Következő tipp érkezik";
                     timerStatus.innerText = "A Róka az oddsokat szaglássza...";
-                    
-                    targetDate.setHours(11, 0, 0, 0); // Alapértelmezett napi elemzés ideje
-                    if (now > targetDate) {
-                        targetDate.setDate(targetDate.getDate() + 1);
-                    }
+                    targetDate.setHours(11, 0, 0, 0);
+                    if (now > targetDate) { targetDate.setDate(targetDate.getDate() + 1); }
                 }
-
                 const diff = targetDate - now;
                 const h = Math.floor(diff / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-                countdownDisplay.innerText = 
-                    `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                countdownDisplay.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }
-
             setInterval(update, 1000);
             update();
         }
 
         window.addEventListener('load', () => {
-            // Toast értesítés indítása
             const toast = document.getElementById('toast');
             setTimeout(() => { toast.classList.add('show'); }, 500);
             setTimeout(() => { toast.classList.remove('show'); }, 4000);
-
-            // Visszaszámláló indítása
             startTimer();
-
-            // Zsivány idézetek léptetése
             const quotes = <%- JSON.stringify(foxQuotes) %>;
             const quoteElement = document.getElementById('dynamicQuote');
             let index = 0;
-
             quoteElement.addEventListener('animationiteration', () => {
                 index = (index + 1) % quotes.length;
                 quoteElement.innerText = '"' + quotes[index] + '"';
