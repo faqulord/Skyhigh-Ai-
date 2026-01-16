@@ -37,6 +37,8 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
+
+// Adatbázis csatlakozás
 mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -62,6 +64,11 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
+// --- FŐOLDAL ÁTIRÁNYÍTÁS (EZ HIÁNYZOTT!) ---
+app.get('/', (req, res) => {
+    res.redirect('/dashboard');
+});
+
 // --- JAVÍTOTT ROBOT LOGIKA ---
 async function runAiRobot() {
     const targetDate = getDbDate();
@@ -74,7 +81,6 @@ async function runAiRobot() {
         const allMatches = response.data.matches || [];
         const timedMatches = allMatches.filter(m => m.status === 'TIMED');
         
-        // Jelzés az adminnak
         await logToChat('Róka', `🕵️‍♂️ Szimatolok... Összesen ${allMatches.length} meccset látok, ebből ${timedMatches.length} meccset elemzek ki éppen.`);
 
         const matchData = timedMatches.slice(0, 40).map(m => `[${m.competition.name}] ${m.homeTeam.name} vs ${m.awayTeam.name}`).join("\n");
@@ -83,7 +89,7 @@ async function runAiRobot() {
             model: "gpt-4-turbo-preview",
             messages: [
                 { role: "system", content: "Te a Zsivány Róka AI vagy. Profi magyar sportfogadó. Szigorú JSON: league, match, prediction, odds, reasoning, memberMessage, matchTime." },
-                { role: "user", content: `Válassz egy izgalmas meccset (lehetőleg ne ugyanazt, mint legutóbb)! Ne csak 1X2-t nézz, hanem gólokat (Pl. Over 2.5) vagy szögleteket is! Mivel nincs odds az API-ban, számolj egy REÁLIS odds-ot 1.60 és 2.50 között!\n\n${matchData}` }
+                { role: "user", content: "Válassz egy izgalmas meccset (ne az előzőt)! Ne csak 1X2-t nézz, hanem gólokat vagy szögleteket is! Adj reális odds-ot 1.60 és 2.50 között!\n\n" + matchData }
             ],
             response_format: { type: "json_object" }
         });
@@ -126,10 +132,10 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
 
 app.post('/admin/generate-insta', checkAdmin, async (req, res) => {
     const tip = await Tip.findOne({ date: getDbDate() });
-    if (!tip) return res.json({ caption: "Nincs mára tipp, amit posztolhatnék!" });
+    if (!tip) return res.json({ caption: "Nincs mára tipp!" });
     const aiRes = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
-        messages: [{ role: "system", content: "Írj egy ütős Instagram posztot emojikkal!" }, { role: "user", content: `Meccs: ${tip.match}, Tipp: ${tip.prediction}, Odds: ${tip.odds}` }]
+        messages: [{ role: "system", content: "Írj egy dörzsölt Instagram posztot emojikkal Zsivány Róka stílusban!" }, { role: "user", content: `Meccs: ${tip.match}, Tipp: ${tip.prediction}, Odds: ${tip.odds}` }]
     });
     res.json({ caption: aiRes.choices[0].message.content });
 });
@@ -146,7 +152,7 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
         u.currentBankroll = bank + profit; u.monthlyProfit += profit; await u.save();
     }
     tip.status = status; await tip.save();
-    await logToChat('System', `🏁 Eredmény: ${tip.match} -> ${status.toUpperCase()}`);
+    await logToChat('System', `🏁 Eredmény rögzítve: ${tip.match} -> ${status.toUpperCase()}`);
     res.redirect('/admin');
 });
 
@@ -154,7 +160,7 @@ app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findB
 
 app.post('/auth/login', async (req, res) => {
     const u = await User.findOne({ email: req.body.email.toLowerCase() });
-    if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hiba");
+    if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hibás belépés");
 });
 
 app.get('/login', (req, res) => res.render('login', { brandName: BRAND_NAME }));
