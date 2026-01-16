@@ -52,7 +52,7 @@ async function logToChat(sender, message) {
     await new ChatMessage({ sender, text: `[${timeStr}] ${message}` }).save();
 }
 
-// --- ADATBÁZIS ÉS MIDDLEWARE ---
+// --- ADATBÁZIS ---
 mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -76,7 +76,6 @@ const checkAdmin = async (req, res, next) => {
 };
 
 // --- FŐOLDAL ---
-// Ha be van lépve -> Dashboard, ha nincs -> Sale oldal
 app.get('/', (req, res) => {
     if (req.session.userId) return res.redirect('/dashboard');
     res.redirect('/sale'); 
@@ -86,20 +85,16 @@ app.get('/', (req, res) => {
 async function runAiRobot() {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
-
     try {
         await logToChat('System', "📡 Kapcsolódás a sportadatbázishoz...");
         const response = await axios.get(`https://api.football-data.org/v4/matches`, { headers: { 'X-Auth-Token': token } });
         const allMatches = response.data.matches || [];
         const timedMatches = allMatches.filter(m => m.status === 'TIMED').slice(0, 45);
-
         await logToChat('Róka', `🕵️‍♂️ Szimatolok... ${allMatches.length} meccset látok, ebből a legfrissebbeket elemzem.`);
-
         const matchData = timedMatches.map(m => {
             const time = new Date(m.utcDate).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Budapest' });
             return `ID: ${m.id} | [${m.competition.name}] ${m.homeTeam.name} vs ${m.awayTeam.name} | Kezdés: ${time}`;
         }).join("\n");
-
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
@@ -108,19 +103,13 @@ async function runAiRobot() {
             ],
             response_format: { type: "json_object" }
         });
-
         const result = JSON.parse(aiRes.choices[0].message.content);
-        await Tip.findOneAndUpdate(
-            { date: targetDate }, 
-            { ...result, date: targetDate, isPublished: false, status: 'pending', scannedMatches: allMatches.length }, 
-            { upsert: true }
-        );
-
+        await Tip.findOneAndUpdate({ date: targetDate }, { ...result, date: targetDate, isPublished: false, status: 'pending', scannedMatches: allMatches.length }, { upsert: true });
         await logToChat('Róka', `🎯 Kész a jelentés! ${result.match} | Kezdés: ${result.matchTime} | Odds: ${result.odds}.`);
     } catch (e) { await logToChat('System', `❌ HIBA: ${e.message}`); }
 }
 
-// --- ÚTVONALAK (ROUTES) ---
+// --- ÚTVONALAK ---
 
 // 1. DASHBOARD
 app.get('/dashboard', async (req, res) => {
@@ -139,17 +128,20 @@ app.get('/dashboard', async (req, res) => {
     });
 });
 
-// 2. SALE OLDAL (EZ HIÁNYZOTT!)
-app.get('/sale', (req, res) => {
-    res.render('sale', { brandName: BRAND_NAME });
+// 2. SALE & REGISTER
+app.get('/sale', (req, res) => { res.render('sale', { brandName: BRAND_NAME }); });
+app.get('/register', (req, res) => { res.render('register', { brandName: BRAND_NAME }); });
+
+// 3. FIZETÉSI OLDAL (ÚJ!)
+app.get('/payment', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    // Ha már van licensze, ne lássa ezt az oldalt, menjen a Dashboardra
+    if (user.hasLicense) return res.redirect('/dashboard');
+    res.render('payment', { user, brandName: BRAND_NAME });
 });
 
-// 3. REGISZTRÁCIÓ OLDAL (EZ HIÁNYZOTT!)
-app.get('/register', (req, res) => {
-    res.render('register', { brandName: BRAND_NAME });
-});
-
-// 4. ADMIN OLDAL
+// 4. ADMIN
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const pendingTips = await Tip.find({ status: 'pending' }).sort({ date: -1 });
@@ -159,17 +151,14 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, pendingTips, chatHistory, scannedCount, brandName: BRAND_NAME });
 });
 
-// --- API FUNKCIÓK ---
-
+// --- ADMIN API ---
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { await runAiRobot(); res.redirect('/admin'); });
-
 app.post('/admin/toggle-license', checkAdmin, async (req, res) => {
     const { userId } = req.body;
     const user = await User.findById(userId);
     if(user) { user.hasLicense = !user.hasLicense; await user.save(); }
     res.redirect('/admin');
 });
-
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     const history = await ChatMessage.find().sort({ timestamp: -1 }).limit(10);
     const contextMessages = history.reverse().map(msg => ({ role: (msg.sender === 'System' || msg.sender === 'Róka') ? 'assistant' : 'user', content: msg.text }));
@@ -180,7 +169,6 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
     await logToChat('Róka', aiRes.choices[0].message.content);
     res.json({ reply: aiRes.choices[0].message.content });
 });
-
 app.post('/admin/generate-insta', checkAdmin, async (req, res) => {
     const tip = await Tip.findOne({ date: getDbDate() });
     if (!tip) return res.json({ caption: "Nincs mára tipp, amit posztolhatnék!" });
@@ -190,7 +178,6 @@ app.post('/admin/generate-insta', checkAdmin, async (req, res) => {
     });
     res.json({ caption: aiRes.choices[0].message.content });
 });
-
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     const { status, tipId } = req.body;
     const tip = await Tip.findById(tipId);
@@ -207,40 +194,39 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     await logToChat('System', `🏁 Eredmény: ${tip.match} -> ${status.toUpperCase()}`);
     res.redirect('/admin');
 });
-
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => { 
     await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); 
     await logToChat('System', "📢 Tipp publikálva a tagoknak!");
     res.redirect('/admin'); 
 });
 
-// --- AUTHENTIKÁCIÓ (BELÉPÉS / REGISZTRÁCIÓ) ---
-
+// --- AUTH (BELÉPÉS LOGIKA MÓDOSÍTVA!) ---
 app.post('/auth/register', async (req, res) => {
     try {
         const existing = await User.findOne({ email: req.body.email.toLowerCase() });
         if (existing) return res.send("Ez az email már foglalt!");
-        
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         await new User({
-            fullname: req.body.fullname,
-            email: req.body.email.toLowerCase(),
-            password: hashedPassword,
-            startingCapital: parseInt(req.body.startingCapital) || 0,
-            currentBankroll: parseInt(req.body.startingCapital) || 0,
-            hasLicense: false // Alapból nincs joga, az ADMIN adja meg!
+            fullname: req.body.fullname, email: req.body.email.toLowerCase(), password: hashedPassword,
+            startingCapital: parseInt(req.body.startingCapital) || 0, currentBankroll: parseInt(req.body.startingCapital) || 0,
+            hasLicense: false
         }).save();
-        
         res.redirect('/login');
-    } catch(e) { res.send("Hiba a regisztrációnál: " + e.message); }
+    } catch(e) { res.send("Hiba: " + e.message); }
 });
 
 app.post('/auth/login', async (req, res) => {
     const u = await User.findOne({ email: req.body.email.toLowerCase() });
     if (u && await bcrypt.compare(req.body.password, u.password)) { 
-        req.session.userId = u._id; 
-        res.redirect('/dashboard'); 
-    } else res.send("Hiba a belépés során.");
+        req.session.userId = u._id;
+        
+        // --- ITT AZ "OKOS" ÁTIRÁNYÍTÁS ---
+        if (u.isAdmin || u.hasLicense) {
+            res.redirect('/dashboard'); // Ha fizetett vagy admin -> Mehet
+        } else {
+            res.redirect('/payment');   // Ha nem fizetett -> Fizetési oldal
+        }
+    } else res.send("Hibás belépési adatok.");
 });
 
 app.get('/login', (req, res) => res.render('login', { brandName: BRAND_NAME }));
