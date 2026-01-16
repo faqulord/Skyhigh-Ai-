@@ -89,7 +89,8 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V68 (ULTIMATE) - ONLINE`));
+
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V69 (FINAL STABLE) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -104,12 +105,37 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v68_ultimate', resave: true, saveUninitialized: true,
+    secret: 'fox_v69_ultimate_secret', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- ROBOT: FIXÁLT ELEMZÉS ÉS ÚJRAGENERÁLÁS ---
+// --- AUTH: REGISZTRÁCIÓ JAVÍTVA (ITT VOLT A HIBA!) ---
+app.post('/auth/register', async (req, res) => {
+    try {
+        const { fullname, email, password } = req.body;
+        const existing = await User.findOne({ email: email.toLowerCase() });
+        if (existing) return res.send("Hiba: Ez az email már foglalt!");
+        
+        const hash = await bcrypt.hash(password, 10);
+        const u = await new User({ fullname, email: email.toLowerCase(), password: hash }).save();
+        req.session.userId = u._id;
+        res.redirect('/dashboard');
+    } catch (e) {
+        console.error("Regisztrációs hiba:", e);
+        res.send("Hiba történt a regisztráció során.");
+    }
+});
+
+app.post('/auth/login', async (req, res) => {
+    const u = await User.findOne({ email: req.body.email.toLowerCase() });
+    if (u && await bcrypt.compare(req.body.password, u.password)) {
+        req.session.userId = u._id;
+        res.redirect('/dashboard');
+    } else res.send("Hibás belépési adatok.");
+});
+
+// --- ROBOT: ÚJRAGENERÁLÁS FIX ---
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
@@ -124,8 +150,7 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
         const matchData = fixtures.slice(0, 25).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name} (${m.competition.name})`).join("\n");
 
         const systemPrompt = `Te vagy a Zsivány Róka AI. Mód: ${settings.strategyMode.toUpperCase()}. 
-        Válassz EGY 80%+ biztonságú meccset. 
-        KÖTELEZŐ JSON: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"MATEK NEKEM", "memberMessage":"DUMA A FALKÁNAK", "matchTime":"HH:mm" }`;
+        Válassz EGY 80%+ biztonságú meccset. JSON: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"Matek nekem", "memberMessage":"Duma a falkának", "matchTime":"HH:mm" }`;
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
@@ -134,20 +159,14 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
-
-        // Csak akkor mentünk ha van érdemi adat
         if (result.prediction && result.odds) {
-            await Tip.findOneAndUpdate(
-                { date: targetDate }, 
-                { ...result, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, 
-                { upsert: true }
-            );
+            await Tip.findOneAndUpdate({ date: targetDate }, { ...result, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, { upsert: true });
         }
-    } catch (e) { console.error("ROBOT HIBA:", e); }
+    } catch (e) { console.error("AI HIBA:", e); }
     res.redirect('/admin');
 });
 
-// --- BANKÁR: LOSS GOMB FIX ÉS KAMATOS KAMAT ---
+// --- BANKÁR: KAMATOS KAMAT FIX ---
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     try {
         const { status } = req.body; 
@@ -174,35 +193,21 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     } catch (err) { res.redirect('/admin'); }
 });
 
-// --- RÓKA AGYA CHAT ---
-app.post('/admin/chat', checkAdmin, async (req, res) => {
-    try {
-        const { message } = req.body;
-        const currentTip = await Tip.findOne({ date: getDbDate() });
-        await new ChatMessage({ sender: 'Főnök', text: message }).save();
-
-        const context = currentTip ? `Meccs: ${currentTip.match}, Tipp: ${currentTip.prediction}, Matek: ${currentTip.reasoning}` : "Nincs mai tipp.";
-        const aiRes = await openai.chat.completions.create({
-            model: "gpt-4-turbo-preview",
-            messages: [
-                { role: "system", content: "Te vagy a Zsivány Róka. A Főnökkel beszélsz. Kontextus: " + context },
-                { role: "user", content: message }
-            ]
-        });
-
-        const reply = aiRes.choices[0].message.content;
-        await new ChatMessage({ sender: 'Róka', text: reply }).save();
-        res.json({ reply });
-    } catch(e) { res.json({ reply: "Hiba." }); }
-});
-
-// --- DASHBOARD ROUTE ---
+// --- DASHBOARD: VAGYON ÉS TÉT SZÁMÍTÁS ---
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
     const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
     const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
     
+    // Licenc lejárati ellenőrzés
+    if (user.licenseExpiresAt && new Date() > new Date(user.licenseExpiresAt)) {
+        user.hasLicense = false; await user.save();
+    }
+    
+    // Adminok és az Owner mindig beléphetnek
+    if (!user.isAdmin && user.email !== OWNER_EMAIL && !user.hasLicense) return res.render('sales', { user });
+
     let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
     const bank = (user.currentBankroll && user.currentBankroll > 0) ? user.currentBankroll : user.startingCapital;
 
@@ -213,7 +218,7 @@ app.get('/dashboard', async (req, res) => {
     });
 });
 
-// ALAPOK
+// --- TOVÁBBI OLDALAK ---
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
@@ -222,10 +227,31 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME });
 });
 
+app.post('/admin/chat', checkAdmin, async (req, res) => {
+    try {
+        const { message } = req.body;
+        const currentTip = await Tip.findOne({ date: getDbDate() });
+        await new ChatMessage({ sender: 'Főnök', text: message }).save();
+        const foxContext = currentTip ? `Meccs: ${currentTip.match}, Tipp: ${currentTip.prediction}, Matek: ${currentTip.reasoning}` : "Nincs mai tipp.";
+        const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Te vagy a Zsivány Róka. A Főnökkel beszélsz. Kontextus: " + foxContext }, { role: "user", content: message }] });
+        const reply = aiRes.choices[0].message.content;
+        await new ChatMessage({ sender: 'Róka', text: reply }).save();
+        res.json({ reply });
+    } catch(e) { res.json({ reply: "Hiba." }); }
+});
+
+app.get('/stats', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    const tips = await Tip.find({ status: { $ne: 'pending' } }).sort({ date: -1 }).limit(10);
+    res.render('stats', { user, tips, wins: tips.filter(t=>t.status==='win').length, losses: tips.filter(t=>t.status==='loss').length, monthlyProfit: user.monthlyProfit || 0 });
+});
+
 app.post('/admin/update-settings', checkAdmin, async (req, res) => { await SystemSetting.findOneAndUpdate({}, { strategyMode: req.body.mode }, { upsert: true }); res.redirect('/admin'); });
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
-app.post('/auth/login', async (req, res) => { const u = await User.findOne({ email: req.body.email.toLowerCase() }); if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hiba."); });
 app.get('/login', (req, res) => res.render('login'));
+app.get('/register', (req, res) => res.render('register'));
 app.get('/', (req, res) => res.render('index'));
 app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
+
 app.listen(process.env.PORT || 8080);
