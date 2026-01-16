@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard | <%= brandName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -30,8 +31,9 @@
             </div>
         </div>
         <div class="flex gap-2">
-            <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">STATS</a>
-            <% if (user.isAdmin || user.email === ownerEmail) { %><a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">HQ</a><% } %>
+            <% if (user.isAdmin || user.email === ownerEmail) { %>
+                <a href="/admin" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">HQ</a>
+            <% } %>
             <a href="/logout" class="thin-purple-border text-purple-300 px-4 py-2 rounded-full text-[10px] font-bold">EXIT</a>
         </div>
     </header>
@@ -89,37 +91,57 @@
     <% } else { %>
         <div class="thin-purple-border bg-[#111] p-10 text-center mb-8 rounded-2xl opacity-60">
             <div class="text-4xl mb-4">🦊</div>
-            <h3 class="text-sm font-bold text-zinc-400 uppercase tracking-widest">A Róka elemzést tart...</h3>
+            <% if(!user.hasLicense) { %>
+                <h3 class="text-sm font-bold text-red-400 uppercase tracking-widest">Nincs aktív licenszed!</h3>
+                <p class="text-[10px] text-zinc-500 mt-2">Kérd az aktiválást az admintól.</p>
+            <% } else { %>
+                <h3 class="text-sm font-bold text-zinc-400 uppercase tracking-widest">A Róka elemzést tart...</h3>
+            <% } %>
         </div>
     <% } %>
 
     <script>
         function startTimer() {
             const countdownDisplay = document.getElementById('countdownDisplay');
+            // Biztonságos adatátadás a szerverről
             const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
-            
-            // Adatok a szerverről
             const tipDateStr = "<%= (dailyTip && dailyTip.date) ? dailyTip.date : '' %>"; // Pl: 2026-01-16
-            let tipTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>"; // Pl: 20:30 vagy 20.30
+            let tipTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>"; // Pl: 20:30
             
-            // Pont cserélése kettőspontra (ha magyar formátumot küld a szerver)
+            // Biztonsági csere: pont (.) helyett kettőspont (:)
             tipTimeStr = tipTimeStr.replace('.', ':');
+
+            // Debuggolás a konzolra (F12)
+            console.log("Róka Timer - Dátum:", tipDateStr, "| Idő:", tipTimeStr);
 
             function update() {
                 const now = new Date();
                 let targetDate = new Date();
 
                 if (hasTip && tipTimeStr.includes(':') && tipDateStr) {
-                    // Ha van konkrét dátum és idő, azt rakjuk össze
-                    // "2026-01-16T20:30:00"
-                    const isoString = `${tipDateStr}T${tipTimeStr}:00`;
-                    targetDate = new Date(isoString);
-                    
-                    // Ha Érvénytelen Dátum lenne (safeguard), akkor maradjon a mai nap
-                    if (isNaN(targetDate.getTime())) {
-                        const [h, m] = tipTimeStr.split(':');
+                    try {
+                        // KÉZI DÁTUM ÖSSZERAKÁS (Böngészőfüggetlen megoldás)
+                        
+                        // 1. Dátum szétszedése (pl. 2026-01-16)
+                        const dateParts = tipDateStr.split('-');
+                        const year = parseInt(dateParts[0]);
+                        const month = parseInt(dateParts[1]) - 1; // JS-ben a Január = 0!
+                        const day = parseInt(dateParts[2]);
+
+                        // 2. Idő szétszedése (pl. 20:30)
+                        const timeParts = tipTimeStr.split(':');
+                        const hour = parseInt(timeParts[0]);
+                        const min = parseInt(timeParts[1]);
+
+                        // 3. Új dátum objektum létrehozása
+                        targetDate = new Date(year, month, day, hour, min, 0);
+                        
+                    } catch (err) {
+                        console.error("Timer Hiba:", err);
+                        // Ha hiba van, álljon be holnap 11:00-ra
                         targetDate = new Date();
-                        targetDate.setHours(parseInt(h), parseInt(m), 0, 0);
+                        targetDate.setHours(11, 0, 0, 0);
+                        targetDate.setDate(targetDate.getDate() + 1);
                     }
                 } else {
                     // Ha nincs tipp, számoljunk holnap 11:00-ig
@@ -137,10 +159,12 @@
                     return;
                 }
 
+                // Hátralévő idő kiszámolása
                 const hrs = Math.floor(diff / 3600000);
                 const min = Math.floor((diff % 3600000) / 60000);
                 const sec = Math.floor((diff % 60000) / 1000);
 
+                // Kijelzés (mindig két számjegy)
                 countdownDisplay.innerText = `${hrs.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
             }
 
