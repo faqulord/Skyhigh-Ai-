@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard | Rafinált Róka</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard | <%= brandName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -13,12 +14,14 @@
         .fox-pulse { animation: pulse-fox 3s infinite ease-in-out; }
         @keyframes pulse-fox { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.7)); } }
         .timer-glow { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); font-family: 'Orbitron', sans-serif; }
-        /* LASSÍTOTT SZÖVEG (100s) */
-        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 5px 0; border-radius: 10px; }
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 100s linear infinite; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* SZUPER LASSÚ FUTÓSZÖVEG BEÁLLÍTÁSA */
+        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 8px 0; border-radius: 10px; border-y: 1px solid rgba(168, 85, 247, 0.1); }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 300s linear infinite; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; letter-spacing: 1.5px; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
         #manifestoModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; backdrop-filter: blur(20px); align-items: center; justify-content: center; }
-        .modal-content { max-height: 90vh; overflow-y: auto; width: 90%; max-width: 450px; }
+        .modal-content { max-height: 90vh; overflow-y: auto; width: 95%; max-width: 450px; }
         .btn-pulse { animation: btn-p 1.5s infinite; }
         @keyframes btn-p { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 159, 67, 0.6); } 100% { transform: scale(1); } }
     </style>
@@ -27,8 +30,8 @@
 
     <header class="flex justify-between items-center mb-4 pt-2">
         <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-2xl shadow-lg fox-glow">🦊</div>
-            <div><h1 class="text-base font-black text-white uppercase">Rafinált Róka</h1><p class="text-[10px] text-zinc-500 font-black tracking-[0.2em] uppercase">Private AI Club</p></div>
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-2xl shadow-lg fox-pulse">🦊</div>
+            <div><h1 class="text-base font-black text-white uppercase tracking-tighter">Zsivány Róka</h1><p class="text-[10px] text-zinc-500 font-black tracking-[0.2em] uppercase">Private AI Club</p></div>
         </div>
         <div class="flex gap-2">
             <a href="/stats" class="thin-purple-border text-purple-300 px-3 py-2 rounded-lg text-[10px] font-bold">STATS</a>
@@ -39,9 +42,14 @@
 
     <div class="marquee-container">
         <div class="marquee-text">
-            <% if (typeof foxQuotes !== 'undefined' && foxQuotes && foxQuotes.length > 0) { %>
-                <% foxQuotes.forEach(quote => { %> <span class="mx-6 text-purple-400">★</span> <span class="text-white"><%= quote %></span> <% }) %>
-            <% } else { %> <span class="mx-6">🦊 A Róka éppen vadászik...</span> <% } %>
+            <% if (typeof foxQuotes !== 'undefined' && foxQuotes.length > 0) { %>
+                <% foxQuotes.forEach(quote => { %> 
+                    <span class="mx-10 text-purple-400">⚡</span> 
+                    <span class="text-white"><%= quote %></span> 
+                <% }) %>
+            <% } else { %> 
+                <span class="mx-10">🦊 A Róka éppen a statisztikákat elemzi a felhőben...</span> 
+            <% } %>
         </div>
     </div>
 
@@ -63,16 +71,39 @@
 
     <div class="thin-purple-border bg-[#0a0a0a] p-6 mb-8 rounded-3xl relative overflow-hidden shadow-2xl">
         <div class="flex justify-between items-start mb-5">
-            <div><h4 class="text-[10px] text-purple-400 font-black uppercase tracking-widest mb-1">A Te Vagyonod</h4><p class="text-2xl font-black text-white tracking-tighter"><span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span></p></div>
+            <div>
+                <h4 class="text-[10px] text-purple-400 font-black uppercase tracking-widest mb-1">A Te Vagyonod</h4>
+                <p class="text-2xl font-black text-white tracking-tighter">
+                    <span class="orange-neon"><%= userBank.toLocaleString() %> Ft</span>
+                </p>
+            </div>
             <button type="button" onclick="openManifesto()" class="bg-orange-500 text-black text-[10px] font-black px-4 py-2.5 rounded-xl btn-pulse uppercase tracking-widest shadow-lg cursor-pointer hover:bg-orange-400">OLVASS EL ❗</button>
         </div>
-        <div class="bg-zinc-900/60 p-3 rounded-xl border border-white/5 mb-4 flex justify-between items-center"><span class="text-[10px] text-zinc-400 uppercase font-bold">Havi Profit:</span><span class="text-sm font-black <%= monthlyProfit >= 0 ? 'text-green-500' : 'text-red-500' %>"><%= monthlyProfit > 0 ? '+' : '' %><%= monthlyProfit.toLocaleString() %> Ft</span></div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-inner"><p class="text-[10px] text-zinc-500 uppercase font-black mb-1 tracking-widest">Napi Téted</p><p class="text-base font-black text-white"><%= suggestedStake.toLocaleString() %> Ft</p></div>
-            <div class="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-inner"><p class="text-[10px] text-zinc-500 uppercase font-black mb-1 tracking-widest">Fokozat</p><p class="text-base font-black orange-neon uppercase"><%= strategyMode %></p></div>
+        
+        <div class="bg-zinc-900/60 p-3 rounded-xl border border-white/5 mb-4 flex justify-between items-center">
+            <span class="text-[10px] text-zinc-400 uppercase font-bold">Havi Profit:</span>
+            <span class="text-sm font-black <%= monthlyProfit >= 0 ? 'text-green-500' : 'text-red-500' %>">
+                <%= monthlyProfit > 0 ? '+' : '' %><%= monthlyProfit.toLocaleString() %> Ft
+            </span>
         </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-inner">
+                <p class="text-[10px] text-zinc-500 uppercase font-black mb-1 tracking-widest">Napi Téted</p>
+                <p class="text-base font-black text-white"><%= suggestedStake.toLocaleString() %> Ft</p>
+            </div>
+            <div class="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-inner">
+                <p class="text-[10px] text-zinc-500 uppercase font-black mb-1 tracking-widest">Fokozat</p>
+                <p class="text-base font-black orange-neon uppercase"><%= strategyMode %></p>
+            </div>
+        </div>
+
         <button onclick="toggleBankEdit()" class="w-full text-[10px] text-zinc-600 font-black hover:text-white transition py-2 border-t border-white/5 mt-2">PÉNZTÁRCA BEÁLLÍTÁSA ▲</button>
-        <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-5 rounded-2xl border border-white/5 animate-fade-in"><p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase tracking-widest">Írd be a PONTOS tőkédet:</p><input type="number" name="amount" placeholder="pl. 100000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500"><button class="w-full bg-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase shadow-xl tracking-widest">Mentés</button></form>
+        <form id="bankForm" action="/user/update-bank" method="POST" class="hidden mt-4 bg-black/50 p-5 rounded-2xl border border-white/5">
+            <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase tracking-widest">Írd be a PONTOS tőkédet:</p>
+            <input type="number" name="amount" placeholder="pl. 100000" class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg w-full outline-none text-white font-black mb-3 focus:border-purple-500" required>
+            <button class="w-full bg-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase shadow-xl tracking-widest">Tőke Mentése</button>
+        </form>
     </div>
 
     <% if (dailyTip && dailyTip.isPublished) { %>
@@ -80,66 +111,74 @@
             <div class="text-center">
                 <p class="text-[11px] text-zinc-500 font-black uppercase mb-3 tracking-widest"><%= dailyTip.league %></p>
                 <h3 class="text-xl font-black text-white mb-5"><%= dailyTip.match %></h3>
-                <div class="bg-zinc-900/80 p-6 rounded-[2rem] border border-white/5 w-full mb-5 shadow-inner"><p class="text-3xl font-black orange-neon-xl tracking-widest"><%= dailyTip.prediction %></p><p class="text-sm font-black text-white mt-2 uppercase tracking-[0.3em]">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p></div>
-                <div class="bg-black/40 p-5 rounded-2xl border border-zinc-800/50 italic relative"><span class="absolute -top-3 left-6 text-xl">🦊</span><p class="text-sm purple-pink-text-gradient leading-relaxed font-medium">"<%= dailyTip.memberMessage %>"</p></div>
+                <div class="bg-zinc-900/80 p-6 rounded-[2rem] border border-white/5 w-full mb-5 shadow-inner">
+                    <p class="text-3xl font-black orange-neon tracking-widest"><%= dailyTip.prediction %></p>
+                    <p class="text-sm font-black text-white mt-2 uppercase tracking-[0.3em]">Odds: <span class="text-purple-400"><%= dailyTip.odds %></span></p>
+                </div>
+                <div class="bg-black/40 p-5 rounded-2xl border border-zinc-800/50 italic relative">
+                    <span class="absolute -top-3 left-6 text-xl">🦊</span>
+                    <p class="text-sm purple-pink-text-gradient leading-relaxed font-medium">"<%= dailyTip.memberMessage %>"</p>
+                </div>
             </div>
+        </div>
+    <% } else { %>
+        <div class="text-center py-10 opacity-30">
+            <p class="text-xs font-bold uppercase tracking-widest">A Róka még elemzi a mai lehetőségeket...</p>
         </div>
     <% } %>
 
     <div id="manifestoModal">
         <div class="thin-purple-border bg-[#0a0a0a] p-8 rounded-[2.5rem] modal-content relative">
             <button onclick="closeManifesto()" class="absolute top-5 right-7 text-zinc-600 font-bold text-3xl hover:text-white transition cursor-pointer">×</button>
-            <div class="text-center mb-8"><div class="fox-pulse text-6xl mb-4">🦊</div><h2 class="orbitron text-2xl font-black orange-neon uppercase tracking-widest">A Róka Törvénye</h2><p class="text-[10px] text-zinc-500 mt-2">Fix Matek. 0% Szerencse.</p></div>
-            
+            <div class="text-center mb-8"><div class="fox-pulse text-6xl mb-4">🦊</div><h2 class="text-2xl font-black orange-neon uppercase tracking-widest">A Róka Törvénye</h2><p class="text-[10px] text-zinc-500 mt-2">Fix Matek. 0% Szerencse.</p></div>
+
             <div class="space-y-6 text-sm leading-relaxed text-zinc-300 font-medium">
-                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
-                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">1. Miért fizetsz?</p>
-                    <p class="text-xs text-zinc-400">Nem tippeket veszel, hanem technológiát. Én egy <strong class="text-white">Felhő alapú Mesterséges Intelligencia</strong> vagyok. 0-24-ben elemzem az élő adatokat, és csak akkor szólok, ha matematikai hibát találok a bukmékernél. Ez a te előnyöd.</p>
+                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5">
+                    <p class="text-white font-bold mb-2 uppercase text-[10px] tracking-widest border-b border-white/10 pb-2">1. Technológia a zsebedben</p>
+                    <p class="text-[11px] text-zinc-400">Én egy felhő alapú AI vagyok. Nem tippelek, hanem a bukmékerek matematikai réseit keresem élő adatok alapján.</p>
                 </div>
-
-                <div class="bg-zinc-900/60 p-5 rounded-3xl border border-white/5 shadow-lg">
-                    <p class="text-white font-bold mb-2 uppercase text-xs tracking-widest border-b border-white/10 pb-2">2. Bárhol Működik</p>
-                    <p class="text-xs text-zinc-400">Teljesen mindegy, hol játszol: <strong class="text-white">Online irodában vagy a sarki Lottózóban.</strong> A matematika univerzális. Mi csak eszközként használjuk a sportfogadást arra, hogy a pénzünk dolgozzon helyettünk, mint egy befektetésnél.</p>
-                </div>
-
-                <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl shadow-lg">
-                    <p class="text-purple-300 font-bold mb-3 uppercase text-xs tracking-widest border-b border-purple-500/20 pb-2">3. JÖVŐKÉP (HÓGOLYÓ EFFEKTUS)</p>
-                    <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800 space-y-3 text-xs">
-                        <div class="flex justify-between items-center"><span class="text-zinc-500">Kezdő tőke:</span><span class="text-white font-bold">100.000 Ft</span></div>
-                        <div class="border-t border-white/5 my-1"></div>
-                        <div class="flex justify-between items-center"><span class="text-purple-400">Fél év múlva:</span><span class="text-white font-black text-sm">~450.000 Ft</span></div>
-                        <div class="flex justify-between items-center"><span class="text-purple-400">1. Év Vége:</span><span class="text-white font-black text-sm">~1.800.000 Ft</span></div>
-                        <div class="flex justify-between items-center"><span class="text-orange-400">2. Év Vége:</span><span class="orange-neon text-lg">~15.000.000 Ft+</span></div>
+                <div class="bg-purple-900/10 border border-purple-500/20 p-5 rounded-3xl">
+                    <p class="text-purple-300 font-bold mb-3 uppercase text-[10px] tracking-widest border-b border-purple-500/20 pb-2">2. A Kamatos Kamat Ereje</p>
+                    <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800 space-y-2 text-[11px]">
+                        <div class="flex justify-between items-center"><span class="text-zinc-500">Kezdés:</span><span class="text-white">100.000 Ft</span></div>
+                        <div class="flex justify-between items-center"><span class="text-purple-400">1. év után:</span><span class="text-white font-black">~1.8M Ft</span></div>
+                        <div class="flex justify-between items-center"><span class="text-orange-400">2. év után:</span><span class="orange-neon text-base">~15M Ft+</span></div>
                     </div>
-                    <p class="text-[9px] text-zinc-500 mt-3 pt-2 border-t border-white/5 italic text-center">(Feltéve, ha nem veszed ki a pénzt!)</p>
-                </div>
-
-                <div class="bg-red-900/10 border border-red-500/30 p-5 rounded-3xl shadow-lg">
-                    <p class="text-red-400 font-bold mb-2 uppercase text-xs tracking-widest border-b border-red-500/20 pb-2">⚠️ 4. VASFAGYELEM</p>
-                    <ul class="space-y-2 list-none text-xs">
-                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>A TŐKE SZENT!</strong> Nem nyúlunk hozzá, hagyjuk nőni.</span></li>
-                        <li class="flex gap-2"><span class="text-orange-500">➤</span> <span><strong>PONTOS TÉT!</strong> Mindig annyit rakj, amennyit a gép ír ki. Ez a siker kulcsa.</span></li>
-                    </ul>
                 </div>
             </div>
-            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-6 rounded-3xl mt-6 uppercase text-xs tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.4)] transition active:scale-95 cursor-pointer">ÉRTEM! INDULJON A PÉNZGYÁR! 🚀</button>
+            <button onclick="closeManifesto()" class="w-full bg-purple-600 text-white font-black py-5 rounded-3xl mt-6 uppercase text-xs tracking-widest shadow-lg active:scale-95 transition">MEGÉRTETTEM! 🚀</button>
         </div>
     </div>
 
     <script>
-        function openManifesto() { const modal = document.getElementById('manifestoModal'); if(modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }
-        function closeManifesto() { const modal = document.getElementById('manifestoModal'); if(modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } }
+        function openManifesto() { document.getElementById('manifestoModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeManifesto() { document.getElementById('manifestoModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
         function toggleBankEdit() { document.getElementById('bankForm').classList.toggle('hidden'); }
+        
         function startTimer() {
-            const countdownDisplay = document.getElementById('countdownDisplay'); if(!countdownDisplay) return;
+            const countdownDisplay = document.getElementById('countdownDisplay');
             const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
+            
             function update() {
-                const now = new Date(); let targetDate = new Date();
-                if (matchTimeStr && matchTimeStr.includes(':')) { const parts = matchTimeStr.split(':'); targetDate.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0); if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ"; return; } } else { targetDate.setHours(11, 0, 0, 0); if(now > targetDate) targetDate.setDate(targetDate.getDate() + 1); }
-                const diff = targetDate - now; if(diff < 0) { countdownDisplay.innerText = "00:00:00"; return; }
-                const hrs = Math.floor(diff / 3600000); const min = Math.floor((diff % 3600000) / 60000); const sec = Math.floor((diff % 60000) / 1000);
+                const now = new Date();
+                let targetDate = new Date();
+                
+                if (matchTimeStr && matchTimeStr.includes(':')) {
+                    const parts = matchTimeStr.split(':');
+                    targetDate.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+                    if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ"; return; }
+                } else {
+                    targetDate.setHours(11, 0, 0, 0);
+                    if(now > targetDate) targetDate.setDate(targetDate.getDate() + 1);
+                }
+                
+                const diff = targetDate - now;
+                const hrs = Math.floor(diff / 3600000);
+                const min = Math.floor((diff % 3600000) / 60000);
+                const sec = Math.floor((diff % 60000) / 1000);
                 countdownDisplay.innerText = `${hrs.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-            } setInterval(update, 1000); update();
+            }
+            setInterval(update, 1000); update();
         }
         window.addEventListener('load', startTimer);
     </script>
