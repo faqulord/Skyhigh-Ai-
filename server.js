@@ -9,12 +9,59 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
+
+// --- 50+ ZSIVÁNY ÜZENET (MOTIVÁCIÓ + VICCEK) ---
 const FOX_QUOTES = [
     "FALKA FIGYELEM! Ma nem kérünk... Elveszünk! 🦊💰",
-    "A buki a zsákmány, mi vagyunk a vadászok. Töltsd a puskát! 🎯",
-    "Ez nem tippmixelés, ez befektetés. A tőke a lőszer! 💣",
-    "A statisztika nem hazudik. A bukméker igen. Mi a mateknak hiszünk. 📊",
-    "Hideg fej, forró oddsok, tele zseb. Ez a Róka törvénye. 🦊"
+    "A buki a zsákmány, mi vagyunk a vadászok. 🎯",
+    "A tőke a lőszer. Ne lövöldözz vaktában! 💣",
+    "A statisztika nem hazudik. A bukméker igen. 📊",
+    "Hideg fej, forró oddsok, tele zseb. Ez a Róka törvénye. 🦊",
+    "Ne dolgozz a pénzért... Küldd el a pénzt dolgozni! 💸",
+    "A kamatos kamat a világ nyolcadik csodája. Mi használjuk. 📈",
+    "A türelem profitot terem, a kapkodás veszteséget. ⏳",
+    "Miért sír a bukméker? Mert meglátta a Róka elemzését. 😂",
+    "Tudod mi a különbség közted és a buki közt? Neked van AI segítséged. 🤖",
+    "A szerencsejátékos reménykedik. A befektető számol. 📉",
+    "Egy Róka sosem hibázik, csak néha teszteli a piacot. 😉",
+    "A Falka nem ismer kegyelmet, csak profitot. 🐺",
+    "A profit nem a cél, hanem a mellékterméke a jó mateknak. 💰",
+    "Ülj le, dőlj hátra, és nézd, ahogy a gép dolgozik. 🦊",
+    "Ma is egy nappal közelebb a pénzügyi szabadsághoz. 🚀",
+    "A legjobb idő a tőkeépítésre tegnap volt. A második legjobb ma. 🔥",
+    "Buksza tele, szív nyugodt. Róka-vibe. ✨",
+    "Nem tippmixelünk. Vagyonkezelünk. 🏛️",
+    "A bukmékernek nincs esélye a mesterséges intelligencia ellen. 🧠",
+    "Kérdezték a Rókát, mi a titka. Azt mondta: Matek és semmi érzelem. 🦊",
+    "A legdrágább dolog a világon a rossz megérzés. 💸",
+    "Legyél te a vadász, ne a préda! 🎯",
+    "A pénz nem boldogít? Próbáld meg a Róka tippjeivel! 😂",
+    "Sokan próbálkoznak, kevesen maradnak állva. Mi maradunk. 🦊",
+    "A jövő felhő alapú, a profitunk pedig kőkemény. ☁️💰",
+    "Amíg ők alszanak, a Róka algoritmusa elemez. 🌙",
+    "Nincs több vakrepülés. Csak precíziós találatok. 🎯",
+    "A siker titka: ne nyúlj a tőkéhez, hagyd fialni! 📈",
+    "Zsebben a lé, agyban a terv. 🧠💸",
+    "A Róka nem eszik tyúkot, csak oddsokat. 🦊🍗",
+    "Fegyelem nélkül nincs birodalom. 🏰",
+    "Minden nyertes tipp egy tégla a váradhoz. 🧱",
+    "A buki azt hitte, ma ő nyer. A Róka csak mosolygott. 😏",
+    "A tőkeépítés nem sprint, hanem maraton. De mi gyorsan futunk! 🏃‍♂️💨",
+    "AI a zsebben, profit a számlán. Ez a 2026-os stílus. 🤖",
+    "Ne csak nézd, csináld! A Róka utat mutat. 🦊",
+    "A legnagyobb kockázat az, ha nem kockáztatsz okosan. 🎲",
+    "Tiszta lap, tiszta matek, tiszta profit. 📉",
+    "A Falka ereje az összefogásban és az algoritmusban van. 🐺",
+    "A bukik utálnak minket. Ez a legnagyobb elismerés. 🏆",
+    "Napi egy tipp, a profitot bent tartja. 😉",
+    "A gazdagság ott kezdődik, ahol a kapzsiság véget ér. 🧠",
+    "Minden meccs egy lehetőség. Mi csak a legjobbakat vesszük el. 🦊",
+    "A Róka nem kér elnézést a nyereségért. 💰",
+    "Építs vagyont, ne csak bankrollt! 🏛️",
+    "A szoftver nem alszik, nem fárad, nem téved. 🤖✨",
+    "Csatlakozz a győztesekhez, maradj a Falkával! 🦊🤝",
+    "A matek a közös nyelvünk. A profit a válaszunk. 📈",
+    "Zsivány Róka: A sportfogadás evolúciója. 🦊🧬"
 ];
 
 // --- MODELLEK ---
@@ -42,8 +89,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V67 (LOSS & COMPOUND FIX) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V68 (ULTIMATE) - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const checkAdmin = async (req, res, next) => {
@@ -58,44 +104,12 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v67_ultimate', resave: true, saveUninitialized: true,
+    secret: 'fox_v68_ultimate', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// --- BANKÁR: A KAMATOS KAMAT ÉS A LOSS GOMB FIX LOGIKÁJA ---
-app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
-    try {
-        const { status } = req.body; 
-        const tip = await Tip.findOne({ date: getDbDate() });
-        const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-
-        if (!tip || tip.status !== 'pending') return res.redirect('/admin');
-
-        // Stratégia alapú tét % meghatározása
-        let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
-        const users = await User.find({ isAdmin: false });
-
-        for (let u of users) {
-            // Kamatos kamat elve: Ha már van currentBankroll, azt használjuk, ha nincs, a startingCapital-t
-            let bank = (u.currentBankroll && u.currentBankroll > 0) ? u.currentBankroll : u.startingCapital;
-            
-            if (bank > 0) {
-                let stake = Math.round(bank * p);
-                let profit = (status === 'win') ? Math.round(stake * (parseFloat(tip.odds) - 1)) : -stake;
-                
-                u.currentBankroll = bank + profit;
-                u.monthlyProfit = (u.monthlyProfit || 0) + profit;
-                await u.save();
-            }
-        }
-        tip.status = status;
-        await tip.save();
-        res.redirect('/admin');
-    } catch (err) { console.error("BANKÁR HIBA:", err); res.redirect('/admin'); }
-});
-
-// --- ROBOT: STRATÉGIA + KETTŐS SZEMÉLYISÉG INTEGRÁCIÓ ---
+// --- ROBOT: FIXÁLT ELEMZÉS ÉS ÚJRAGENERÁLÁS ---
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
@@ -109,9 +123,9 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
 
         const matchData = fixtures.slice(0, 25).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name} (${m.competition.name})`).join("\n");
 
-        const systemPrompt = `Te vagy a Zsivány Róka AI. Mód: ${settings.strategyMode}. 
-        Feladat: Válassz egy 80%+ tippet. 
-        JSON választ adj: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"MATEK A FŐNÖKNEK", "memberMessage":"DÖRZSÖLT SZÖVEG A FALKÁNAK", "matchTime":"HH:mm" }`;
+        const systemPrompt = `Te vagy a Zsivány Róka AI. Mód: ${settings.strategyMode.toUpperCase()}. 
+        Válassz EGY 80%+ biztonságú meccset. 
+        KÖTELEZŐ JSON: { "league":"", "match":"", "prediction":"", "odds":"", "reasoning":"MATEK NEKEM", "memberMessage":"DUMA A FALKÁNAK", "matchTime":"HH:mm" }`;
 
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
@@ -120,24 +134,75 @@ app.post('/admin/run-robot', checkAdmin, async (req, res) => {
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
-        await Tip.findOneAndUpdate({ date: targetDate }, { ...result, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, { upsert: true });
-    } catch (e) { console.error("ROBOT HIBA:", e); } res.redirect('/admin');
+
+        // Csak akkor mentünk ha van érdemi adat
+        if (result.prediction && result.odds) {
+            await Tip.findOneAndUpdate(
+                { date: targetDate }, 
+                { ...result, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, 
+                { upsert: true }
+            );
+        }
+    } catch (e) { console.error("ROBOT HIBA:", e); }
+    res.redirect('/admin');
 });
 
-// --- DASHBOARD (BANKROLL MEGJELENÍTÉS) ---
+// --- BANKÁR: LOSS GOMB FIX ÉS KAMATOS KAMAT ---
+app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
+    try {
+        const { status } = req.body; 
+        const tip = await Tip.findOne({ date: getDbDate() });
+        const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
+        if (!tip || tip.status !== 'pending') return res.redirect('/admin');
+
+        let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
+        const users = await User.find({ isAdmin: false });
+
+        for (let u of users) {
+            let currentBank = (u.currentBankroll && u.currentBankroll > 0) ? u.currentBankroll : u.startingCapital;
+            if (currentBank > 0) {
+                let stake = Math.round(currentBank * p);
+                let profit = (status === 'win') ? Math.round(stake * (parseFloat(tip.odds) - 1)) : -stake;
+                u.currentBankroll = currentBank + profit;
+                u.monthlyProfit = (u.monthlyProfit || 0) + profit;
+                await u.save();
+            }
+        }
+        tip.status = status;
+        await tip.save();
+        res.redirect('/admin');
+    } catch (err) { res.redirect('/admin'); }
+});
+
+// --- RÓKA AGYA CHAT ---
+app.post('/admin/chat', checkAdmin, async (req, res) => {
+    try {
+        const { message } = req.body;
+        const currentTip = await Tip.findOne({ date: getDbDate() });
+        await new ChatMessage({ sender: 'Főnök', text: message }).save();
+
+        const context = currentTip ? `Meccs: ${currentTip.match}, Tipp: ${currentTip.prediction}, Matek: ${currentTip.reasoning}` : "Nincs mai tipp.";
+        const aiRes = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [
+                { role: "system", content: "Te vagy a Zsivány Róka. A Főnökkel beszélsz. Kontextus: " + context },
+                { role: "user", content: message }
+            ]
+        });
+
+        const reply = aiRes.choices[0].message.content;
+        await new ChatMessage({ sender: 'Róka', text: reply }).save();
+        res.json({ reply });
+    } catch(e) { res.json({ reply: "Hiba." }); }
+});
+
+// --- DASHBOARD ROUTE ---
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
+    const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
     const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
     
-    if (user.licenseExpiresAt && new Date() > new Date(user.licenseExpiresAt)) {
-        user.hasLicense = false; await user.save();
-    }
-    
-    // SALES OLDAL REDIRECT LICENC HIÁNYÁBAN
-    if (!user.isAdmin && user.email !== OWNER_EMAIL && !user.hasLicense) return res.render('sales', { user });
-
-    const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
     let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
     const bank = (user.currentBankroll && user.currentBankroll > 0) ? user.currentBankroll : user.startingCapital;
 
@@ -148,7 +213,7 @@ app.get('/dashboard', async (req, res) => {
     });
 });
 
-// --- TOVÁBBI ALAPFUNKCIÓK ---
+// ALAPOK
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const currentTip = await Tip.findOne({ date: getDbDate() });
@@ -157,40 +222,10 @@ app.get('/admin', checkAdmin, async (req, res) => {
     res.render('admin', { users, currentTip, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME });
 });
 
-app.post('/admin/update-settings', checkAdmin, async (req, res) => {
-    await SystemSetting.findOneAndUpdate({}, { strategyMode: req.body.mode }, { upsert: true });
-    res.redirect('/admin');
-});
-
-app.post('/admin/publish-tip', checkAdmin, async (req, res) => {
-    await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true });
-    res.redirect('/admin');
-});
-
-app.post('/auth/register', async (req, res) => {
-    const { fullname, email, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    const u = await new User({ fullname, email: email.toLowerCase(), password: hash }).save();
-    req.session.userId = u._id; res.redirect('/dashboard');
-});
-
-app.post('/auth/login', async (req, res) => {
-    const u = await User.findOne({ email: req.body.email.toLowerCase() });
-    if (u && await bcrypt.compare(req.body.password, u.password)) {
-        req.session.userId = u._id; res.redirect('/dashboard');
-    } else res.send("Hiba.");
-});
-
-app.get('/stats', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-    const tips = await Tip.find({ status: { $ne: 'pending' } }).sort({ date: -1 }).limit(10);
-    res.render('stats', { user, tips, wins: tips.filter(t=>t.status==='win').length, losses: tips.filter(t=>t.status==='loss').length, monthlyProfit: user.monthlyProfit || 0 });
-});
-
+app.post('/admin/update-settings', checkAdmin, async (req, res) => { await SystemSetting.findOneAndUpdate({}, { strategyMode: req.body.mode }, { upsert: true }); res.redirect('/admin'); });
+app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
+app.post('/auth/login', async (req, res) => { const u = await User.findOne({ email: req.body.email.toLowerCase() }); if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hiba."); });
 app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
 app.get('/', (req, res) => res.render('index'));
-
+app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
 app.listen(process.env.PORT || 8080);
