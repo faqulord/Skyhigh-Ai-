@@ -1,222 +1,137 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner HQ | <%= brandName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; }
-        .tech-card { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; margin-bottom: 20px; }
-        .hidden { display: none !important; }
-        #sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #09090b; border-right: 1px solid #222; z-index: 9999; transform: translateX(-100%); transition: 0.3s ease; padding-top: 80px; }
-        #sidebar.open { transform: translateX(0); }
-        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9998; display: none; backdrop-filter: blur(5px); }
-        #overlay.show { display: block; }
-        @media (min-width: 1024px) { #sidebar { transform: translateX(0); } #overlay { display: none !important; } }
-        .menu-item { display: flex; align-items: center; gap: 15px; width: 100%; padding: 18px 25px; color: #666; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; border-left: 3px solid transparent; }
+        .tech-card { background: #0a0a0a; border: 1px solid #222; border-radius: 15px; margin-bottom: 20px; }
+        #sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #09090b; border-right: 1px solid #222; padding-top: 20px; }
+        .menu-item { padding: 15px 25px; color: #666; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; border-left: 3px solid transparent; }
         .menu-item.active { color: #fff; background: #111; border-left-color: #c084fc; }
-        .msg { padding: 10px; border-radius: 12px; font-size: 11px; margin-bottom: 8px; border: 1px solid #111; }
-        .msg-ai { background: #1e1b4b; border-color: #312e81; color: #c7d2fe; }
-        .msg-me { background: #2563eb; color: #fff; align-self: flex-end; }
-        .stat-box { background: #111; border: 1px solid #222; padding: 15px; rounded: 15px; text-align: center; }
+        .hidden { display: none !important; }
+        .msg-ai { background: #1e1b4b; padding: 10px; border-radius: 10px; font-size: 11px; margin-bottom: 5px; }
     </style>
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('show');
-        }
         function switchTab(id) {
             document.querySelectorAll('.page-section').forEach(e => e.classList.add('hidden'));
             document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + id).classList.remove('hidden');
             document.getElementById('btn-' + id).classList.add('active');
-            
-            const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth < 1024 && sidebar.classList.contains('open')) {
-                toggleSidebar();
-            }
-            window.scrollTo(0,0);
         }
     </script>
 </head>
-<body class="min-h-screen">
-    <div id="overlay" onclick="toggleSidebar()"></div>
-
+<body>
     <nav id="sidebar">
-        <div class="px-6 mb-6"><h2 class="text-white font-black text-xl uppercase tracking-widest">HQ CONTROL</h2><p class="text-[10px] text-zinc-500">v81 Fixed</p></div>
-        <div onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-item active">📊 VEZÉRLŐPULT</div>
-        <div onclick="switchTab('chat')" id="btn-chat" class="menu-item">🤖 RÓKA AGYA</div>
-        <div onclick="switchTab('users')" id="btn-users" class="menu-item">👥 TAGOK</div>
-        <div onclick="switchTab('finance')" id="btn-finance" class="menu-item">💰 PÉNZÜGY</div>
-        <div onclick="switchTab('email')" id="btn-email" class="menu-item">📩 EMAIL</div>
-        <div class="absolute bottom-10 left-0 w-full px-6"><a href="/logout" class="block text-center border border-red-900/50 text-red-500 py-3 rounded-xl text-[10px] font-black uppercase">Kilépés</a></div>
+        <div class="px-6 mb-10 text-white font-black uppercase tracking-tighter text-xl">FOX HQ</div>
+        <div onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-item active">📊 Dashboard</div>
+        <div onclick="switchTab('chat')" id="btn-chat" class="menu-item">🤖 Róka Agya</div>
+        <div onclick="switchTab('users')" id="btn-users" class="menu-item">👥 Tagok</div>
+        <div onclick="switchTab('finance')" id="btn-finance" class="menu-item">💰 Pénzügy</div>
+        <div onclick="switchTab('insta')" id="btn-insta" class="menu-item">📸 Instagram</div>
+        <div onclick="switchTab('email')" id="btn-email" class="menu-item">📩 Email</div>
     </nav>
 
-    <header class="fixed top-0 left-0 w-full bg-black/90 border-b border-zinc-800 p-4 z-40 flex justify-between items-center h-[70px] lg:hidden">
-        <button onclick="toggleSidebar()" class="text-white bg-zinc-900 px-3 py-2 rounded-lg border border-zinc-700 font-bold">☰</button>
-        <span class="font-black text-white uppercase tracking-widest"><%= brandName %> HQ</span>
-        <a href="/dashboard" class="text-[10px] font-bold text-purple-500 uppercase border border-purple-500 px-3 py-1 rounded-full">DASH ➤</a>
-    </header>
-
-    <main class="pt-[90px] lg:pt-[40px] px-4 pb-10 w-full lg:pl-[280px] max-w-4xl mx-auto">
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="stat-box">
-                <p class="text-[9px] text-zinc-500 uppercase font-bold">Átvizsgált meccsek</p>
-                <p class="text-xl font-black text-purple-500"><%= typeof scannedCount !== 'undefined' ? scannedCount : 0 %></p>
+    <main class="ml-[250px] p-10 max-w-5xl">
+        <div class="grid grid-cols-4 gap-4 mb-10">
+            <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
+                <p class="text-[10px] text-zinc-500 font-bold uppercase">Átvizsgált</p>
+                <p class="text-2xl font-black text-purple-500"><%= scannedCount %></p>
             </div>
-            <div class="stat-box">
-                <p class="text-[9px] text-zinc-500 uppercase font-bold">Összes Tag</p>
-                <p class="text-xl font-black text-white"><%= users.length %></p>
+            <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
+                <p class="text-[10px] text-zinc-500 font-bold uppercase">Összes Tag</p>
+                <p class="text-2xl font-black"><%= users.length %></p>
             </div>
         </div>
 
         <div id="tab-dashboard" class="page-section">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black text-white border-l-4 border-purple-500 pl-4 uppercase">Elemzések</h2>
-                <form action="/admin/run-robot" method="POST" onsubmit="this.querySelector('button').innerText='🦊 Szimatolás...'">
-                    <button class="bg-white text-black px-6 py-3 rounded-xl font-black uppercase text-[10px]">🚀 ÚJ ELEMZÉS FUTTATÁSA</button>
+                <h2 class="text-2xl font-black uppercase">Várakozó Tippek</h2>
+                <form action="/admin/run-robot" method="POST">
+                    <button class="bg-white text-black px-6 py-2 rounded-lg font-black text-[10px] uppercase">🚀 Új Elemzés</button>
                 </form>
             </div>
-            
-            <% if(pendingTips.length === 0) { %>
-                <div class="tech-card p-10 text-center opacity-50">
-                    <p class="text-xs uppercase font-bold">Nincs várakozó tipp. Indítsd el a robotot!</p>
-                </div>
-            <% } %>
-
             <% pendingTips.forEach(tip => { %>
-                <div class="tech-card p-6 mb-4">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-[10px] text-zinc-500 font-bold uppercase mb-1"><%= tip.date %></p>
-                            <h3 class="text-xl font-black"><%= tip.match %></h3>
-                        </div>
-                        <span class="bg-zinc-800 text-purple-400 text-[10px] px-3 py-1 rounded-full font-bold uppercase">Tipp: <%= tip.prediction %></span>
+                <div class="tech-card p-6">
+                    <h3 class="text-xl font-black"><%= tip.match %></h3>
+                    <p class="text-purple-400 font-bold mb-4"><%= tip.prediction %> (@<%= tip.odds %>)</p>
+                    <div class="bg-zinc-900 p-4 rounded-lg text-xs italic text-zinc-400 mb-6"><%= tip.reasoning %></div>
+                    <div class="flex gap-4">
+                        <form action="/admin/settle-tip" method="POST" class="flex-1"><input type="hidden" name="tipId" value="<%= tip._id %>"><input type="hidden" name="status" value="win"><button class="w-full bg-green-600 py-3 rounded-xl font-bold uppercase text-[10px]">Nyert</button></form>
+                        <form action="/admin/settle-tip" method="POST" class="flex-1"><input type="hidden" name="tipId" value="<%= tip._id %>"><input type="hidden" name="status" value="loss"><button class="w-full bg-red-600 py-3 rounded-xl font-bold uppercase text-[10px]">Vesztett</button></form>
                     </div>
-
-                    <div class="bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 mb-6">
-                        <p class="text-[9px] text-purple-500 font-bold uppercase mb-2">Róka elemzése:</p>
-                        <p class="text-xs text-zinc-300 leading-relaxed italic"><%= tip.reasoning || 'Nincs szöveges elemzés.' %></p>
-                        <div class="mt-3 pt-3 border-t border-zinc-800">
-                            <p class="text-[10px] text-white font-bold uppercase">Odds: <span class="text-orange-500"><%= tip.odds %></span></p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= tip._id %>"><input type="hidden" name="status" value="win"><button class="w-full bg-green-900/40 text-green-500 py-3 rounded-xl font-black text-xs uppercase hover:bg-green-600 hover:text-white transition">NYERŐ ✅</button></form>
-                        <form action="/admin/settle-tip" method="POST"><input type="hidden" name="tipId" value="<%= tip._id %>"><input type="hidden" name="status" value="loss"><button class="w-full bg-red-900/40 text-red-500 py-3 rounded-xl font-black text-xs uppercase hover:bg-red-600 hover:text-white transition">VESZTETT ❌</button></form>
-                    </div>
-                    <% if(!tip.isPublished) { %><form action="/admin/publish-tip" method="POST" class="mt-4"><input type="hidden" name="tipId" value="<%= tip._id %>"><button class="w-full bg-purple-600 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg shadow-purple-500/20">📢 PUBLIKÁLÁS A TAGOKNAK</button></form><% } %>
+                    <% if(!tip.isPublished) { %><form action="/admin/publish-tip" method="POST" class="mt-4"><input type="hidden" name="tipId" value="<%= tip._id %>"><button class="w-full border border-blue-500 text-blue-500 py-3 rounded-xl font-bold uppercase text-[10px]">📢 Publikálás</button></form><% } %>
                 </div>
             <% }) %>
         </div>
 
         <div id="tab-chat" class="page-section hidden">
-            <h2 class="text-xl font-black text-white border-l-4 border-blue-500 pl-4 uppercase mb-6">Róka Napló & Chat</h2>
-            <div class="tech-card p-4 h-[550px] flex flex-col shadow-2xl">
-                <div id="chat-win" class="flex-1 overflow-y-auto pr-2 mb-4 space-y-2">
-                    <% chatHistory.forEach(msg => { %> 
-                        <div class="msg <%= msg.sender === 'System' ? 'bg-zinc-900 border-zinc-700 text-zinc-400' : 'msg-ai' %>">
-                            <strong class="uppercase text-[9px] block mb-1"><%= msg.sender %></strong> 
-                            <%= msg.text %>
-                        </div> 
-                    <% }) %>
+            <div class="tech-card p-6 h-[500px] flex flex-col">
+                <div id="chat-win" class="flex-1 overflow-y-auto mb-4">
+                    <% chatHistory.forEach(msg => { %> <div class="msg-ai"><strong><%= msg.sender %>:</strong> <%= msg.text %></div> <% }) %>
                 </div>
-                <div class="flex gap-2 bg-black p-2 rounded-2xl border border-zinc-800">
-                    <input type="text" id="chat-in" class="flex-1 bg-transparent px-4 py-3 text-xs text-white outline-none" placeholder="Küldj utasítást a Rókának..." onkeypress="if(event.key === 'Enter') talk()">
-                    <button onclick="talk()" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold transition hover:bg-purple-500">KÜLDÉS</button>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-in" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 text-xs" placeholder="Utasítás...">
+                    <button onclick="talk()" class="bg-purple-600 px-6 py-2 rounded-lg font-bold">➤</button>
                 </div>
             </div>
         </div>
 
         <div id="tab-users" class="page-section hidden">
-            <h2 class="text-xl font-black text-white border-l-4 border-green-500 pl-4 uppercase mb-6">Regisztrált Tagok</h2>
             <div class="tech-card overflow-hidden">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-zinc-900 text-zinc-500 uppercase font-black">
-                        <tr>
-                            <th class="p-4">Név / Email</th>
-                            <th class="p-4">Licensz</th>
-                            <th class="p-4">Bankroll</th>
-                            <th class="p-4">Művelet</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-900">
-                        <% users.forEach(u => { %>
-                            <tr class="hover:bg-zinc-900/30">
-                                <td class="p-4">
-                                    <p class="font-bold text-white"><%= u.fullname %></p>
-                                    <p class="text-[10px] text-zinc-500"><%= u.email %></p>
-                                </td>
-                                <td class="p-4">
-                                    <span class="<%= u.hasLicense ? 'text-green-500' : 'text-red-500' %> font-bold">
-                                        <%= u.hasLicense ? 'AKTÍV' : 'NINCS' %>
-                                    </span>
-                                </td>
-                                <td class="p-4 font-mono text-purple-400"><%= u.currentBankroll.toLocaleString() %> Ft</td>
-                                <td class="p-4 text-right">
-                                    <button class="bg-zinc-800 p-2 rounded text-[10px] font-bold uppercase">Szerkeszt</button>
-                                </td>
-                            </tr>
-                        <% }) %>
+                <table class="w-full text-xs text-left">
+                    <thead class="bg-zinc-900 uppercase"><tr><th class="p-4">Név</th><th class="p-4">Email</th><th class="p-4">Bankroll</th></tr></thead>
+                    <tbody>
+                        <% users.forEach(u => { %> <tr class="border-t border-zinc-900"><td class="p-4 font-bold"><%= u.fullname %></td><td class="p-4"><%= u.email %></td><td class="p-4"><%= u.currentBankroll %> Ft</td></tr> <% }) %>
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div id="tab-finance" class="page-section hidden">
-            <h2 class="text-xl font-black text-white border-l-4 border-yellow-500 pl-4 uppercase mb-6">Pénzügyi Áttekintés</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="tech-card p-6 border-yellow-900/30">
-                    <p class="text-zinc-500 text-[10px] font-bold uppercase">Összesített Tag tőke</p>
-                    <h3 class="text-3xl font-black text-white mt-2">
-                        <% let totalBank = users.reduce((s, u) => s + (u.currentBankroll || 0), 0); %>
-                        <%= totalBank.toLocaleString() %> Ft
-                    </h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="tech-card p-10 text-center">
+                    <p class="text-zinc-500 font-bold uppercase text-[10px]">Összes tőke</p>
+                    <h3 class="text-3xl font-black mt-2"><%= users.reduce((s, u) => s + (u.currentBankroll || 0), 0).toLocaleString() %> Ft</h3>
                 </div>
-                <div class="tech-card p-6 border-green-900/30">
-                    <p class="text-zinc-500 text-[10px] font-bold uppercase">Generált Profit (Havi)</p>
-                    <h3 class="text-3xl font-black text-green-500 mt-2">
-                        <% let totalProfit = users.reduce((s, u) => s + (u.monthlyProfit || 0), 0); %>
-                        +<%= totalProfit.toLocaleString() %> Ft
-                    </h3>
+                <div class="tech-card p-10 text-center">
+                    <p class="text-zinc-500 font-bold uppercase text-[10px]">Havi Profit</p>
+                    <h3 class="text-3xl font-black text-green-500 mt-2">+<%= users.reduce((s, u) => s + (u.monthlyProfit || 0), 0).toLocaleString() %> Ft</h3>
                 </div>
+            </div>
+        </div>
+
+        <div id="tab-insta" class="page-section hidden">
+            <div class="tech-card p-6">
+                <button onclick="generateInsta()" class="w-full bg-pink-600 py-4 rounded-xl font-black uppercase text-xs">Poszt Szöveg Generálása</button>
+                <div id="insta-res" class="mt-6 bg-zinc-900 p-4 rounded-lg hidden text-xs whitespace-pre-wrap"></div>
             </div>
         </div>
 
         <div id="tab-email" class="page-section hidden">
-            <h2 class="text-xl font-black text-white border-l-4 border-red-500 pl-4 uppercase mb-6">Email Küldése</h2>
             <div class="tech-card p-6">
-                <div class="mb-4">
-                    <label class="text-[10px] font-bold text-zinc-500 uppercase block mb-2">Tárgy</label>
-                    <input type="text" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-purple-500" placeholder="Pl: Új tipp elérhető!">
-                </div>
-                <div class="mb-6">
-                    <label class="text-[10px] font-bold text-zinc-500 uppercase block mb-2">Üzenet tartalma</label>
-                    <textarea class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white outline-none h-40 focus:border-purple-500" placeholder="Írd ide az üzenetet..."></textarea>
-                </div>
-                <button class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest transition hover:bg-zinc-200">Üzenet kiküldése az összes tagnak 🚀</button>
+                <input type="text" placeholder="Tárgy" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl mb-4 text-xs">
+                <textarea placeholder="Üzenet..." class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl h-40 text-xs mb-4"></textarea>
+                <button class="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs">Email küldése a Falkának</button>
             </div>
         </div>
-
     </main>
+
     <script>
-        // Chat görgetés az aljára
-        const win = document.getElementById('chat-win'); if(win) win.scrollTop = win.scrollHeight;
-        
         async function talk() {
             const i = document.getElementById('chat-in'); if(!i.value) return;
-            const msgText = i.value; i.value = '';
-            win.innerHTML += `<div class="msg msg-me"><strong class="uppercase text-[9px] block mb-1">Főnök</strong> ${msgText}</div>`;
-            win.scrollTop = win.scrollHeight;
-            try {
-                const r = await fetch('/admin/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: msgText})});
-                const d = await r.json();
-                win.innerHTML += `<div class="msg msg-ai"><strong class="uppercase text-[9px] block mb-1">Róka</strong> ${d.reply}</div>`;
-                win.scrollTop = win.scrollHeight;
-            } catch (err) { console.error(err); }
+            const r = await fetch('/admin/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: i.value}) });
+            const d = await r.json();
+            document.getElementById('chat-win').innerHTML += `<div class="msg-ai"><strong>Róka:</strong> ${d.reply}</div>`;
+            i.value = '';
+        }
+        async function generateInsta() {
+            const r = await fetch('/admin/generate-insta', { method: 'POST' });
+            const d = await r.json();
+            const res = document.getElementById('insta-res');
+            res.innerText = d.caption; res.classList.remove('hidden');
         }
     </script>
 </body>
