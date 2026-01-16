@@ -97,25 +97,55 @@
         function startTimer() {
             const countdownDisplay = document.getElementById('countdownDisplay');
             const hasTip = <%= (dailyTip && dailyTip.isPublished) ? "true" : "false" %>;
-            const matchTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>";
             
+            // Adatok a szerverről
+            const tipDateStr = "<%= (dailyTip && dailyTip.date) ? dailyTip.date : '' %>"; // Pl: 2026-01-16
+            let tipTimeStr = "<%= (dailyTip && dailyTip.matchTime) ? dailyTip.matchTime : '' %>"; // Pl: 20:30 vagy 20.30
+            
+            // Pont cserélése kettőspontra (ha magyar formátumot küld a szerver)
+            tipTimeStr = tipTimeStr.replace('.', ':');
+
             function update() {
-                const now = new Date(); let targetDate = new Date();
-                if (hasTip && matchTimeStr.includes(':')) {
-                    const [h, m] = matchTimeStr.split(':');
-                    targetDate.setHours(parseInt(h), parseInt(m), 0, 0);
-                    if (now > targetDate) { countdownDisplay.innerText = "ÉLŐ"; return; }
+                const now = new Date();
+                let targetDate = new Date();
+
+                if (hasTip && tipTimeStr.includes(':') && tipDateStr) {
+                    // Ha van konkrét dátum és idő, azt rakjuk össze
+                    // "2026-01-16T20:30:00"
+                    const isoString = `${tipDateStr}T${tipTimeStr}:00`;
+                    targetDate = new Date(isoString);
+                    
+                    // Ha Érvénytelen Dátum lenne (safeguard), akkor maradjon a mai nap
+                    if (isNaN(targetDate.getTime())) {
+                        const [h, m] = tipTimeStr.split(':');
+                        targetDate = new Date();
+                        targetDate.setHours(parseInt(h), parseInt(m), 0, 0);
+                    }
                 } else {
+                    // Ha nincs tipp, számoljunk holnap 11:00-ig
                     targetDate.setHours(11, 0, 0, 0);
                     if (now > targetDate) targetDate.setDate(targetDate.getDate() + 1);
                 }
+
                 const diff = targetDate - now;
+
+                // Ha lejárt az idő (vagy már megy a meccs)
+                if (diff <= 0) {
+                    countdownDisplay.innerText = "ÉLŐ";
+                    countdownDisplay.classList.add("text-red-500");
+                    document.getElementById('timerStatus').innerText = "A vadászat zajlik...";
+                    return;
+                }
+
                 const hrs = Math.floor(diff / 3600000);
                 const min = Math.floor((diff % 3600000) / 60000);
                 const sec = Math.floor((diff % 60000) / 1000);
+
                 countdownDisplay.innerText = `${hrs.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
             }
-            setInterval(update, 1000); update();
+
+            setInterval(update, 1000);
+            update();
         }
         window.addEventListener('load', startTimer);
     </script>
