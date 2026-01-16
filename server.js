@@ -22,7 +22,7 @@ const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema(
     fullname: String, 
     email: { type: String, unique: true, lowercase: true },
     password: String, 
-    hasLicense: { type: Boolean, default: false },
+    hasLicense: { type: Boolean, default: false }, // EZT FOGJUK KAPCSOLGATNI
     licenseExpiresAt: { type: Date, default: null }, 
     isAdmin: { type: Boolean, default: false }, 
     startingCapital: { type: Number, default: 0 }, 
@@ -82,12 +82,9 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
-// --- FŐOLDAL (Átirányítás a Dashboardra) ---
-app.get('/', (req, res) => {
-    res.redirect('/dashboard');
-});
+app.get('/', (req, res) => { res.redirect('/dashboard'); });
 
-// --- JAVÍTOTT ROBOT LOGIKA (IDŐPONTOKKAL) ---
+// --- ROBOT LOGIKA ---
 async function runAiRobot() {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
@@ -95,13 +92,12 @@ async function runAiRobot() {
     try {
         await logToChat('System', "📡 Kapcsolódás a sportadatbázishoz...");
         const response = await axios.get(`https://api.football-data.org/v4/matches`, { headers: { 'X-Auth-Token': token } });
-        
+
         const allMatches = response.data.matches || [];
         const timedMatches = allMatches.filter(m => m.status === 'TIMED').slice(0, 45);
-        
+
         await logToChat('Róka', `🕵️‍♂️ Szimatolok... ${allMatches.length} meccset látok, ebből a legfrissebbeket elemzem.`);
 
-        // Adatok előkészítése az AI számára időkkel
         const matchData = timedMatches.map(m => {
             const time = new Date(m.utcDate).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Budapest' });
             return `ID: ${m.id} | [${m.competition.name}] ${m.homeTeam.name} vs ${m.awayTeam.name} | Kezdés: ${time}`;
@@ -110,26 +106,20 @@ async function runAiRobot() {
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
             messages: [
-                { 
-                    role: "system", 
-                    content: "Te a Zsivány Róka AI vagy. Profi magyar sportfogadó. Szigorú JSON: league, match, prediction, odds, reasoning, memberMessage, matchTime (ÓRA:PERC formátumban a listából!)." 
-                },
-                { 
-                    role: "user", 
-                    content: `Válassz egyet a listából! A 'matchTime' mezőbe írd be a listában szereplő kezdési időpontot!\n\n${matchData}` 
-                }
+                { role: "system", content: "Te a Zsivány Róka AI vagy. Profi magyar sportfogadó. Szigorú JSON: league, match, prediction, odds, reasoning, memberMessage, matchTime (ÓRA:PERC formátumban a listából!)." },
+                { role: "user", content: `Válassz egyet a listából! A 'matchTime' mezőbe írd be a listában szereplő kezdési időpontot!\n\n${matchData}` }
             ],
             response_format: { type: "json_object" }
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
-        
+
         await Tip.findOneAndUpdate(
             { date: targetDate }, 
             { ...result, date: targetDate, isPublished: false, status: 'pending', scannedMatches: allMatches.length }, 
             { upsert: true }
         );
-        
+
         await logToChat('Róka', `🎯 Kész a jelentés! ${result.match} | Kezdés: ${result.matchTime} | Odds: ${result.odds}.`);
     } catch (e) { 
         await logToChat('System', `❌ HIBA: ${e.message}`); 
@@ -140,10 +130,13 @@ async function runAiRobot() {
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
+    
+    // LICENSZ ELLENŐRZÉS: Ha nincs licensze, nem látja a tippet!
+    const dailyTip = user.hasLicense ? await Tip.findOne({ date: getDbDate(), isPublished: true }) : null;
+    
     const pendingTips = await Tip.find({ status: 'pending' }).sort({ date: -1 });
     const bank = (user.currentBankroll > 0) ? user.currentBankroll : (user.startingCapital || 0);
-    
+
     res.render('dashboard', { 
         user, dailyTip, pendingTips, 
         suggestedStake: Math.round(bank * 0.03), 
@@ -160,24 +153,53 @@ app.get('/admin', checkAdmin, async (req, res) => {
     const chatHistory = await ChatMessage.find().sort({ timestamp: -1 }).limit(35);
     const lastTip = await Tip.findOne().sort({ _id: -1 });
     const scannedCount = lastTip ? lastTip.scannedMatches : 0;
-    
+
     res.render('admin', { users, pendingTips, chatHistory, scannedCount, brandName: BRAND_NAME });
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { await runAiRobot(); res.redirect('/admin'); });
 
+// --- ÚJ: TAG AKTIVÁLÁS / TILTÁS ---
+app.post('/admin/toggle-license', checkAdmin, async (req, res) => {
+    const { userId } = req.body;
+    const user = await User.findById(userId);
+    if(user) {
+        user.hasLicense = !user.hasLicense; // Ha aktív volt, elveszi. Ha nem volt, aktiválja.
+        await user.save();
+    }
+    res.redirect('/admin');
+});
+
+// --- ÚJ: MEMÓRIÁVAL RENDELKEZŐ CHAT ---
 app.post('/admin/chat', checkAdmin, async (req, res) => {
+    // 1. Lekérjük az utolsó 10 üzenetet az adatbázisból (Memória)
+    const history = await ChatMessage.find().sort({ timestamp: -1 }).limit(10);
+    
+    // 2. Formázzuk az AI számára (User vs Assistant)
+    const contextMessages = history.reverse().map(msg => ({
+        role: (msg.sender === 'System' || msg.sender === 'Róka') ? 'assistant' : 'user',
+        content: msg.text
+    }));
+
     const aiRes = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
-        messages: [{ role: "system", content: "Te a Zsivány Róka vagy. KIZÁRÓLAG MAGYARUL válaszolj dörzsölt stílusban!" }, { role: "user", content: req.body.message }]
+        messages: [
+            { role: "system", content: "Te a Zsivány Róka vagy. Emlékszel mindenre, amit a lenti beszélgetésben látsz. KIZÁRÓLAG MAGYARUL válaszolj dörzsölt stílusban!" }, 
+            ...contextMessages, // Itt adjuk át a memóriát
+            { role: "user", content: req.body.message }
+        ]
     });
+    
+    // Válasz mentése
+    await logToChat('Róka', aiRes.choices[0].message.content);
+    
     res.json({ reply: aiRes.choices[0].message.content });
 });
 
 app.post('/admin/generate-insta', checkAdmin, async (req, res) => {
     const tip = await Tip.findOne({ date: getDbDate() });
     if (!tip) return res.json({ caption: "Nincs mára tipp, amit posztolhatnék!" });
-    
+
     const aiRes = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
         messages: [{ role: "system", content: "Írj egy dörzsölt Instagram poszt szöveget emojikkal a tipphez!" }, { role: "user", content: `Meccs: ${tip.match}, Tipp: ${tip.prediction}, Odds: ${tip.odds}` }]
@@ -196,7 +218,7 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
         let stake = Math.round(bank * 0.03);
         let oddsNum = parseFloat(tip.odds.toString().replace(',', '.'));
         let profit = (status === 'win') ? Math.round(stake * (oddsNum - 1)) : -stake;
-        
+
         u.currentBankroll = bank + profit; 
         u.monthlyProfit += profit; 
         await u.save();
