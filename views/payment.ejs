@@ -2,119 +2,74 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Skyhigh AI | Csomagok</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tagság Aktiválása | <%= brandName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: white; font-family: sans-serif; }
-        
-        /* MOBIL FIRST KÁRTYÁK */
-        .tier-card { 
-            background: #0f0f11; 
-            border: 1px solid #27272a; 
-            border-radius: 24px; 
-            padding: 24px; 
-            display: flex; x
-            flex-direction: column;
-            position: relative;
-            margin-bottom: 20px; /* Hely a kártyák között mobilon */
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .hero-font { font-family: 'Orbitron', sans-serif; }
+        .gradient-border { 
+            position: relative; 
+            background: #0a0a0a; 
+            border-radius: 1.5rem; 
+            z-index: 1;
         }
-
-        /* Aktiváláskor (Hover vagy érintés) */
-        .tier-card:active, .tier-card:hover { border-color: #555; transform: scale(1.01); }
-
-        /* A PROFI CSOMAG KIEMELÉSE */
-        .popular { 
-            border: 2px solid #a855f7; 
-            box-shadow: 0 0 25px rgba(168, 85, 247, 0.2); 
-            background: #131315;
-            order: -1; /* Mobilon ez legyen legfelül! */
+        .gradient-border::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: 1.6rem;
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.5;
         }
-        @media (min-width: 768px) { .popular { order: 0; transform: scale(1.05); } }
-
-        /* ÓRIÁS GOMBOK MOBILRA */
-        .btn-pay {
-            background: white; color: black; font-weight: 900; text-transform: uppercase; 
-            padding: 18px; border-radius: 14px; width: 100%; text-align: center; margin-top: 20px;
-            font-size: 14px; letter-spacing: 1px; transition: 0.2s;
-        }
-        .btn-pay:active { background: #ccc; }
-        
-        .btn-purple { 
-            background: #a855f7; color: white; border: none; 
-            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-        }
-
-        .price-tag { font-size: 32px; font-weight: 900; color: white; line-height: 1; }
     </style>
 </head>
-<body class="p-4 md:p-8 min-h-screen flex flex-col justify-center">
+<body class="min-h-screen flex flex-col items-center justify-center p-5 text-center bg-black">
 
-    <div class="text-center mb-8 mt-4">
-        <a href="/dashboard" class="inline-block bg-zinc-900 text-zinc-400 px-4 py-2 rounded-full text-xs font-bold uppercase mb-6"><i class="fas fa-arrow-left mr-2"></i> Mégse</a>
-        <h1 class="text-3xl font-black uppercase italic mb-2">Válassz <span class="text-purple-500">Licencet</span></h1>
-        <p class="text-zinc-400 text-sm px-4">A rendszer automatikusan aktiválódik fizetés után.</p>
+    <div class="mb-4 text-5xl animate-bounce mt-4">🦊</div>
+    <h1 class="text-2xl font-black uppercase tracking-tighter mb-2 hero-font text-white"><%= brandName %></h1>
+    <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-8">A Falka vár téged...</p>
+
+    <div class="gradient-border w-full max-w-xs p-6 mb-8 relative">
+        
+        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">
+            Ajánlott Csomag
+        </div>
+
+        <h2 class="text-xl font-black uppercase text-white mb-1">VIP TAGSÁG</h2>
+        <p class="text-zinc-400 text-[10px] mb-6">Teljes hozzáférés a Róka rendszeréhez</p>
+
+        <ul class="text-left text-xs text-zinc-300 space-y-3 mb-8 pl-2">
+            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Napi AI elemzések</li>
+            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Magas Odds tippek</li>
+            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Bankroll menedzsment</li>
+            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 0-24 Dashboard elérés</li>
+        </ul>
+
+        <div class="space-y-3">
+            
+            <a href="https://revolut.me/stylefaqu" target="_blank" class="flex items-center justify-center gap-2 w-full bg-[#0075EB] text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:scale-105 transition shadow-lg shadow-blue-900/40">
+                <span class="text-lg">R</span> Revolut Fizetés
+            </a>
+
+            <a href="https://t.me/stylefaqu" target="_blank" class="flex items-center justify-center gap-2 w-full bg-[#229ED9] text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:scale-105 transition shadow-lg shadow-cyan-900/40">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 11.944 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                Írok Telegramon
+            </a>
+
+        </div>
+
+        <p class="text-[9px] text-zinc-500 mt-4 leading-tight">
+            Utalás közleménybe: <strong><%= user.email %></strong>
+        </p>
+
     </div>
 
-    <div class="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pb-20">
-
-        <div class="tier-card opacity-90">
-            <h3 class="text-lg font-bold text-zinc-300 mb-1">Kezdő Csomag</h3>
-            <div class="price-tag">20.000 Ft <span class="text-sm font-normal text-zinc-500">/ hó</span></div>
-
-            <div class="my-6 border-t border-zinc-800"></div>
-
-            <ul class="space-y-3 text-sm text-zinc-400">
-                <li><i class="fas fa-check text-zinc-600 mr-3"></i> 30 Napos Aktiválás</li>
-                <li><i class="fas fa-check text-zinc-600 mr-3"></i> Napi 1 Master Tipp</li>
-            </ul>
-
-            <form action="/pay/create-checkout-session" method="POST" class="mt-auto">
-                <input type="hidden" name="plan" value="monthly">
-                <button type="submit" class="btn-pay">Kiválasztás</button>
-            </form>
-        </div>
-
-        <div class="tier-card popular">
-            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase tracking-widest">Legnépszerűbb</div>
-
-            <h3 class="text-xl font-black text-purple-400 mb-1 uppercase">Profi Stratégia</h3>
-            <div class="price-tag">100.000 Ft <span class="text-sm font-normal text-zinc-400">/ 6 hó</span></div>
-            <p class="text-xs text-green-500 font-bold mt-1 uppercase"><i class="fas fa-coins mr-1"></i> Megtakarítás: 20.000 Ft</p>
-
-            <div class="my-6 border-t border-zinc-700"></div>
-
-            <ul class="space-y-4 text-sm text-white font-medium">
-                <li class="flex items-center"><i class="fas fa-calendar-check text-purple-500 mr-3 text-lg"></i> 180 Napos Licenc</li>
-                <li class="flex items-center"><i class="fas fa-chart-line text-purple-500 mr-3 text-lg"></i> Stratégiai Tőkekezelés</li>
-                <li class="flex items-center"><i class="fas fa-crown text-purple-500 mr-3 text-lg"></i> Kiemelt Támogatás</li>
-            </ul>
-
-            <form action="/pay/create-checkout-session" method="POST" class="mt-auto">
-                <input type="hidden" name="plan" value="biannual">
-                <button type="submit" class="btn-pay btn-purple">
-                    Aktiválás (100k) <i class="fas fa-bolt ml-2"></i>
-                </button>
-            </form>
-        </div>
-
-        <div class="tier-card opacity-90">
-            <h3 class="text-lg font-bold text-zinc-300 mb-1">Befektetői</h3>
-            <div class="price-tag">180.000 Ft <span class="text-sm font-normal text-zinc-500">/ év</span></div>
-
-            <div class="my-6 border-t border-zinc-800"></div>
-
-            <ul class="space-y-3 text-sm text-zinc-400">
-                <li><i class="fas fa-check text-zinc-600 mr-3"></i> 365 Napos Aktiválás</li>
-                <li><i class="fas fa-check text-zinc-600 mr-3"></i> VIP Bánásmód</li>
-            </ul>
-
-            <form action="/pay/create-checkout-session" method="POST" class="mt-auto">
-                <input type="hidden" name="plan" value="annual">
-                <button type="submit" class="btn-pay">Kiválasztás</button>
-            </form>
-        </div>
-
+    <div class="mt-auto pb-4">
+        <a href="/logout" class="text-[10px] text-red-500 font-bold uppercase border border-red-900/30 px-6 py-2 rounded-full">Kijelentkezés</a>
     </div>
 
 </body>
