@@ -3,73 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tagság Aktiválása | <%= brandName %></title>
+    <title>Válassz Csomagot | <%= brandName %></title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; padding-bottom: 40px; }
         .hero-font { font-family: 'Orbitron', sans-serif; }
-        .gradient-border { 
-            position: relative; 
-            background: #0a0a0a; 
-            border-radius: 1.5rem; 
-            z-index: 1;
+        
+        /* Kártya alapstílus */
+        .pack-card {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            transition: transform 0.2s;
         }
-        .gradient-border::before {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            border-radius: 1.6rem;
-            background: linear-gradient(45deg, #a855f7, #ec4899);
-            z-index: -1;
-            filter: blur(10px);
-            opacity: 0.5;
+        .pack-card:active { transform: scale(0.98); }
+
+        /* Kiemelt kártya effekt (VIP) */
+        .gold-glow {
+            border: 1px solid #eab308;
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.2);
+        }
+        
+        .ai-badge {
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-5 text-center bg-black">
+<body class="min-h-screen flex flex-col items-center p-5">
 
-    <div class="mb-4 text-5xl animate-bounce mt-4">🦊</div>
-    <h1 class="text-2xl font-black uppercase tracking-tighter mb-2 hero-font text-white"><%= brandName %></h1>
-    <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-8">A Falka vár téged...</p>
-
-    <div class="gradient-border w-full max-w-xs p-6 mb-8 relative">
-        
-        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">
-            Ajánlott Csomag
-        </div>
-
-        <h2 class="text-xl font-black uppercase text-white mb-1">VIP TAGSÁG</h2>
-        <p class="text-zinc-400 text-[10px] mb-6">Teljes hozzáférés a Róka rendszeréhez</p>
-
-        <ul class="text-left text-xs text-zinc-300 space-y-3 mb-8 pl-2">
-            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Napi AI elemzések</li>
-            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Magas Odds tippek</li>
-            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Bankroll menedzsment</li>
-            <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 0-24 Dashboard elérés</li>
-        </ul>
-
-        <div class="space-y-3">
-            
-            <a href="https://revolut.me/stylefaqu" target="_blank" class="flex items-center justify-center gap-2 w-full bg-[#0075EB] text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:scale-105 transition shadow-lg shadow-blue-900/40">
-                <span class="text-lg">R</span> Revolut Fizetés
-            </a>
-
-            <a href="https://t.me/stylefaqu" target="_blank" class="flex items-center justify-center gap-2 w-full bg-[#229ED9] text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:scale-105 transition shadow-lg shadow-cyan-900/40">
-                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 11.944 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                Írok Telegramon
-            </a>
-
-        </div>
-
-        <p class="text-[9px] text-zinc-500 mt-4 leading-tight">
-            Utalás közleménybe: <strong><%= user.email %></strong>
+    <div class="text-4xl animate-bounce mt-2 mb-2">🦊</div>
+    <h1 class="text-xl font-black uppercase tracking-widest hero-font text-white mb-1"><%= brandName %></h1>
+    
+    <div class="text-center mb-8 max-w-xs">
+        <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
+            Mesterséges Intelligencia <br> 
+            <span class="ai-badge text-xs">PROFI SPORT ELEMZÉS</span>
         </p>
-
     </div>
 
-    <div class="mt-auto pb-4">
-        <a href="/logout" class="text-[10px] text-red-500 font-bold uppercase border border-red-900/30 px-6 py-2 rounded-full">Kijelentkezés</a>
+    <div class="pack-card w-full max-w-xs">
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-lg font-black uppercase text-zinc-300">1 Hónap</h2>
+            <span class="text-xl font-bold text-white">20.000 Ft</span>
+        </div>
+        <p class="text-[10px] text-zinc-500 mb-4">Próbáld ki a Róka erejét kockázat nélkül.</p>
+        <ul class="text-xs text-zinc-400 space-y-2 mb-6">
+            <li>✔ 30 nap hozzáférés</li>
+            <li>✔ Napi AI elemzések</li>
+            <li>✔ Teljes Dashboard elérés</li>
+        </ul>
+        <a href="https://revolut.me/stylefaqu" target="_blank" class="block w-full bg-zinc-800 text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-zinc-700 text-center">
+            Kiválasztom (20k)
+        </a>
+    </div>
+
+    <div class="pack-card w-full max-w-xs border-purple-500/50">
+        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap">
+            Megtakarítás: 30.000 Ft
+        </div>
+        <div class="flex justify-between items-center mb-2 mt-2">
+            <h2 class="text-lg font-black uppercase text-purple-400">6 Hónap</h2>
+            <div class="text-right">
+                <span class="block text-[10px] text-zinc-500 line-through">120.000 Ft</span>
+                <span class="text-xl font-bold text-white">90.000 Ft</span>
+            </div>
+        </div>
+        <p class="text-[10px] text-zinc-500 mb-4">Okos döntés. Hosszú távú profit.</p>
+        <ul class="text-xs text-zinc-300 space-y-2 mb-6">
+            <li>✔ <strong>180 nap</strong> tagság</li>
+            <li>✔ 15.000 Ft / hó (kedvezményes ár)</li>
+            <li>✔ Minden VIP funkció</li>
+        </ul>
+        <a href="https://revolut.me/stylefaqu" target="_blank" class="block w-full bg-purple-600 text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-purple-500 text-center shadow-lg shadow-purple-900/30">
+            Kiválasztom (90k)
+        </a>
+    </div>
+
+    <div class="pack-card w-full max-w-xs gold-glow bg-gradient-to-b from-yellow-900/10 to-black">
+        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap shadow-lg shadow-yellow-500/50">
+            FALKA VEZÉR (Best Deal)
+        </div>
+        <div class="flex justify-between items-center mb-2 mt-2">
+            <h2 class="text-xl font-black uppercase text-yellow-500">1 ÉV</h2>
+            <div class="text-right">
+                <span class="block text-[10px] text-zinc-500 line-through">240.000 Ft</span>
+                <span class="text-2xl font-bold text-white">150.000 Ft</span>
+            </div>
+        </div>
+        <p class="text-[10px] text-yellow-500/80 mb-4 font-bold uppercase">Spórolj 90.000 forintot! 👑</p>
+        <ul class="text-xs text-zinc-200 space-y-2 mb-6">
+            <li>✔ <strong>365 nap</strong> teljes nyugalom</li>
+            <li>✔ Csak 12.500 Ft / hó</li>
+            <li>✔ Prioritásos támogatás</li>
+            <li>✔ Hozzáférés az összes fejlesztéshez</li>
+        </ul>
+        <a href="https://revolut.me/stylefaqu" target="_blank" class="block w-full bg-gradient-to-r from-yellow-600 to-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:scale-105 transition text-center shadow-lg shadow-yellow-600/20">
+            EZ KELL NEKEM (150k) 🚀
+        </a>
+    </div>
+
+    <div class="max-w-xs w-full text-center mt-4">
+        <div class="bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl mb-4">
+            <p class="text-[10px] text-zinc-500 uppercase font-bold mb-2">Fizetés után a közleménybe írd be:</p>
+            <p class="text-sm font-mono text-white select-all bg-black p-2 rounded border border-zinc-700"><%= user.email %></p>
+        </div>
+
+        <a href="https://t.me/stylefaqu" target="_blank" class="flex items-center justify-center gap-2 w-full bg-[#229ED9] text-white py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:opacity-90 transition">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 11.944 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            Bizonylat küldése Telegramon
+        </a>
+        
+        <a href="/logout" class="block mt-6 text-[10px] text-red-500 font-bold uppercase">Kijelentkezés</a>
     </div>
 
 </body>
