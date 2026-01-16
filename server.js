@@ -9,12 +9,7 @@ const app = express();
 
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
-const FOX_QUOTES = [
-    "FALKA FIGYELEM! Ma nem kérünk... Elveszünk! 🦊💰",
-    "A tőke a lőszer. Ne lövöldözz vaktában! 💣",
-    "Hideg fej, forró oddsok, tele zseb. Ez a Róka törvénye. 🦊",
-    "A szoftver nem alszik, nem fárad, nem téved. 🤖✨"
-];
+const FOX_QUOTES = ["FALKA FIGYELEM! Ma nem kérünk... Elveszünk! 🦊💰", "A tőke a lőszer! 💣", "A szoftver nem alszik. 🤖"];
 
 // --- MODELLEK ---
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
@@ -32,16 +27,12 @@ const Tip = mongoose.models.Tip || mongoose.model('Tip', new mongoose.Schema({
     date: { type: String, index: true }
 }));
 
-const SystemSetting = mongoose.models.SystemSetting || mongoose.model('SystemSetting', new mongoose.Schema({
-    strategyMode: { type: String, default: 'normal' } 
-}));
-
 const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', new mongoose.Schema({
     sender: String, text: String, timestamp: { type: Date, default: Date.now }
 }));
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V79 (MANUAL CONTROL) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V80 - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function logToChat(sender, message) {
@@ -54,7 +45,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v79_manual_control', resave: true, saveUninitialized: true,
+    secret: 'fox_v80_restored', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
@@ -66,54 +57,44 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
-// --- RÓKA ELEMZÉS (CSAK JELENTÉS, NINCS AUTOMATA PUBLIKÁLÁS) ---
+// --- ROBOT: ÚJ ELEMZÉS (AZONNALI JELENTÉSSEL) ---
 async function runAiRobot() {
-    await ChatMessage.deleteMany({}); // Logok tisztítása az új elemzéshez
+    await ChatMessage.deleteMany({});
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
 
     try {
-        await logToChat('System', "📡 Kapcsolódás a sportadatbázishoz...");
+        await logToChat('System', "📡 Friss adatok lekérése...");
         const response = await axios.get(`https://api.football-data.org/v4/matches`, { headers: { 'X-Auth-Token': token } });
-        const matches = response.data.matches.filter(m => m.status === 'TIMED').slice(0, 25);
+        const matches = response.data.matches.filter(m => m.status === 'TIMED').slice(0, 30);
         
-        if (matches.length === 0) {
-            await logToChat('Róka', "⚠️ Nem találtam alkalmas meccset a kínálatban.");
-            return;
-        }
-
         const matchData = matches.map(m => `[${m.competition.name}] ${m.homeTeam.name} vs ${m.awayTeam.name}`).join("\n");
-        await logToChat('System', `${matches.length} meccs elemezése folyamatban...`);
-
         const aiRes = await openai.chat.completions.create({
             model: "gpt-4-turbo-preview",
-            messages: [{ role: "system", content: "Zsivány Róka AI. JSON: league, match, prediction, odds, reasoning, memberMessage, matchTime." }, { role: "user", content: matchData }],
+            messages: [{ role: "system", content: "Zsivány Róka AI. JSON: league, match, prediction, odds, reasoning, memberMessage, matchTime." }, { role: "user", content: `Válassz egy meccset, ami NEM a tegnapi volt! Kínálat:\n${matchData}` }],
             response_format: { type: "json_object" }
         });
 
         const result = JSON.parse(aiRes.choices[0].message.content);
-        await Tip.findOneAndUpdate({ date: targetDate }, { ...result, date: targetDate, isPublished: false, status: 'pending' }, { upsert: true });
-        
-        await logToChat('Róka', `✅ Megvan a mai zsákmány: ${result.match}. Főnök, várja a jóváhagyásodat!`);
-    } catch (e) {
-        await logToChat('System', `❌ HIBA: ${e.message}`);
-    }
+        // Frissítjük a mai tippet
+        await Tip.findOneAndUpdate({ date: targetDate }, { ...result, isPublished: false, status: 'pending' }, { upsert: true });
+        await logToChat('Róka', `✅ Új jelentés kész: ${result.match}. Várom a jóváhagyást!`);
+    } catch (e) { await logToChat('System', `❌ HIBA: ${e.message}`); }
 }
 
-// --- ÚTVONALAK ---
+// --- DASHBOARD FIX: PENDINGTIPS HOZZÁADVA ---
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     const user = await User.findById(req.session.userId);
-    if (!user.isAdmin && user.email !== OWNER_EMAIL && !user.hasLicense) return res.render('sales', { user, brandName: BRAND_NAME });
-
     const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-    let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
-    const bank = (user.currentBankroll > 0) ? user.currentBankroll : (user.startingCapital || 0);
+    
+    // EZ HIÁNYZOTT! Emiatt volt a fehér lap.
+    const pendingTips = await Tip.find({ status: 'pending' }).sort({ date: -1 });
 
+    const bank = (user.currentBankroll > 0) ? user.currentBankroll : (user.startingCapital || 0);
     res.render('dashboard', { 
-        user, dailyTip, suggestedStake: Math.round(bank * p), userBank: bank, 
-        strategyMode: settings.strategyMode, monthlyProfit: user.monthlyProfit || 0, 
+        user, dailyTip, pendingTips, suggestedStake: Math.round(bank * 0.03), userBank: bank, 
+        strategyMode: 'normal', monthlyProfit: user.monthlyProfit || 0, 
         foxQuotes: FOX_QUOTES, ownerEmail: OWNER_EMAIL, brandName: BRAND_NAME 
     });
 });
@@ -121,33 +102,30 @@ app.get('/dashboard', async (req, res) => {
 app.get('/admin', checkAdmin, async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     const pendingTips = await Tip.find({ status: 'pending' }).sort({ date: -1 });
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
     const chatHistory = await ChatMessage.find().sort({ timestamp: 1 });
-    res.render('admin', { users, pendingTips, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME });
+    res.render('admin', { users, pendingTips, chatHistory, strategyMode: 'normal', brandName: BRAND_NAME });
+});
+
+// MARKETING AI ÚTVONALAK
+app.post('/admin/social-content', checkAdmin, async (req, res) => {
+    const { type } = req.body;
+    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "user", content: `Írj egy Insta posztot: ${type}` }] });
+    res.json({ content: aiRes.choices[0].message.content });
 });
 
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { await runAiRobot(); res.redirect('/admin'); });
+app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     const { status, tipId } = req.body;
     const tip = await Tip.findById(tipId);
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-    let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
     const users = await User.find({ isAdmin: false });
-
     for (let u of users) {
-        let bank = (u.currentBankroll > 0) ? u.currentBankroll : (u.startingCapital || 0);
-        let stake = Math.round(bank * p);
+        let bank = (u.currentBankroll > 0) ? u.currentBankroll : u.startingCapital;
+        let stake = Math.round(bank * 0.03);
         let profit = (status === 'win') ? Math.round(stake * (parseFloat(tip.odds) - 1)) : -stake;
-        u.currentBankroll = bank + profit; u.monthlyProfit = (u.monthlyProfit || 0) + profit; await u.save();
+        u.currentBankroll = bank + profit; u.monthlyProfit += profit; await u.save();
     }
     tip.status = status; await tip.save(); res.redirect('/admin');
-});
-
-app.post('/auth/register', async (req, res) => {
-    const { fullname, email, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    const u = await new User({ fullname, email: email.toLowerCase(), password: hash }).save();
-    req.session.userId = u._id; res.redirect('/dashboard');
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -155,15 +133,6 @@ app.post('/auth/login', async (req, res) => {
     if (u && await bcrypt.compare(req.body.password, u.password)) { req.session.userId = u._id; res.redirect('/dashboard'); } else res.send("Hiba");
 });
 
-app.post('/admin/publish-tip', checkAdmin, async (req, res) => { await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); res.redirect('/admin'); });
-app.post('/admin/manage-sub', checkAdmin, async (req, res) => {
-    const { userId, action } = req.body; const u = await User.findById(userId);
-    if (u) { if (action === 'add30') { let base = (u.licenseExpiresAt > new Date()) ? u.licenseExpiresAt : new Date(); u.licenseExpiresAt = new Date(base.getTime() + 30*24*60*60*1000); u.hasLicense = true; } else u.hasLicense = false; await u.save(); }
-    res.redirect('/admin');
-});
-
 app.get('/login', (req, res) => res.render('login', { brandName: BRAND_NAME }));
-app.get('/register', (req, res) => res.render('register', { brandName: BRAND_NAME }));
 app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
-
 app.listen(process.env.PORT || 8080);
