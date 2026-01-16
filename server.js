@@ -7,19 +7,15 @@ const axios = require('axios');
 const { OpenAI } = require('openai');
 const app = express();
 
-// --- GLOBÁLIS KONFIGURÁCIÓ ---
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
 const FOX_QUOTES = [
     "FALKA FIGYELEM! Ma nem kérünk... Elveszünk! 🦊💰",
     "A buki a zsákmány, mi vagyunk a vadászok. 🎯",
     "A tőke a lőszer. Ne lövöldözz vaktában! 💣",
-    "Hideg fej, forró oddsok, tele zseb. Ez a Róka törvénye. 🦊",
-    "A kamatos kamat a világ nyolcadik csodája. 📈",
-    "Matek a közös nyelvünk. A profit a válaszunk. 📈"
+    "Hideg fej, forró oddsok, tele zseb. Ez a Róka törvénye. 🦊"
 ];
 
-// --- ADATBÁZIS MODELLEK ---
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, email: { type: String, unique: true, lowercase: true },
     password: String, hasLicense: { type: Boolean, default: false },
@@ -45,19 +41,15 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
 
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
 
-// CSATLAKOZÁS
-mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V74 (STABLE) - ONLINE`));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log(`🚀 RÓKA MOTOR V75 - ONLINE`));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// MIDDLEWARE
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'fox_v74_super_secret', 
-    resave: true, 
-    saveUninitialized: true,
+    secret: 'fox_v75_ultimate', resave: true, saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
@@ -69,12 +61,10 @@ const checkAdmin = async (req, res, next) => {
     res.redirect('/dashboard');
 };
 
-// --- AUTH: BEJELENTKEZÉS ÉS REGISZTRÁCIÓ ---
+// --- AUTH ---
 app.post('/auth/register', async (req, res) => {
     try {
         const { fullname, email, password } = req.body;
-        const existing = await User.findOne({ email: email.toLowerCase() });
-        if (existing) return res.send("Hiba: Ez az email már foglalt!");
         const hash = await bcrypt.hash(password, 10);
         const u = await new User({ fullname, email: email.toLowerCase(), password: hash }).save();
         req.session.userId = u._id;
@@ -88,22 +78,17 @@ app.post('/auth/login', async (req, res) => {
         if (u && await bcrypt.compare(req.body.password, u.password)) {
             req.session.userId = u._id;
             res.redirect('/dashboard');
-        } else { res.send("Hibás adatok."); }
-    } catch (e) { res.send("Bejelentkezési hiba."); }
+        } else res.send("Rossz adatok.");
+    } catch (e) { res.send("Hiba."); }
 });
 
-// --- DASHBOARD: JAVÍTOTT VÁLTOZÓKKAL ---
+// --- DASHBOARD (TAGOKNAK) ---
 app.get('/dashboard', async (req, res) => {
     try {
         if (!req.session.userId) return res.redirect('/login');
         const user = await User.findById(req.session.userId);
-        if (!user) return res.redirect('/logout');
+        if (!user) return res.redirect('/login');
 
-        if (user.licenseExpiresAt && new Date() > new Date(user.licenseExpiresAt)) {
-            user.hasLicense = false; await user.save();
-        }
-
-        // Fontos: sales.ejs-nek is kellenek az alap adatok!
         if (!user.isAdmin && user.email !== OWNER_EMAIL && !user.hasLicense) {
             return res.render('sales', { user, brandName: BRAND_NAME });
         }
@@ -111,51 +96,49 @@ app.get('/dashboard', async (req, res) => {
         const dailyTip = await Tip.findOne({ date: getDbDate(), isPublished: true });
         const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
         let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
-        const bank = (user.currentBankroll && user.currentBankroll > 0) ? user.currentBankroll : (user.startingCapital || 0);
+        const bank = (user.currentBankroll > 0) ? user.currentBankroll : (user.startingCapital || 0);
 
         res.render('dashboard', { 
             user, dailyTip, suggestedStake: Math.round(bank * p), userBank: bank, 
             strategyMode: settings.strategyMode, monthlyProfit: user.monthlyProfit || 0, 
             foxQuotes: FOX_QUOTES, ownerEmail: OWNER_EMAIL, brandName: BRAND_NAME 
         });
-    } catch (err) { res.status(500).send("Belső szerverhiba történt. Kérlek próbáld újra."); }
+    } catch (err) { res.status(500).send("Hiba a Dashboard betöltésekor."); }
 });
 
-// --- ADMIN HQ: JAVÍTOTT MECCSEK ÉS KETTŐS AI ---
+// --- ADMIN (NEKED) ---
 app.get('/admin', checkAdmin, async (req, res) => {
-    const users = await User.find().sort({ createdAt: -1 });
-    const pendingTips = await Tip.find({ status: 'pending' }).sort({ date: -1 });
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-    const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(20);
-    res.render('admin', { users, pendingTips, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME });
+    try {
+        const users = await User.find().sort({ createdAt: -1 });
+        const pendingTips = await Tip.find({ status: 'pending' }).sort({ date: -1 });
+        const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
+        const chatHistory = await ChatMessage.find().sort({ timestamp: 1 }).limit(20);
+        res.render('admin', { users, pendingTips, chatHistory, strategyMode: settings.strategyMode, brandName: BRAND_NAME, ownerEmail: OWNER_EMAIL });
+    } catch (err) { res.status(500).send("Hiba az Admin felületen."); }
 });
 
+// ELEMZÉS ÉS LEZÁRÁS
 app.post('/admin/run-robot', checkAdmin, async (req, res) => {
     const targetDate = getDbDate();
     const token = (process.env.SPORT_API_KEY || "").trim();
-    const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
     try {
         const response = await axios.get(`https://api.football-data.org/v4/matches`, { headers: { 'X-Auth-Token': token } });
-        const matchData = response.data.matches.filter(m => m.status === 'TIMED').slice(0, 25).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name}`).join("\n");
+        const matchData = response.data.matches.filter(m => m.status === 'TIMED').slice(0, 20).map(m => `${m.homeTeam.name} vs ${m.awayTeam.name}`).join("\n");
         const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Zsivány Róka AI. JSON válasz: league, match, prediction, odds, reasoning, memberMessage, matchTime" }, { role: "user", content: matchData }], response_format: { type: "json_object" } });
         const result = JSON.parse(aiRes.choices[0].message.content);
         await Tip.findOneAndUpdate({ date: targetDate }, { ...result, date: targetDate, isPublished: false, isReal: true, status: 'pending' }, { upsert: true });
     } catch (e) { console.error(e); } res.redirect('/admin');
 });
 
-// BANKÁR
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     try {
         const { status, tipId } = req.body; 
         const tip = await Tip.findById(tipId);
         const settings = await SystemSetting.findOne({}) || { strategyMode: 'normal' };
-        if (!tip || tip.status !== 'pending') return res.redirect('/admin');
-
         let p = settings.strategyMode === 'aggressive' ? 0.06 : (settings.strategyMode === 'recovery' ? 0.015 : 0.03);
         const users = await User.find({ isAdmin: false });
-
         for (let u of users) {
-            let bank = (u.currentBankroll && u.currentBankroll > 0) ? u.currentBankroll : u.startingCapital;
+            let bank = (u.currentBankroll > 0) ? u.currentBankroll : (u.startingCapital || 0);
             if (bank > 0) {
                 let stake = Math.round(bank * p);
                 let profit = (status === 'win') ? Math.round(stake * (parseFloat(tip.odds) - 1)) : -stake;
@@ -165,22 +148,7 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
             }
         }
         tip.status = status; await tip.save();
-    } catch (err) { console.error(err); }
-    res.redirect('/admin');
-});
-
-// EGYÉB FUNKCIÓK
-app.get('/stats', async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-    const tips = await Tip.find({ status: { $ne: 'pending' } }).sort({ date: -1 }).limit(10);
-    res.render('stats', { user, tips, wins: tips.filter(t=>t.status==='win').length, losses: tips.filter(t=>t.status==='loss').length, monthlyProfit: user.monthlyProfit || 0, brandName: BRAND_NAME });
-});
-
-app.post('/admin/chat', checkAdmin, async (req, res) => {
-    const { message } = req.body;
-    const aiRes = await openai.chat.completions.create({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: "Te vagy a Zsivány Róka." }, { role: "user", content: message }] });
-    res.json({ reply: aiRes.choices[0].message.content });
+    } catch (err) {} res.redirect('/admin');
 });
 
 app.post('/admin/manage-sub', checkAdmin, async (req, res) => {
