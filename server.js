@@ -7,15 +7,14 @@ const axios = require('axios');
 const { OpenAI } = require('openai');
 const app = express();
 
-// --- 1. JAVÍTÁS: BIZTONSÁGOS DOTENV BETÖLTÉS ---
-// Ez megakadályozza az összeomlást ("Cannot find module dotenv"), ha nincs telepítve.
+// --- 1. BIZTONSÁGOS KONFIGURÁCIÓ ---
+// Ha van .env fájl, betöltjük, ha nincs (pl. Render), nem omlunk össze.
 try {
     require('dotenv').config();
 } catch (e) {
-    console.log("⚠️ Dotenv modul nem található - Sebaj, a környezeti változókat a Render kezeli.");
+    console.log("⚠️ Dotenv modul nem található - A környezeti változókat a szolgáltató kezeli.");
 }
 
-// --- KONFIGURÁCIÓ ---
 const OWNER_EMAIL = "stylefaqu@gmail.com"; 
 const BRAND_NAME = "Zsivány Róka"; 
 const FOX_QUOTES = [
@@ -25,8 +24,7 @@ const FOX_QUOTES = [
     "Hideg fej, forró oddsok, tele zseb. Ez a Róka törvénye. 🦊"
 ];
 
-// --- ADATBÁZIS CSATLAKOZÁS ---
-// Ha nincs beállítva a MONGO_URL a Renderen, itt szólunk, hogy ne omoljon össze némán
+// --- 2. ADATBÁZIS KAPCSOLÓDÁS ---
 if (!process.env.MONGO_URL) {
     console.error("❌ KRITIKUS HIBA: Nincs beállítva a MONGO_URL környezeti változó!");
 }
@@ -37,7 +35,7 @@ mongoose.connect(process.env.MONGO_URL || "")
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- MODELLEK ---
+// --- 3. MODELLEK ---
 const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
     fullname: String, 
     email: { type: String, unique: true, lowercase: true },
@@ -64,7 +62,7 @@ const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage',
     sender: String, text: String, timestamp: { type: Date, default: Date.now }
 }));
 
-// --- SEGÉDFÜGGVÉNYEK ---
+// --- 4. SEGÉDFÜGGVÉNYEK ---
 const getDbDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Budapest' });
 
 async function logToChat(sender, message) {
@@ -74,19 +72,19 @@ async function logToChat(sender, message) {
     } catch (e) { console.log("Chat log hiba"); }
 }
 
-// --- MIDDLEWARE ---
+// --- 5. MIDDLEWARE ---
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.set('trust proxy', 1); // Renderhez szükséges
+app.set('trust proxy', 1); // FONTOS: Render/Heroku kompatibilitás
 
 app.use(session({
     secret: 'fox_v81_final_master', 
     resave: false, 
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || "mongodb://localhost/test" }), // Fallback URL
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || "mongodb://localhost/test" }),
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 napos session
 }));
 
 const checkAdmin = async (req, res, next) => {
@@ -98,13 +96,16 @@ const checkAdmin = async (req, res, next) => {
     } catch (e) { res.redirect('/login'); }
 };
 
-// --- ÚTVONALAK ---
+// --- 6. ÚTVONALAK (JAVÍTVA) ---
 
-// 2. JAVÍTÁS: FŐOLDAL ÁTIRÁNYÍTÁS JAVÍTVA
-// Mivel nincs sale.ejs, a /login-ra irányítunk, ami létezik.
+// FŐOLDAL - LANDING PAGE
 app.get('/', (req, res) => {
+    // Ha be van lépve, menjen a belső felületre
     if (req.session.userId) return res.redirect('/dashboard');
-    res.redirect('/login'); 
+    
+    // Ha nincs belépve, mutassa a Landing Page-et (index.ejs)
+    // FIGYELEM: Kell lennie 'views/index.ejs' fájlnak!
+    res.render('index', { brandName: BRAND_NAME }); 
 });
 
 // ROBOT LOGIKA
@@ -137,7 +138,7 @@ async function runAiRobot() {
     } catch (e) { await logToChat('System', `❌ HIBA: ${e.message}`); }
 }
 
-// OLDALAK
+// BELSŐ OLDALAK
 app.get('/dashboard', async (req, res) => {
     if (!req.session.userId) return res.redirect('/login');
     try {
@@ -180,8 +181,9 @@ app.get('/admin', checkAdmin, async (req, res) => {
     } catch (e) { res.send("Admin hiba"); }
 });
 
-// ADMIN APIK
+// ADMIN FUNKCIÓK
 app.post('/admin/run-robot', checkAdmin, async (req, res) => { await runAiRobot(); res.redirect('/admin'); });
+
 app.post('/admin/toggle-license', checkAdmin, async (req, res) => {
     try {
         const { userId } = req.body;
@@ -190,6 +192,7 @@ app.post('/admin/toggle-license', checkAdmin, async (req, res) => {
     } catch (e) {}
     res.redirect('/admin');
 });
+
 app.post('/admin/chat', checkAdmin, async (req, res) => {
     try {
         const history = await ChatMessage.find().sort({ timestamp: -1 }).limit(10);
@@ -202,6 +205,7 @@ app.post('/admin/chat', checkAdmin, async (req, res) => {
         res.json({ reply: aiRes.choices[0].message.content });
     } catch (e) { res.json({ reply: "Hiba az AI-nál." }); }
 });
+
 app.post('/admin/generate-insta', checkAdmin, async (req, res) => {
     try {
         const tip = await Tip.findOne({ date: getDbDate() });
@@ -213,6 +217,7 @@ app.post('/admin/generate-insta', checkAdmin, async (req, res) => {
         res.json({ caption: aiRes.choices[0].message.content });
     } catch (e) { res.json({ caption: "Hiba." }); }
 });
+
 app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
     try {
         const { status, tipId } = req.body;
@@ -231,6 +236,7 @@ app.post('/admin/settle-tip', checkAdmin, async (req, res) => {
         res.redirect('/admin');
     } catch (e) { res.redirect('/admin'); }
 });
+
 app.post('/admin/publish-tip', checkAdmin, async (req, res) => { 
     try {
         await Tip.findByIdAndUpdate(req.body.tipId, { isPublished: true }); 
@@ -268,5 +274,6 @@ app.post('/auth/login', async (req, res) => {
 app.get('/login', (req, res) => res.render('login', { brandName: BRAND_NAME }));
 app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
 
+// --- SZERVER INDÍTÁSA ---
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`🚀 RÓKA SZERVER ONLINE A ${PORT} PORTON`));
