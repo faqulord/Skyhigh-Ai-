@@ -3,153 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh Global</title>
+    <title>Skyhigh Tech</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="ticker-wrap">
-        <div class="ticker-item">
-            📢 Aktív felhasználók: 14,203 fő &nbsp;&nbsp; 📢 Új kifizetés: User882... 450 USDT &nbsp;&nbsp; 📢 Skyhigh NASDAQ IPO 2026 Q3 &nbsp;&nbsp; 📢 Gratulálunk User991... Manager szint!
-        </div>
-    </div>
-
     <div class="header">
-        <div class="brand"><i class="fas fa-satellite-dish"></i> SKYHIGH</div>
-        <div class="lang-badge">HU | EN</div>
+        <div class="logo">SKYHIGH</div>
+        <div class="lang">HU | EN</div>
     </div>
 
     <div id="home" class="page active">
-        <div class="hero-card">
-            <div class="hero-sub">INTELLIGENT WORKSPACE</div>
-            <div class="hero-bal" id="lobbyBal">0.00</div>
-            <div class="hero-lbl">USDT Egyenleg</div>
-            <button class="enter-btn" onclick="nav('work')">MUNKATERÜLET MEGNYITÁSA <i class="fas fa-arrow-right"></i></button>
+        <div class="notice-bar">
+            <i class="fas fa-bullhorn"></i>
+            <marquee>Gratulálunk User8834... felvett 450 USDT-t! --- A Skyhigh 2026-os NASDAQ bevezetése előkészületben. --- Új SLV4 szint elérhető!</marquee>
         </div>
 
-        <div class="info-card">
+        <div class="hero-box">
+            <div class="hero-title">TELJES VAGYON (USDT)</div>
+            <div class="hero-val" id="mainBal">0.00</div>
+            <div class="hero-sub">Mai profit: <span id="mainToday">0.00</span> USDT</div>
+            <div class="lock-tag"><i class="fas fa-lock"></i> Tőke lekötve: 365 Nap</div>
+        </div>
+
+        <div class="comp-desc">
             <h3><i class="fab fa-google"></i> Google Partner Program</h3>
-            <p>A Skyhigh Technology a globális megosztott gazdaság (Shared Economy) úttörője. Rendszerünk automatikusan optimalizálja az applikációk rangsorolását.</p>
+            <p>A Skyhigh Technology a globális Megosztott Gazdaság (Shared Economy) elvén működő decentralizált platform. Rendszerünk a "Smart Cloud" technológiával optimalizálja az alkalmazások rangsorolását.</p>
         </div>
 
-        <div class="info-card green-border">
-            <h3 class="c-green"><i class="fas fa-chart-line"></i> Tőzsdei Kilátások (2026)</h3>
-            <p>A Skyhigh Technology 2026 Q3-ban tervezi a tőzsdei bevezetést (IPO) a NASDAQ-on. Minden aktív Menedzser részvénycsomagot kap.</p>
+        <div class="comp-desc" style="border-left-color: #ffd700;">
+            <h3 style="color:#ffd700"><i class="fas fa-chart-line"></i> Tőzsdei Tervek 2026</h3>
+            <p>A cég 2026 Q3-ban tervezi a tőzsdei bevezetést. Minden aktív Manager szintű partner részvényopciót kap.</p>
+        </div>
+
+        <div class="bonus-section">
+            <h3 class="bonus-head">IDŐALAPÚ BÓNUSZOK</h3>
+            
+            <div class="bonus-card">
+                <div class="b-title">Öt hónapos munka után</div>
+                <p>Ha a 123. szinten lévő partnerek száma eléri a 18-at, ebből 2 OA2 szintű számlával és 4 1. szintű partner, Ön 1000 USDT hozzájárulási bónuszt kap.</p>
+            </div>
+
+            <div class="bonus-card">
+                <div class="b-title">Nyolc hónapos munka után</div>
+                <p>Ha a 123. szinten lévő partnerek száma eléri a 30-at, ebből 3 OA2 szintű számlával és 4 első szintű partner, akkor 2500 USDT hozzájárulási bónuszt kap.</p>
+            </div>
+
+            <div class="bonus-card">
+                <div class="b-title">Tizenkét hónapos munka után</div>
+                <p>Amikor a 123. szinten lévő partnerek száma eléri az 50-et, ebből 6 OA2 szintű számlával és 4 első szintű partner, Ön 5000 USDT bónuszt kap.</p>
+            </div>
         </div>
     </div>
 
     <div id="levels" class="page">
-        <h2 class="page-title">VIP SZINTEK</h2>
-        <div id="levelContainer">
-            </div>
+        <h2 class="section-title">VIP TAGSÁG</h2>
+        <div id="lvContainer"></div>
     </div>
 
-    <div id="work" class="page">
-        <div class="stats-row">
-            <div class="stat-box">
-                <div class="stat-val" id="workBal">0.00</div>
-                <div class="stat-lbl">Egyenleg</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-val c-green" id="workComm">0.00</div>
-                <div class="stat-lbl">Jutalék</div>
+    <div id="work" class="page" style="background: radial-gradient(circle, #1a0b2e 0%, #000 100%);">
+        <div class="work-header">
+            <div>
+                <div class="w-label">Számla: 363***44674</div>
+                <div class="w-label">Pozíció: <span id="userPos">OA1.Pro</span></div>
             </div>
         </div>
 
-        <div class="grid-container" id="iconGrid">
+        <div class="rotator-container">
+            <div class="rotator-circle" id="rotator">
+                </div>
+            <div class="center-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/1200px-Google_%22G%22_Logo.svg.png" alt="Logo">
+                <div id="centerText">10/10</div>
             </div>
-
-        <div class="btn-zone">
-            <button class="work-btn" id="startBtn" onclick="startTask()">FELADAT INDÍTÁSA</button>
-            <div class="task-count">Mai feladatok: <span id="taskCount">0</span>/10</div>
         </div>
+
+        <div class="hex-stats">
+            <div class="hex">
+                <div class="h-val" id="workDone">0/10</div>
+                <div class="h-lbl">Mennyiség</div>
+            </div>
+            <div class="hex center">
+                <div class="h-val" style="color:#f0f" id="workComm">0.00</div>
+                <div class="h-lbl">Jutalék</div>
+            </div>
+            <div class="hex">
+                <div class="h-val" id="workTotal">0.00</div>
+                <div class="h-lbl">Összesen</div>
+            </div>
+        </div>
+
+        <button class="start-work-btn" id="startBtn" onclick="startRotation()">FELADAT INDÍTÁSA</button>
     </div>
 
     <div id="career" class="page">
-        <h2 class="page-title c-gold">KARRIER PROGRAM</h2>
-        <p class="career-desc">Építs csapatot és szerezz fix havi fizetést a jutalékok mellé!</p>
+        <h2 class="section-title" style="color:#ffd700">KARRIER ÚT</h2>
         
-        <table class="career-table">
-            <thead>
-                <tr><th>Pozíció</th><th>Fő</th><th>Fizetés</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><span class="badg gray">Junior</span></td><td>20</td><td>300 USDT</td></tr>
-                <tr><td><span class="badg white">Assistant</span></td><td>50</td><td>800 USDT</td></tr>
-                <tr><td><span class="badg blue">Manager</span></td><td>100</td><td>2000 USDT</td></tr>
-                <tr><td><span class="badg gold">Director</span></td><td>200+</td><td>5000 USDT</td></tr>
-            </tbody>
-        </table>
+        <div class="promo-box">
+            <h3>Rögzített pozíció előléptetés</h3>
+            <p>Ha megosztja a fiókjának meghívó linkjét, és 15 olyan partnert toboroz, akik OA2 vagy magasabb szintű fiókot aktiválnak, a Skyhigh csapatvezetői pozícióba lép. <strong>700 USDT fix havi fizetést</strong> kap.</p>
+        </div>
+
+        <div class="promo-box">
+            <h3>Felügyelői szint</h3>
+            <p>Ha az első szintű csapattagok közül 6-ot a Skyhigh "Csapatvezetőnek" nevez ki, akkor "Felügyelő" pozícióba lép, és fix <strong>3000 USDT</strong> havi fizetést kap.</p>
+        </div>
+
+        <div class="promo-box">
+            <h3>Menedzser szint</h3>
+            <p>Ha az első szintű csapattagok közül 3-at a Skyhigh "Felügyelőnek" nevez ki, akkor Menedzser lesz. <strong>8000 USDT</strong> fix havi fizetés.</p>
+        </div>
     </div>
 
     <div id="profile" class="page">
-        <div class="prof-head">
-            <div class="avatar">S</div>
-            <div>
-                <h2 class="user-id">363***9301 <span class="slv">SLV4</span></h2>
-                <div class="code">Kód: 659**02 <i class="far fa-copy"></i></div>
-            </div>
-            <div class="lock-bar">
-                <span><i class="fas fa-lock"></i> Lekötve</span>
-                <span>167 Nap 18 Óra</span>
+        <div class="prof-top">
+            <div class="u-row">
+                <div class="avatar"><i class="fas fa-user-astronaut"></i></div>
+                <div>
+                    <div class="u-id">363***09301 <span class="slv-badge">SLV4</span></div>
+                    <div class="u-code">Invite code: 659***02 <i class="far fa-copy"></i></div>
+                    <div class="u-timer">Visszaszámlálás: 167 Nap 18 Óra</div>
+                </div>
             </div>
         </div>
 
-        <div class="balance-details">
-            <div class="main-b-title">a mérlegem</div>
-            <div class="main-b-val" id="profBal">0.00 USDT</div>
+        <div class="bal-card">
+            <div class="bal-head">Mérlegem</div>
+            <div class="bal-big" id="profBigBal">0.00 USDT</div>
             
-            <div class="b-grid">
-                <div>
-                    <div id="profAvail">0.00 USDT</div>
+            <div class="bal-grid">
+                <div class="b-item">
+                    <div id="pAvail">0.00 USDT</div>
                     <span>Rendelkezésre álló</span>
                 </div>
-                <div>
+                <div class="b-item">
                     <div class="c-green">4280.00 USDT</div>
                     <span>Lekötött betét</span>
                 </div>
-                <div>
-                    <div id="profToday">0.00 USDT</div>
+                <div class="b-item">
+                    <div id="pToday">0.00 USDT</div>
                     <span>Mai jutalék</span>
                 </div>
-                <div>
-                    <div class="c-green">15079 USDT</div>
+                <div class="b-item">
+                    <div class="c-green">904 USDT</div>
                     <span>Minden jutalék</span>
+                </div>
+                <div class="b-item">
+                    <div>25660 USDT</div>
+                    <span>Összes kivonás</span>
+                </div>
+                <div class="b-item">
+                    <div class="c-green">7473.86 USDT</div>
+                    <span>Összes bevétel</span>
                 </div>
             </div>
 
             <div class="act-btns">
-                <button class="act-btn dep">Letét</button>
-                <button class="act-btn wit">Pénzfelvétel</button>
+                <button class="btn-dep"><i class="fas fa-wallet"></i> Letét</button>
+                <button class="btn-wit"><i class="fas fa-coins"></i> Kivonás</button>
             </div>
         </div>
 
         <div class="menu-list">
-            <div class="menu-item"><i class="fas fa-users icon"></i> Csapat <span>></span></div>
-            <div class="menu-item"><i class="fas fa-file-invoice icon"></i> Számla <span>></span></div>
-            <div class="menu-item"><i class="fas fa-wallet icon"></i> USDT Cím <span>></span></div>
-            <div class="menu-item red"><i class="fas fa-sign-out-alt icon"></i> Kilépés</div>
+            <div class="m-item"><div class="ico"><i class="fas fa-users"></i></div> Csapat <span>></span></div>
+            <div class="m-item"><div class="ico"><i class="fas fa-file-invoice"></i></div> Számla <span>></span></div>
+            <div class="m-item"><div class="ico"><i class="fab fa-usps"></i></div> USDT Cím <span>></span></div>
         </div>
     </div>
 
-    <div id="modal" class="modal-overlay">
-        <div class="modal-box">
-            <i class="fas fa-check-circle modal-icon"></i>
-            <h3>SIKERES!</h3>
-            <p id="modalApp">App: TikTok</p>
-            <h2 id="modalAmt" class="c-green">+0.50 USDT</h2>
-            <button onclick="closeModal()">RENDBEN</button>
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="m-icon"><i class="fas fa-check-circle"></i></div>
+            <h3>Sikeres Skyhigh feladat!</h3>
+            <p id="mApp">App: TikTok</p>
+            <h2 id="mReward">+0.50 USDT</h2>
+            <button onclick="closeModal()">OK</button>
         </div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-home"></i>Főoldal</div>
-        <div class="nav-item" onclick="nav('levels', this)"><i class="fas fa-layer-group"></i>Szintek</div>
-        <div class="nav-item" onclick="nav('work', this)"><i class="fas fa-bolt"></i>Munka</div>
-        <div class="nav-item" onclick="nav('career', this)"><i class="fas fa-briefcase"></i>Karrier</div>
-        <div class="nav-item" onclick="nav('profile', this)"><i class="fas fa-user"></i>Profil</div>
+    <div class="nav">
+        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-home"></i><br>Főoldal</div>
+        <div class="nav-item" onclick="nav('levels', this)"><i class="fas fa-layer-group"></i><br>Szintek</div>
+        <div class="nav-item big-icon" onclick="nav('work', this)"><i class="fas fa-camera-aperture"></i></div>
+        <div class="nav-item" onclick="nav('career', this)"><i class="fas fa-chart-line"></i><br>Karrier</div>
+        <div class="nav-item" onclick="nav('profile', this)"><i class="fas fa-user"></i><br>Profil</div>
     </div>
 
     <script src="script.js"></script>
