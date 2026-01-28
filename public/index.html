@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K ETQ - Global Promotion</title>
+    <style>
+        /* ALAP DESIGN (WTQ STÍLUS) */
+        body {
+            background-color: #000814; /* Sötétkék alap */
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(180deg, #001f3f 0%, #000814 100%);
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #4d4dff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+        .lang-icon {
+            font-size: 20px;
+        }
+
+        /* BALANCE KÁRTYA (A kék doboz a képen) */
+        .balance-card {
+            background: linear-gradient(135deg, #003366 0%, #001a33 100%);
+            margin: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #0059b3;
+            box-shadow: 0 0 20px rgba(0, 89, 179, 0.3);
+            text-align: center;
+        }
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .balance-label {
+            color: #8daec4;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* TASK GOMB (A nagy gomb) */
+        .task-section {
+            text-align: center;
+            margin: 20px;
+        }
+        .start-btn {
+            background: linear-gradient(90deg, #00d4ff 0%, #0059b3 100%);
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #00d4ff;
+            width: 80%;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+        .progress-container {
+            width: 80%;
+            height: 10px;
+            background-color: #001a33;
+            margin: 10px auto;
+            border-radius: 5px;
+            display: none; /* Alapból rejtve */
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #00d4ff;
+            border-radius: 5px;
+            transition: width 0.1s;
+        }
+
+        /* VIP SZINTEK (A lista a képről) */
+        .vip-list {
+            padding: 10px 20px;
+        }
+        .vip-card {
+            background: linear-gradient(90deg, #0d0d2b 0%, #1a1a40 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Színek a szintekhez */
+        .lv1 { border-color: #00ff00; }
+        .lv2 { border-color: #00d4ff; }
+        .lv3 { border-color: #ffa500; }
+        .lv4 { border-color: #b10dc9; } /* Lila - ahogy kérted */
+
+        .vip-info h3 { margin: 0; font-size: 18px; }
+        .vip-info p { margin: 5px 0 0; font-size: 12px; color: #aaa; }
+        .vip-price { font-weight: bold; color: #fff; }
+
+        /* FOOTER MENÜ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000814;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #333;
+        }
+        .nav-item {
+            color: #888;
+            font-size: 12px;
+            text-align: center;
+        }
+        .nav-item.active { color: #00d4ff; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">K ETQ</div>
+        <div class="lang-icon">🌐 HU</div>
+    </div>
+
+    <div class="balance-card">
+        <div class="balance-amount" id="userBalance">0.00 USDT</div>
+        <div class="balance-label">Rendelkezésre álló egyenleg</div>
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+            <button style="background: #b10dc9; border:none; color:white; padding:5px 15px; border-radius:5px;">Letét</button>
+            <button style="background: #0059b3; border:none; color:white; padding:5px 15px; border-radius:5px;">Kivonás</button>
+        </div>
+    </div>
+
+    <div class="task-section">
+        <h3>Napi feladatok: <span id="taskCount">0</span>/10</h3>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <button class="start-btn" onclick="startTask()">GET TO WORK</button>
+        <p id="statusMsg" style="color: #00d4ff; font-size: 12px; min-height: 20px;"></p>
+    </div>
+
+    <div class="vip-list">
+        <div class="vip-card lv1">
+            <div class="vip-info">
+                <h3 style="color:#00ff00;">Level 1</h3>
+                <p>Napi 10 rendelés | Jutalék: 2%</p>
+            </div>
+            <div class="vip-price">200 USDT</div>
+        </div>
+
+        <div class="vip-card lv2">
+            <div class="vip-info">
+                <h3 style="color:#00d4ff;">Level 2</h3>
+                <p>Napi 20 rendelés | Jutalék: 2.5%</p>
+            </div>
+            <div class="vip-price">680 USDT</div>
+        </div>
+
+        <div class="vip-card lv3">
+            <div class="vip-info">
+                <h3 style="color:#ffa500;">Level 3</h3>
+                <p>Napi 30 rendelés | Jutalék: 3%</p>
+            </div>
+            <div class="vip-price">1560 USDT</div>
+        </div>
+
+        <div class="vip-card lv4">
+            <div class="vip-info">
+                <h3 style="color:#b10dc9;">Level 4 (VIP)</h3>
+                <p>Napi 50 rendelés | Jutalék: 3.5%</p>
+            </div>
+            <div class="vip-price">3200 USDT</div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item">🏠<br>Főoldal</div>
+        <div class="nav-item active">⚡<br>Munka</div>
+        <div class="nav-item">👥<br>Csapat</div>
+        <div class="nav-item">👤<br>Profil</div>
+    </div>
+
+    <script>
+        // Ez a Javascript végzi az "A Opciót" (Szimuláció)
+        let balance = 0.00;
+        let tasksDone = 0;
+        let userLevel = 1; // Alapból LV1 a demóban
+
+        function startTask() {
+            if (tasksDone >= 10) {
+                alert("Mára végeztél a feladatokkal!");
+                return;
+            }
+
+            const btn = document.querySelector('.start-btn');
+            const status = document.getElementById('statusMsg');
+            const bar = document.getElementById('progressBar');
+            const container = document.getElementById('progressContainer');
+
+            // UI Animáció indítása
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            container.style.display = "block";
+            status.innerText = "Applikációk rangsorolása folyamatban... (Google API)";
+
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    completeTaskBackend(); // Ha kész a csík, hívjuk a szervert
+                } else {
+                    width++;
+                    bar.style.width = width + '%';
+                }
+            }, 30); // Gyorsaság
+        }
+
+        function completeTaskBackend() {
+            // Itt kommunikálunk a server.js-el
+            fetch('/api/complete-task', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ level: userLevel })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // UI Frissítése
+                balance += data.reward;
+                tasksDone++;
+                
+                document.getElementById('userBalance').innerText = balance.toFixed(2) + " USDT";
+                document.getElementById('taskCount').innerText = tasksDone;
+                document.getElementById('statusMsg').innerText = data.message + " +" + data.reward + " USDT";
+                
+                // Reset
+                document.querySelector('.start-btn').disabled = false;
+                document.querySelector('.start-btn').style.opacity = "1";
+                document.getElementById('progressContainer').style.display = "none";
+            });
+        }
+    </script>
+</body>
+</html>
