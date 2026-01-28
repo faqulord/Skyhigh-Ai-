@@ -3,417 +3,401 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh Platform</title>
+    <title>Skyhigh Tech</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- MINDEN STÍLUS EGY HELYEN (HOGY NE ESSEN SZÉT) --- */
+        /* --- CORE STYLES --- */
         :root {
-            --bg-color: #050a14;
-            --purple-dark: #1a0033;
-            --purple-light: #6a0dad;
-            --neon-blue: #00f2ff;
-            --neon-pink: #ff00e6;
-            --text-white: #ffffff;
-            --gray-text: #aeb4b7;
+            --bg: #050a14;
+            --card: #0d1b36;
+            --cyan: #00f2ff;
+            --purple: #aa00ff;
+            --pink: #ff00ea;
+            --gold: #ffd700;
+            --text: #fff;
+            --green: #00ff9d;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body { 
             margin: 0; padding: 0; 
-            background-color: var(--bg-color); 
+            background-color: var(--bg); 
             font-family: 'Arial', sans-serif; 
-            color: var(--text-white);
-            padding-bottom: 70px; /* Hely a menünek */
+            color: var(--text);
+            padding-bottom: 80px; 
             overflow-x: hidden;
         }
 
         /* --- HEADER --- */
         .header {
             position: fixed; top: 0; width: 100%; z-index: 100;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
             padding: 15px; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .logo { font-weight: bold; font-size: 16px; color: var(--neon-blue); letter-spacing: 1px; }
-        .lang { font-size: 12px; color: #888; }
+        .logo { font-weight: bold; font-size: 16px; color: var(--cyan); letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .lang { font-size: 10px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; }
 
-        /* --- OLDALAK KEZELÉSE --- */
-        .page { display: none; padding-top: 60px; min-height: 100vh; }
+        /* --- PAGES --- */
+        .page { display: none; padding-top: 60px; padding-bottom: 20px; min-height: 100vh; }
         .page.active { display: block; }
 
-        /* --- 1. MUNKA OLDAL (BFBDT LILA DESIGN) --- */
-        #work {
-            background: radial-gradient(circle at center, #2e004d 0%, #000000 100%);
-        }
-        
-        .task-info-card {
-            margin: 15px; background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px;
-            padding: 10px 15px; display: flex; justify-content: space-between;
-            font-size: 11px; color: #ccc;
+        /* --- 1. HOME (LOBBY) --- */
+        #home { padding: 70px 15px 20px 15px; }
+
+        .notice-bar {
+            background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--gold); padding: 8px; font-size: 11px; border-radius: 5px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 10px;
         }
 
-        /* A NAGY KÖR ANIMÁCIÓ */
-        .rotator-container {
-            position: relative; width: 320px; height: 320px; margin: 20px auto;
+        .hero-card {
+            background: linear-gradient(135deg, #0d1b36, #000); padding: 25px;
+            border-radius: 15px; border: 1px solid #333; text-align: center; margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
         }
-        /* Díszítő körív */
-        .orbit-line {
+        .hero-lbl { color: var(--cyan); font-size: 11px; letter-spacing: 1px; margin-bottom: 5px; }
+        .hero-val { font-size: 42px; font-weight: bold; margin: 5px 0; text-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+        .hero-sub { color: #888; font-size: 12px; }
+        .lock-pill { 
+            display: inline-block; background: rgba(255,215,0,0.15); color: var(--gold); 
+            font-size: 10px; padding: 4px 10px; border-radius: 20px; margin-top: 10px; border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .cta-box { text-align: center; margin: 25px 0; }
+        .big-cta-btn {
+            background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; border: none;
+            padding: 15px 40px; border-radius: 30px; font-weight: bold; width: 100%; font-size: 14px;
+            box-shadow: 0 0 20px rgba(0, 114, 255, 0.4); display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+
+        .info-block { margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; border-left: 3px solid #ccc; }
+        .info-block.purple { border-color: var(--purple); } .info-block.purple h3 { color: var(--purple); }
+        .info-block.green { border-color: var(--green); } .info-block.green h3 { color: var(--green); }
+        .info-block h3 { margin: 0 0 5px 0; font-size: 14px; }
+        .info-block p { margin: 0; font-size: 11px; color: #ccc; line-height: 1.4; }
+
+        /* BÓNUSZ KÁRTYÁK */
+        .sec-title { color: #fff; margin-top: 25px; font-size: 14px; margin-bottom: 10px; border-left: 3px solid var(--gold); padding-left: 10px; }
+        .bonus-card {
+            background: linear-gradient(135deg, #4a148c, #2a0e50); margin-bottom: 15px; padding: 15px;
+            border-radius: 10px; border: 1px solid #7c4dff;
+        }
+        .b-head { font-weight: bold; color: #fff; margin-bottom: 8px; font-size: 13px; color: #e1bee7; }
+        .bonus-card p { font-size: 11px; color: #d1c4e9; margin: 0; line-height: 1.5; }
+
+        /* --- 2. LEVELS (VIP) --- */
+        #levels { padding: 70px 15px 20px 15px; }
+        .lv-card {
+            background: #0d1b36; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; border-radius: 10px;
+            display: flex; align-items: center; overflow: hidden; height: 110px; position: relative;
+        }
+        .lv-left { 
+            width: 90px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-right: 1px solid rgba(0,0,0,0.2);
+        }
+        .bg-1 { background: linear-gradient(135deg, #00c853, #009624); }
+        .bg-2 { background: linear-gradient(135deg, #2962ff, #0039cb); }
+        .bg-3 { background: linear-gradient(135deg, #ffab00, #c68400); }
+        .bg-4 { background: linear-gradient(135deg, #d500f9, #9e00c5); }
+        
+        .lv-icon { font-size: 32px; color: #fff; margin-bottom: 5px; }
+        .lv-txt { color: #fff; font-weight: bold; font-size: 16px; }
+
+        .lv-right { flex: 1; padding: 10px 15px; }
+        .lv-row { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-bottom: 6px; }
+        .lv-row span:last-child { color: #fff; font-weight: bold; }
+        .lv-btn { 
+            float: right; margin-top: 5px; padding: 6px 20px; border-radius: 5px; 
+            border: none; font-weight: bold; font-size: 11px; cursor: pointer;
+        }
+        .btn-active { background: rgba(0,255,157,0.2); color: var(--green); border: 1px solid var(--green); }
+        .btn-lock { background: #333; color: #ccc; border: 1px solid #555; }
+
+        /* --- 3. WORK (TASK - BFBDT STYLE) --- */
+        #work {
+            background: radial-gradient(circle at center, #3a005c 0%, #050a14 100%);
+            padding-top: 60px;
+        }
+        
+        .task-header-pill {
+            margin: 10px auto; width: 90%;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px; padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 11px; color: #ddd; backdrop-filter: blur(5px);
+        }
+        .pill-badge { background: var(--pink); color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: bold; margin-left: 5px; }
+
+        /* ROTATOR */
+        .rotator-area {
+            position: relative; width: 320px; height: 320px; margin: 30px auto;
+        }
+        .orbit {
             position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            border: 1px solid rgba(138, 43, 226, 0.3); top: 0; left: 0;
+            border: 1px solid rgba(255,255,255,0.1); top: 0; left: 0;
         }
-        /* Forgó elem */
-        .icon-spinner {
+        .spinner {
             width: 100%; height: 100%; border-radius: 50%; position: relative;
             transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .app-icon {
-            position: absolute; width: 45px; height: 45px; border-radius: 10px;
-            top: 50%; left: 50%; margin-top: -22.5px; margin-left: -22.5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5); overflow: hidden;
-        }
-        .app-icon img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* KÖZÉPSŐ GYÉMÁNT LOGÓ (BFBDT) */
-        .center-logo-box {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80px; height: 80px; z-index: 10;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .diamond-shape {
-            width: 50px; height: 50px; background: linear-gradient(135deg, #3366ff, #00ccff);
-            transform: rotate(45deg); margin-bottom: 5px;
-            border: 2px solid #fff; box-shadow: 0 0 20px #00ccff;
+        
+        .app-node {
+            position: absolute; width: 48px; height: 48px; border-radius: 12px;
+            top: 50%; left: 50%; margin-top: -24px; margin-left: -24px;
             display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .diamond-inner { width: 20px; height: 20px; background: #ffd700; box-shadow: 0 0 10px #ffd700; }
-        .center-count { font-size: 14px; font-weight: bold; color: #fff; text-shadow: 0 0 5px #000; }
 
-        /* HATSZÖGEK (HEXAGONS) */
-        .hex-row { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        /* Center Diamond */
+        .center-diamond {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90px; height: 90px; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .d-shape {
+            width: 60px; height: 60px; background: linear-gradient(135deg, #3366ff, #00ccff);
+            transform: rotate(45deg); border: 2px solid #fff; box-shadow: 0 0 25px #00ccff;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
+        }
+        .d-inner { width: 25px; height: 25px; background: #ffd700; box-shadow: 0 0 10px #ffd700; }
+        .c-text { color: #fff; font-weight: bold; text-shadow: 0 0 5px #000; font-size: 14px; position: relative; top: -15px;}
+
+        /* Hexagon Stats */
+        .hex-grid { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
         .hex {
-            width: 100px; height: 90px;
-            background: rgba(60, 20, 100, 0.4);
+            width: 100px; height: 90px; background: rgba(80, 20, 120, 0.3);
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .hex.main { background: rgba(120, 20, 180, 0.5); transform: scale(1.1); z-index: 2; border: 1px solid var(--neon-pink); }
-        .hex-val { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 2px; }
-        .hex-lbl { font-size: 9px; color: #ccc; }
+        .hex.main { background: rgba(180, 20, 220, 0.4); transform: scale(1.1); border: 1px solid var(--pink); z-index: 2; }
+        .h-val { font-size: 16px; font-weight: bold; color: #fff; }
+        .h-lbl { font-size: 9px; color: #ccc; margin-top: 3px; }
 
-        /* START GOMB */
-        .start-btn-box { text-align: center; margin-top: 30px; }
-        .power-btn {
-            width: 70px; height: 70px; border-radius: 50%; background: transparent;
-            border: 3px solid var(--neon-pink); color: var(--neon-pink); font-size: 30px;
-            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 10px var(--neon-pink);
+        /* Power Button */
+        .start-zone { text-align: center; margin-top: 40px; }
+        .pwr-btn {
+            width: 75px; height: 75px; border-radius: 50%; background: transparent;
+            border: 4px solid var(--pink); color: var(--pink); font-size: 32px;
+            box-shadow: 0 0 20px var(--pink), inset 0 0 10px var(--pink);
             cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto;
         }
-        .power-btn:active { transform: scale(0.95); }
+        .pwr-btn:active { transform: scale(0.9); }
 
-        /* --- 2. PROFIL OLDAL (WTQ KÉK DESIGN) --- */
-        #profile { background: #000; }
-        .prof-header {
-            background: #000; padding: 20px 15px; display: flex; align-items: center; gap: 15px;
+        /* --- 4. KARRIER --- */
+        #career { padding: 70px 15px 20px 15px; }
+        .promo-card {
+            background: linear-gradient(135deg, #2d0b4e, #1a0530); margin-bottom: 15px; padding: 20px;
+            border-radius: 12px; border: 1px solid #6a0dad;
         }
-        .avatar-slv {
-            width: 55px; height: 55px; border-radius: 50%; background: #fff; color: #0055ff;
-            font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;
-        }
-        .u-info h2 { margin: 0; font-size: 16px; color: #fff; }
-        .slv-text { color: #ff4500; font-weight: 900; font-style: italic; }
-        .u-sub { font-size: 11px; color: #888; margin-top: 4px; }
+        .p-title { color: #fff; font-weight: bold; font-size: 14px; margin-bottom: 8px; }
+        .p-text { color: #ccc; font-size: 12px; line-height: 1.5; }
 
-        .balance-card {
-            background: #002244; margin: 0 15px; border-radius: 12px; padding: 20px;
-            border: 1px solid #004080;
+        /* --- 5. PROFIL (WTQ KÉK) --- */
+        #profile { background: #000; padding: 0; padding-bottom: 80px; }
+        .prof-head {
+            background: #000; padding: 30px 20px 20px 20px; display: flex; align-items: center; gap: 15px;
         }
-        .bal-title { text-align: center; color: #fff; font-size: 14px; margin-bottom: 5px; }
-        .bal-total { text-align: center; color: #fff; font-size: 32px; font-weight: bold; margin-bottom: 20px; }
+        .avatar {
+            width: 60px; height: 60px; border-radius: 50%; background: #fff; color: #0055ff;
+            font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+        }
+        .u-det h2 { margin: 0; font-size: 18px; color: #fff; }
+        .slv-s { color: #ff3300; font-weight: 900; font-style: italic; }
+        .u-sub { font-size: 11px; color: #888; margin-top: 5px; }
+
+        .bal-wrap {
+            background: #002244; margin: 0 15px; border-radius: 12px; padding: 20px; border: 1px solid #004080;
+        }
+        .b-tit { text-align: center; color: #fff; font-size: 12px; }
+        .b-tot { text-align: center; color: #fff; font-size: 36px; font-weight: bold; margin: 10px 0 20px 0; }
         
-        .bal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
-        .bal-item div { font-size: 13px; font-weight: bold; color: #fff; }
-        .bal-item span { font-size: 10px; color: #888; }
-        .green-txt { color: #00ff9d !important; }
+        .b-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
+        .b-cell div { font-size: 14px; font-weight: bold; color: #fff; }
+        .b-cell span { font-size: 10px; color: #888; }
+        .c-g { color: #00ff9d !important; }
 
-        .btn-row { display: flex; gap: 15px; margin-top: 20px; padding: 0 10px; }
-        .act-btn {
-            flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; color: #fff; font-size: 12px;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
+        .act-row { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-act {
+            flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; color: #fff; font-size: 13px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-dep { background: #3366ff; }
-        .btn-wit { background: #556677; }
+        .depo { background: #3366ff; } .with { background: #556677; }
 
-        .menu-list { margin-top: 20px; padding: 0 15px; }
-        .menu-item {
-            background: #0d1b36; padding: 15px; margin-bottom: 2px;
-            display: flex; align-items: center; color: #fff; font-size: 14px;
+        .m-list { margin-top: 20px; padding: 0 15px; }
+        .m-item {
+            background: #0d1b36; padding: 18px; margin-bottom: 2px;
+            display: flex; align-items: center; color: #fff; font-size: 14px; cursor: pointer;
         }
-        .menu-icon { 
-            width: 30px; height: 30px; background: rgba(50,100,255,0.2); border-radius: 50%; 
+        .m-ico { 
+            width: 32px; height: 32px; background: rgba(50,100,255,0.2); border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; color: #3366ff; margin-right: 15px;
         }
-        .arrow { margin-left: auto; color: #555; font-size: 12px; }
+        .arw { margin-left: auto; color: #555; font-size: 12px; }
 
-        /* --- 3. SZINTEK & KARRIER (LILA DOBOZOS) --- */
-        .promo-card {
-            background: linear-gradient(135deg, #320b52, #1a0530); margin: 15px; padding: 15px;
-            border-radius: 10px; border: 1px solid #6a0dad;
-        }
-        .promo-title { color: #fff; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        .promo-text { color: #ccc; font-size: 11px; line-height: 1.5; margin: 0; }
-
-        /* --- POPUP MODAL --- */
-        .modal-overlay {
+        /* --- MODAL --- */
+        .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 2000; display: none;
+            background: rgba(0,0,0,0.85); z-index: 5000; display: none;
             justify-content: center; align-items: center;
         }
-        .modal-box {
-            background: #1a1a1a; padding: 25px; border-radius: 15px; width: 80%; text-align: center; border: 1px solid #444;
+        .m-box {
+            background: #1a1a1a; padding: 30px; border-radius: 15px; width: 85%; text-align: center; border: 1px solid #444;
         }
-        .modal-btn { background: var(--neon-blue); border: none; padding: 10px 30px; border-radius: 5px; margin-top: 15px; font-weight: bold; }
+        .m-btn { background: var(--cyan); border: none; padding: 12px 40px; border-radius: 5px; margin-top: 20px; font-weight: bold; }
 
-        /* --- ALSÓ MENÜ (FIXED) --- */
-        .nav-bar {
-            position: fixed; bottom: 0; width: 100%; height: 60px;
+        /* --- NAV --- */
+        .nav {
+            position: fixed; bottom: 0; width: 100%; height: 65px;
             background: #000; border-top: 1px solid #333;
             display: flex; justify-content: space-around; align-items: center; z-index: 999;
         }
-        .nav-item { text-align: center; color: #666; font-size: 10px; cursor: pointer; flex: 1; }
-        .nav-item i { font-size: 20px; margin-bottom: 3px; display: block; }
-        .nav-item.active { color: var(--neon-blue); }
+        .ni { text-align: center; color: #666; font-size: 10px; cursor: pointer; flex: 1; padding-top: 5px; }
+        .ni i { font-size: 20px; margin-bottom: 4px; display: block; }
+        .ni.active { color: var(--cyan); }
         
-        /* Kiemelt középső gomb (BFBDT stílus) */
-        .nav-item.big { position: relative; top: -15px; }
-        .big-circle {
-            width: 50px; height: 50px; background: #000; border: 2px solid var(--neon-pink);
+        .ni.big { position: relative; top: -20px; }
+        .big-c {
+            width: 55px; height: 55px; background: #000; border: 2px solid var(--pink);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 15px var(--neon-pink);
+            box-shadow: 0 0 15px var(--pink);
         }
-        .big-circle i { font-size: 24px; color: var(--neon-pink); margin: 0; }
+        .big-c i { font-size: 26px; color: var(--pink); margin: 0; }
 
     </style>
 </head>
 <body>
 
-    <div id="page-work" class="page active">
-        <div class="task-info-card">
-            <span>Account: 363***44674</span>
-            <span>Position level: OA1.Pro</span>
+    <div id="p-home" class="page active">
+        <div class="header">
+            <div class="logo"><i class="fas fa-satellite-dish"></i> SKYHIGH</div>
+            <div class="lang">HU | EN</div>
         </div>
 
-        <div style="text-align: center; margin-top: 20px; font-weight: bold;">Start Making Money</div>
-
-        <div class="rotator-container">
-            <div class="orbit-line"></div>
-            <div id="spinner" class="icon-spinner">
-                </div>
-            
-            <div class="center-logo-box">
-                <div class="diamond-shape"><div class="diamond-inner"></div></div>
-                <div class="center-count" id="centerCount">0/10</div>
-            </div>
+        <div class="notice-bar">
+            <i class="fas fa-bullhorn"></i> <marquee>📢 Skyhigh Hírek: User992... 500 USDT kivét! -- Új SLV szintek elérhetőek! -- NASDAQ IPO 2026 Q3</marquee>
         </div>
 
-        <div class="hex-row">
-            <div class="hex">
-                <div class="hex-val" id="wTask">0/10</div>
-                <div class="hex-lbl">Order Quantity</div>
-            </div>
-            <div class="hex main">
-                <div class="hex-val" style="color:var(--neon-pink)" id="wComm">0.00</div>
-                <div class="hex-lbl">Commission</div>
-                <div class="hex-lbl" style="font-size:8px">OA1.Pro</div>
-            </div>
-            <div class="hex">
-                <div class="hex-val" id="wTotal">0.00</div>
-                <div class="hex-lbl">Get Commission</div>
-            </div>
+        <div class="hero-card">
+            <div class="hero-lbl">TELJES VAGYON (USDT)</div>
+            <div class="hero-val" id="lobBal">0.00</div>
+            <div class="hero-sub">Mai profit: <span id="lobToday" style="color:#00ff9d">0.00</span> USDT</div>
+            <div class="lock-pill"><i class="fas fa-lock"></i> Tőke lekötve: 365 Nap</div>
         </div>
 
-        <div class="start-btn-box">
-            <button class="power-btn" id="startBtn" onclick="runTask()"><i class="fas fa-power-off"></i></button>
-            <div style="color:#888; font-size:10px; margin-top:5px;">Start Task</div>
+        <div class="cta-box">
+            <button class="big-cta-btn" onclick="nav('p-work')">
+                <i class="fas fa-bolt"></i> MUNKATERÜLET MEGNYITÁSA
+            </button>
+        </div>
+
+        <div class="info-block purple">
+            <h3><i class="fab fa-google"></i> Google Partner Program</h3>
+            <p>A Skyhigh Technology a globális megosztott gazdaság úttörője. Optimalizáljuk a Play Áruház applikációit.</p>
+        </div>
+        <div class="info-block green">
+            <h3><i class="fas fa-chart-line"></i> Tőzsdei Tervek 2026</h3>
+            <p>2026 Q3-ban tervezzük a NASDAQ bevezetést. Minden aktív Manager részvényopciót kap.</p>
+        </div>
+
+        <h3 class="sec-title">IDŐALAPÚ BÓNUSZOK</h3>
+        <div class="bonus-card">
+            <div class="b-head">Öt hónapos munka után</div>
+            <p>Ha a 123. szinten lévő partnerek száma eléri a 18-at, ebből 2 OA2 szintű számlával és 4 1. szintű partner, Ön 1000 USDT bónuszt kap.</p>
+        </div>
+        <div class="bonus-card">
+            <div class="b-head">Nyolc hónapos munka után</div>
+            <p>Ha a 123. szinten lévő partnerek száma eléri a 30-at, ebből 3 OA2 szintű számlával és 4 első szintű partner, akkor 2500 USDT bónuszt kap.</p>
         </div>
     </div>
 
-    <div id="page-profile" class="page">
-        <div class="prof-header">
-            <div class="avatar-slv">SLV4</div>
-            <div class="u-info">
-                <h2>363***09301 <span class="slv-text">slv.4</span></h2>
+    <div id="p-levels" class="page">
+        <div class="header">
+            <div class="logo">VIP SZINTEK</div>
+        </div>
+        <div id="lvList">
+            </div>
+    </div>
+
+    <div id="p-work" class="page">
+        <div class="task-header-pill">
+            <span>Account: 363***44674</span>
+            <span style="display:flex;align-items:center">Level: <div class="pill-badge" id="workLvBadge">LV1</div></span>
+        </div>
+
+        <div style="text-align:center; color:#fff; font-weight:bold; margin-top:15px;">Start Making Money</div>
+
+        <div class="rotator-area">
+            <div class="orbit"></div>
+            <div id="spinner" class="spinner"></div> <div class="center-diamond">
+                <div class="d-shape"><div class="d-inner"></div></div>
+                <div class="c-text" id="cenCnt">0/10</div>
+            </div>
+        </div>
+
+        <div class="hex-grid">
+            <div class="hex">
+                <div class="h-val" id="wTask">0/10</div>
+                <div class="h-lbl">Order Quantity</div>
+            </div>
+            <div class="hex main">
+                <div class="h-val" style="color:#ff00ea" id="wComm">0.00</div>
+                <div class="h-lbl">Commission</div>
+                <div class="h-lbl" style="font-size:8px" id="wLv">LV1</div>
+            </div>
+            <div class="hex">
+                <div class="h-val" id="wTot">0.00</div>
+                <div class="h-lbl">Total Funds</div>
+            </div>
+        </div>
+
+        <div class="start-zone">
+            <button class="pwr-btn" id="startBtn" onclick="runTask()"><i class="fas fa-power-off"></i></button>
+            <div style="font-size:10px; color:#888; margin-top:8px;">Start Task</div>
+        </div>
+    </div>
+
+    <div id="p-career" class="page">
+        <div class="header"><div class="logo" style="color:#ffd700">KARRIER PROGRAM</div></div>
+        
+        <div class="promo-card">
+            <div class="p-title">Rögzített pozíció előléptetés</div>
+            <div class="p-text">Ha megosztja a fiókjának meghívó linkjét, és 15 olyan partnert toboroz, akik LV2 vagy magasabb szintű fiókot aktiválnak, csapatvezetői pozícióba lép. <strong>700 USDT fix havi fizetést</strong> kap.</div>
+        </div>
+        <div class="promo-card">
+            <div class="p-title">Felügyelői szint</div>
+            <div class="p-text">Ha az első szintű csapattagok közül 6-ot "Csapatvezetőnek" neveznek ki, akkor "Felügyelő" pozícióba lép, és fix <strong>3000 USDT</strong> havi fizetést kap.</div>
+        </div>
+        <div class="promo-card">
+            <div class="p-title">Menedzser szint</div>
+            <div class="p-text">Ha az első szintű csapattagok közül 3-at "Felügyelőnek" neveznek ki, akkor Menedzser lesz. <strong>8000 USDT</strong> fix havi fizetés.</div>
+        </div>
+    </div>
+
+    <div id="p-profile" class="page">
+        <div class="prof-head">
+            <div class="avatar" id="avText">LV1</div>
+            <div class="u-det">
+                <h2>363***09301 <span class="slv-s" id="slvStat">SLV.0</span></h2>
                 <div class="u-sub">Invite code: 659***02 <i class="far fa-copy"></i></div>
                 <div class="u-sub">Count Down 79 Day 16 Hour...</div>
             </div>
         </div>
 
-        <div class="balance-card">
-            <div class="bal-title">My Balance</div>
-            <div class="bal-total" id="profBal">0.00 USDT</div>
+        <div class="bal-wrap">
+            <div class="b-tit">My Balance</div>
+            <div class="b-tot" id="pBal">0.00 USDT</div>
             
-            <div class="bal-grid">
-                <div class="bal-item"><div id="pAvail">0.00 USDT</div><span>Available Balance</span></div>
-                <div class="bal-item"><div class="green-txt">4280.00 USDT</div><span>Security Deposit</span></div>
-                <div class="bal-item"><div id="pToday">0.00 USDT</div><span>Today Commission</span></div>
-                <div class="bal-item"><div class="green-txt">904 USDT</div><span>All Commission</span></div>
-                <div class="bal-item"><div>25660 USDT</div><span>All withdrawn</span></div>
-                <div class="bal-item"><div class="green-txt">7473.86 USDT</div><span>Total Revenue</span></div>
+            <div class="b-grid">
+                <div class="b-cell"><div id="pAvail">0.00 USDT</div><span>Available Balance</span></div>
+                <div class="b-cell"><div class="c-g">4280.00 USDT</div><span>Security Deposit</span></div>
+                <div class="b-cell"><div id="pToday">0.00 USDT</div><span>Today Commission</span></div>
+                <div class="b-cell"><div class="c-g">904 USDT</div><span>All Commission</span></div>
+                <div class="b-cell"><div>25660 USDT</div><span>All withdrawn</span></div>
+                <div class="b-cell"><div class="c-g">7473.86 USDT</div><span>Total Revenue</span></div>
             </div>
 
-            <div class="btn-row">
-                <button class="act-btn btn-dep"><i class="fas fa-wallet"></i> Recharge</button>
-                <button class="act-btn btn-wit"><i class="fas fa-credit-card"></i> Withdraw</button>
-            </div>
-        </div>
-
-        <div class="menu-list">
-            <div class="menu-item"><div class="menu-icon"><i class="fas fa-users"></i></div> Team <span class="arrow">></span></div>
-            <div class="menu-item"><div class="menu-icon"><i class="fas fa-file-alt"></i></div> Bill <span class="arrow">></span></div>
-            <div class="menu-item"><div class="menu-icon"><i class="fas fa-coins"></i></div> USDT <span class="arrow">></span></div>
-        </div>
-    </div>
-
-    <div id="page-career" class="page" style="padding: 15px;">
-        <h2 style="text-align:center; color:#ffd700; margin-bottom:20px;">KARRIER & BÓNUSZ</h2>
-        
-        <div class="promo-card">
-            <div class="promo-title">Öt hónapos munka után</div>
-            <p class="promo-text">Ha a 123. szinten lévő partnerek száma eléri a 18-at, ebből 2 OA2 szintű számlával és 4 1. szintű partner, Ön 1000 USDT hozzájárulási bónuszt kap.</p>
-        </div>
-        
-        <div class="promo-card">
-            <div class="promo-title">Nyolc hónapos munka után</div>
-            <p class="promo-text">Ha a 123. szinten lévő partnerek száma eléri a 30-at, ebből 3 OA2 szintű számlával és 4 első szintű partner, akkor 2500 USDT hozzájárulási bónuszt kap.</p>
-        </div>
-
-        <div class="promo-card">
-            <div class="promo-title">Menedzser szint</div>
-            <p class="promo-text">Ha az első szintű csapattagok közül 3-at "Felügyelőnek" neveznek ki, akkor Menedzser lesz. 8000 USDT fix havi fizetés.</p>
-        </div>
-    </div>
-
-    <div id="page-home" class="page" style="padding:15px;">
-        <div class="promo-card" style="border-color:#00f2ff;">
-            <div class="promo-title" style="color:#00f2ff;">Google Partner Program</div>
-            <p class="promo-text">A Skyhigh Technology a globális megosztott gazdaság (Shared Economy) úttörője.</p>
-        </div>
-    </div>
-
-    <div id="modal" class="modal-overlay">
-        <div class="modal-box">
-            <i class="fas fa-check-circle" style="font-size:40px; color:#00f2ff; margin-bottom:10px;"></i>
-            <h3>Sikeres Feladat!</h3>
-            <p id="mApp" style="color:#ccc; margin:10px 0;">App: TikTok</p>
-            <h2 id="mRew" style="color:#00f2ff;">+0.50 USDT</h2>
-            <button class="modal-btn" onclick="closeModal()">RENDBEN</button>
-        </div>
-    </div>
-
-    <div class="nav-bar">
-        <div class="nav-item" onclick="nav('page-home', this)"><i class="fas fa-home"></i><br>Főoldal</div>
-        <div class="nav-item" onclick="nav('page-career', this)"><i class="fas fa-chart-line"></i><br>Karrier</div>
-        <div class="nav-item big" onclick="nav('page-work', this)">
-            <div class="big-circle"><i class="fas fa-camera-aperture"></i></div>
-        </div>
-        <div class="nav-item" onclick="nav('page-profile', this)"><i class="fas fa-user"></i><br>Profil</div>
-    </div>
-
-    <script>
-        // ADATOK
-        let user = { balance: 0.00, today: 0.00, tasks: 0 };
-        const apps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
-
-        // INICIALIZÁLÁS
-        window.onload = function() {
-            initRotator();
-            updateUI();
-            nav('page-work', document.querySelector('.nav-item.big')); // Alapból Munka oldal
-        };
-
-        // UI FRISSÍTÉS
-        function updateUI() {
-            // Munka
-            document.getElementById('wTask').innerText = user.tasks + "/10";
-            document.getElementById('wComm').innerText = user.today.toFixed(2);
-            document.getElementById('wTotal').innerText = user.balance.toFixed(2);
-            document.getElementById('centerCount').innerText = user.tasks + "/10";
-            // Profil
-            document.getElementById('profBal').innerText = user.balance.toFixed(2) + " USDT";
-            document.getElementById('pAvail').innerText = user.balance.toFixed(2) + " USDT";
-            document.getElementById('pToday').innerText = user.today.toFixed(2) + " USDT";
-        }
-
-        // MENÜ VÁLTÁS
-        window.nav = function(pageId, btn) {
-            // Oldalak
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            
-            // Gombok színezése
-            if(btn) {
-                document.querySelectorAll('.nav-item').forEach(b => b.style.color = '#666');
-                btn.style.color = '#00f2ff';
-            }
-        }
-
-        // KÖR IKONOK LÉTREHOZÁSA
-        function initRotator() {
-            const spinner = document.getElementById('spinner');
-            const radius = 135; 
-            const total = 12;
-
-            for(let i=0; i<total; i++) {
-                const el = document.createElement('div');
-                el.className = 'app-icon';
-                // Placeholder színes négyzetek
-                el.style.backgroundColor = `hsl(${i*30}, 60%, 40%)`;
-                el.innerHTML = '<i class="fas fa-gamepad" style="color:#fff; font-size:20px; display:flex; justify-content:center; align-items:center; height:100%;"></i>';
-                
-                const angle = (i / total) * 2 * Math.PI;
-                const x = Math.cos(angle) * radius + 160; 
-                const y = Math.sin(angle) * radius + 160;
-                
-                el.style.left = (x - 22.5) + 'px';
-                el.style.top = (y - 22.5) + 'px';
-                
-                spinner.appendChild(el);
-            }
-        }
-
-        // PÖRGETÉS
-        window.runTask = function() {
-            if(user.tasks >= 10) { alert("Mára végeztél!"); return; }
-            
-            const spinner = document.getElementById('spinner');
-            const btn = document.getElementById('startBtn');
-            btn.disabled = true;
-            
-            // Forgás
-            const rot = 720 + Math.floor(Math.random() * 360);
-            spinner.style.transform = `rotate(${rot}deg)`;
-            
-            setTimeout(() => {
-                spinner.style.transform = `rotate(0deg)`;
-                
-                const r = 0.50;
-                user.balance += r;
-                user.today += r;
-                user.tasks++;
-                updateUI();
-                
-                document.getElementById('mRew').innerText = "+" + r.toFixed(2) + " USDT";
-                document.getElementById('modal').style.display = 'flex';
-                
-                btn.disabled = false;
-            }, 3000);
-        }
-
-        window.closeModal = function() {
-            document.getElementById('modal').style.display = 'none';
-        }
-    </script>
-</body>
-</html>
+            <div class="act-row">
+                <button class="btn-act depo"><i class="fas fa-wallet"></i> Recharge</button>
+                <button class="btn
