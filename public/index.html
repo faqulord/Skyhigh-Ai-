@@ -6,7 +6,7 @@
     <title>Skyhigh Technology</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- SKYHIGH TECHNOLOGY DESIGN SYSTEM --- */
+        /* --- SKYHIGH TECHNOLOGY FINAL DESIGN --- */
         :root {
             --bg-dark: #020b1c;
             --card-bg: #0d1b36;
@@ -16,6 +16,7 @@
             --gold: #ffd700;
             --text-main: #ffffff;
             --text-muted: #8899ac;
+            --neon-green: #00ff9d;
         }
 
         body {
@@ -23,10 +24,8 @@
             color: var(--text-main);
             font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding-bottom: 90px; /* Hely a menünek */
-            background-image: 
-                linear-gradient(180deg, rgba(2,11,28,0.8) 0%, var(--bg-dark) 100%),
-                url('https://www.transparenttextures.com/patterns/cubes.png'); /* Finom minta */
+            padding-bottom: 90px;
+            background-image: linear-gradient(180deg, rgba(2,11,28,0.9) 0%, var(--bg-dark) 100%), url('https://www.transparenttextures.com/patterns/cubes.png');
         }
 
         /* HEADER */
@@ -37,413 +36,394 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--sky-blue);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: sticky; top: 0; z-index: 100;
             box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
         }
         .brand {
-            font-size: 18px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
             background: linear-gradient(90deg, #fff, var(--sky-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .slv-badge {
+        .level-display {
             background: linear-gradient(135deg, var(--deep-purple), var(--danger));
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
+            padding: 5px 12px; border-radius: 4px; font-size: 11px; font-weight: bold;
             box-shadow: 0 0 10px var(--deep-purple);
         }
 
-        /* DASHBOARD (BALANCE) */
-        .dashboard {
-            padding: 20px;
-        }
+        /* DASHBOARD */
+        .dashboard { padding: 20px; }
         .balance-card {
             background: linear-gradient(160deg, #162c52 0%, #081226 100%);
-            border-radius: 16px;
-            padding: 25px;
-            text-align: center;
+            border-radius: 16px; padding: 25px; text-align: center;
             border: 1px solid rgba(0, 242, 255, 0.1);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             position: relative;
         }
-        .lock-icon {
-            position: absolute;
-            top: 15px; right: 15px;
-            color: var(--gold);
-            font-size: 18px;
-            opacity: 0.8;
+        .lock-badge {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 10px; color: var(--gold); border: 1px solid var(--gold);
+            padding: 2px 6px; border-radius: 4px;
         }
-        .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .balance-value { font-size: 42px; font-weight: 700; color: #fff; margin: 10px 0; text-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
-        .lock-info {
-            font-size: 10px;
-            color: var(--gold);
-            background: rgba(255, 215, 0, 0.1);
-            padding: 5px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            display: inline-block;
-        }
-
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
+        .balance-val { font-size: 42px; font-weight: 700; color: #fff; margin: 10px 0; text-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
         .btn-action {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; padding: 12px; border-radius: 8px; font-size: 13px; cursor: pointer; flex: 1;
         }
         .btn-primary { background: linear-gradient(90deg, #00c6ff, #0072ff); border: none; font-weight: bold; }
 
-        /* WORK SECTION */
-        .work-area {
-            text-align: center;
-            margin-top: 30px;
-            position: relative;
-        }
-        .orb-container {
-            width: 180px;
-            height: 180px;
-            margin: 0 auto;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        /* WORK BUTTON */
+        .work-area { text-align: center; margin-top: 30px; }
         .start-btn {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
+            width: 140px; height: 140px; border-radius: 50%;
             background: linear-gradient(135deg, var(--sky-blue), #0066ff);
-            border: none;
-            color: #020b1c;
-            font-size: 20px;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.4);
-            z-index: 2;
+            border: 4px solid rgba(255,255,255,0.1); color: #020b1c;
+            font-size: 20px; font-weight: 900; cursor: pointer;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.4);
             transition: transform 0.2s;
         }
         .start-btn:active { transform: scale(0.95); }
-        .orb-ring {
-            position: absolute;
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            border: 2px solid var(--sky-blue);
-            animation: spin 4s linear infinite;
-            opacity: 0.5;
-        }
-        .orb-ring:nth-child(2) { width: 120%; height: 120%; border-color: var(--deep-purple); animation-direction: reverse; animation-duration: 6s; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* RULES & PHILOSOPHY (FONTOS!) */
-        .rules-card {
-            background: #081226;
-            margin: 30px 20px;
-            padding: 20px;
-            border-left: 4px solid var(--danger);
-            border-radius: 0 10px 10px 0;
+        /* LEVELS PAGE (NEW!) */
+        .levels-container { display: none; padding: 20px; }
+        .level-card {
+            background: #0d1b36; border-radius: 12px; margin-bottom: 20px;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
         }
-        .rules-title { color: #fff; font-size: 15px; margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-        .rules-text { color: var(--text-muted); font-size: 11px; line-height: 1.6; text-align: justify; }
+        .lv-header {
+            background: linear-gradient(90deg, #1a2f4d, #0d1b36);
+            padding: 15px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .lv-title { font-size: 18px; font-weight: bold; color: var(--sky-blue); }
+        .lv-price { font-size: 16px; font-weight: bold; color: white; }
+        
+        .lv-body { padding: 15px; }
+        .profit-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--text-muted); }
+        .profit-val { color: white; font-weight: bold; }
+        
+        /* SLV HIGHLIGHT SECTION */
+        .slv-box {
+            background: rgba(112, 0, 255, 0.1);
+            border: 1px solid var(--deep-purple);
+            border-radius: 8px; padding: 10px; margin-top: 10px;
+        }
+        .slv-title { color: var(--deep-purple); font-weight: bold; font-size: 12px; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .slv-val { color: var(--gold); font-weight: bold; font-size: 15px; }
+        .slv-req { font-size: 10px; color: #aaa; margin-top: 2px; }
 
-        /* TEAM SECTION (REFERRAL 3 LEVELS) */
-        .team-section {
-            display: none; /* JS kapcsolja be */
-            padding: 20px;
+        .unlock-btn {
+            width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 6px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff); color: white; font-weight: bold; cursor: pointer;
         }
-        .ref-level {
-            background: rgba(255,255,255,0.05);
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .level-badge { font-size: 10px; padding: 3px 8px; border-radius: 4px; background: #333; }
-        .l1 { background: var(--sky-blue); color: black; }
-        .l2 { background: var(--deep-purple); }
-        .l3 { background: var(--danger); }
+        .unlock-btn.disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        /* TEAM PAGE */
+        .team-container { display: none; padding: 20px; }
+        .ref-stat { background: #162c52; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; }
 
         /* NAV */
         .nav {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            background: #0d1b36;
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            z-index: 999;
+            position: fixed; bottom: 0; width: 100%; background: #0d1b36;
+            display: flex; justify-content: space-around; padding: 15px 0;
+            border-top: 1px solid rgba(255,255,255,0.05); z-index: 999;
         }
-        .nav-item { color: #5a6b8c; text-align: center; font-size: 10px; text-decoration: none; cursor: pointer; }
+        .nav-item { color: #5a6b8c; text-align: center; font-size: 10px; cursor: pointer; }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
         .nav-item.active { color: var(--sky-blue); }
 
         /* MODAL */
         .modal {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 11, 28, 0.95);
-            z-index: 2000;
-            justify-content: center; align-items: center; flex-direction: column;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;
         }
+
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="brand"><i class="fas fa-satellite-dish"></i> SKYHIGH TECH</div>
-        <div class="slv-badge" id="levelBadge">LV1</div>
+        <div class="brand"><i class="fas fa-satellite-dish"></i> SKYHIGH</div>
+        <div class="level-display" id="headerBadge">LV1</div>
     </div>
 
     <div id="page-home">
-        
         <div class="dashboard">
             <div class="balance-card">
-                <i class="fas fa-lock lock-icon"></i>
-                <div class="balance-label">Teljes Vagyon (USDT)</div>
-                <div class="balance-value" id="balance">0.00</div>
-                
-                <div class="lock-info">
-                    <i class="fas fa-shield-alt"></i> Tőke lekötve: 365 Nap (Biztonsági Kaució)
-                </div>
-
-                <div style="font-size: 12px; color: var(--sky-blue);">
+                <div class="lock-badge"><i class="fas fa-lock"></i> 365 Nap</div>
+                <div style="font-size: 12px; color: var(--text-muted);">TELJES VAGYON (USDT)</div>
+                <div class="balance-val" id="balance">0.00</div>
+                <div style="font-size: 12px; color: var(--sky-blue); margin-bottom: 20px;">
                     Mai profit: <span id="dailyProfit">0.00</span> USDT
                 </div>
-
-                <div class="action-grid">
-                    <button class="btn-action btn-primary">BEFIZETÉS</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-action btn-primary" onclick="addMoney()">+ BEFIZETÉS (TESZT)</button>
                     <button class="btn-action">KIFIZETÉS</button>
                 </div>
             </div>
         </div>
 
         <div class="work-area">
-            <div style="margin-bottom: 15px; font-size: 12px; color: var(--text-muted);">
-                SKYHIGH INTELLIGENT DISPATCH SYSTEM
-            </div>
-            
-            <div class="orb-container">
-                <div class="orb-ring"></div>
-                <div class="orb-ring"></div>
-                <button class="start-btn" onclick="startWork()">
-                    START<br>WORK
-                </button>
-            </div>
-
-            <div style="margin-top: 20px; font-size: 13px;">
-                Mai feladatok: <strong id="taskCount" style="color: var(--sky-blue);">0</strong> / <span id="maxTask">10</span>
-            </div>
+            <div style="color: #666; font-size: 12px; margin-bottom: 15px;">INTELLIGENT RANKING SYSTEM</div>
+            <button class="start-btn" onclick="startTask()">START</button>
+            <div style="margin-top: 20px;">Mai feladatok: <strong id="taskCount" style="color:var(--sky-blue)">0</strong> / <span id="maxTask">10</span></div>
         </div>
-
-        <div class="rules-card">
-            <div class="rules-title"><i class="fas fa-exclamation-triangle"></i> Munkavállalói Szabályzat</div>
-            <p class="rules-text">
-                A <strong>Skyhigh Technology</strong> a globális Google ökoszisztéma hivatalos partnere. Mivel applikáció fejlesztőkkel dolgozunk, a minőség garantálása érdekében minden munkavállaló tőkéjét <strong>1 évre (365 napra) lekötjük biztonsági kaucióként</strong>.
-                <br><br>
-                <strong>Miért van erre szükség?</strong><br>
-                Ez a fedezet arra az esetre, ha a munkavállaló nem végzi el a napi kötelező feladatokat, ezzel kárt okozva a partnercégeknek. Ebben az esetben a rendszer automatikusan kötbért vonhat le a kaucióból.
-            </p>
+        
+        <div style="margin: 30px 20px; padding: 15px; background: rgba(255,0,85,0.1); border-left: 3px solid var(--danger); font-size: 11px; color: #aaa;">
+            <strong style="color: white;"><i class="fas fa-shield-alt"></i> Biztonsági Kaució:</strong><br>
+            A rendszer a befizetett tőkét 1 évre zárolja a partnerek (Google, TikTok) felé vállalt garancia miatt. Nem teljesítés esetén kötbér vonható le.
         </div>
-
     </div>
 
-    <div id="page-team" class="team-section">
-        <h2 style="text-align: center; margin-bottom: 20px;">Csapatom</h2>
+    <div id="page-levels" class="levels-container">
+        <h2 style="text-align: center; margin-bottom: 20px;">Szint Feloldása</h2>
+
+        <div class="level-card">
+            <div class="lv-header">
+                <div class="lv-title">LEVEL 1</div>
+                <div class="lv-price">200 USDT</div>
+            </div>
+            <div class="lv-body">
+                <div class="profit-row"><span>Napi feladat:</span><span class="profit-val">10 db</span></div>
+                <div class="profit-row"><span>Szerződés:</span><span class="profit-val">365 Nap</span></div>
+                <div class="profit-row"><span>Napi profit:</span><span class="profit-val">4.00 USDT</span></div>
+                
+                <div class="slv-box">
+                    <div class="slv-title">
+                        <span><i class="fas fa-bolt"></i> SLV1 BÓNUSZ</span>
+                        <span style="color: var(--neon-green);">AKTÍV</span>
+                    </div>
+                    <div class="slv-val">6.00 USDT / Nap</div>
+                    <div class="slv-req">Feltétel: 2 meghívott tag után</div>
+                </div>
+
+                <button class="unlock-btn" onclick="unlockLevel(1, 200)">FELOLDÁS (200 USDT)</button>
+            </div>
+        </div>
+
+        <div class="level-card">
+            <div class="lv-header">
+                <div class="lv-title" style="color: var(--deep-purple);">LEVEL 2</div>
+                <div class="lv-price">680 USDT</div>
+            </div>
+            <div class="lv-body">
+                <div class="profit-row"><span>Napi feladat:</span><span class="profit-val">20 db</span></div>
+                <div class="profit-row"><span>Szerződés:</span><span class="profit-val">365 Nap</span></div>
+                <div class="profit-row"><span>Napi profit:</span><span class="profit-val">18.00 USDT</span></div>
+                
+                <div class="slv-box">
+                    <div class="slv-title">
+                        <span><i class="fas fa-bolt"></i> SLV2 BÓNUSZ</span>
+                    </div>
+                    <div class="slv-val">24.00 USDT / Nap</div>
+                    <div class="slv-req">Feltétel: 3 meghívott tag után</div>
+                </div>
+
+                <button class="unlock-btn" onclick="unlockLevel(2, 680)">FELOLDÁS (680 USDT)</button>
+            </div>
+        </div>
+
+        <div class="level-card">
+            <div class="lv-header">
+                <div class="lv-title" style="color: var(--gold);">LEVEL 3</div>
+                <div class="lv-price">1560 USDT</div>
+            </div>
+            <div class="lv-body">
+                <div class="profit-row"><span>Napi feladat:</span><span class="profit-val">30 db</span></div>
+                <div class="profit-row"><span>Szerződés:</span><span class="profit-val">365 Nap</span></div>
+                <div class="profit-row"><span>Napi profit:</span><span class="profit-val">48.00 USDT</span></div>
+                
+                <div class="slv-box">
+                    <div class="slv-title"><span><i class="fas fa-bolt"></i> SLV3 BÓNUSZ</span></div>
+                    <div class="slv-val">65.00 USDT / Nap</div>
+                    <div class="slv-req">Feltétel: 5 meghívott tag után</div>
+                </div>
+
+                <button class="unlock-btn" onclick="unlockLevel(3, 1560)">FELOLDÁS (1560 USDT)</button>
+            </div>
+        </div>
         
-        <div style="background: #0d1b36; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
-            <div style="color: #888; font-size: 12px;">Meghívottak száma (SLV Feloldáshoz)</div>
-            <div style="font-size: 24px; font-weight: bold; color: white; margin: 5px 0;" id="inviteCount">0 Fő</div>
-            <button onclick="addInvite()" style="background: transparent; border: 1px solid #555; color: #aaa; padding: 5px 10px; border-radius: 5px; font-size: 10px;">+ Új Tag (Szimuláció)</button>
-        </div>
+        <div class="level-card">
+            <div class="lv-header">
+                <div class="lv-title" style="color: var(--danger);">LEVEL 4</div>
+                <div class="lv-price">3200 USDT</div>
+            </div>
+            <div class="lv-body">
+                <div class="profit-row"><span>Napi feladat:</span><span class="profit-val">50 db</span></div>
+                <div class="profit-row"><span>Szerződés:</span><span class="profit-val">365 Nap</span></div>
+                <div class="profit-row"><span>Napi profit:</span><span class="profit-val">112.00 USDT</span></div>
+                
+                <div class="slv-box">
+                    <div class="slv-title"><span><i class="fas fa-bolt"></i> SLV4 BÓNUSZ</span></div>
+                    <div class="slv-val">150.00 USDT / Nap</div>
+                    <div class="slv-req">Feltétel: 10 meghívott tag után</div>
+                </div>
 
-        <div class="ref-level">
-            <div>
-                <span class="level-badge l1">LEVEL 1</span>
-                <span style="font-size: 12px; margin-left: 10px;">Közvetlen</span>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-size: 10px; color: #888;">Jutalék: 16%</div>
-                <div style="color: var(--sky-blue);">0.00 USDT</div>
-            </div>
-        </div>
-
-        <div class="ref-level">
-            <div>
-                <span class="level-badge l2">LEVEL 2</span>
-                <span style="font-size: 12px; margin-left: 10px;">Közvetett</span>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-size: 10px; color: #888;">Jutalék: 8%</div>
-                <div style="color: var(--deep-purple);">0.00 USDT</div>
+                <button class="unlock-btn" onclick="unlockLevel(4, 3200)">FELOLDÁS (3200 USDT)</button>
             </div>
         </div>
+    </div>
 
-        <div class="ref-level">
-            <div>
-                <span class="level-badge l3">LEVEL 3</span>
-                <span style="font-size: 12px; margin-left: 10px;">Mélységi</span>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-size: 10px; color: #888;">Jutalék: 4%</div>
-                <div style="color: var(--danger);">0.00 USDT</div>
-            </div>
+    <div id="page-team" class="team-container">
+        <div style="text-align:center; margin-bottom:20px;">
+            <h3>Meghívottak</h3>
+            <div style="font-size:30px; font-weight:bold;" id="inviteCount">0 Fő</div>
+            <p style="font-size:11px; color:#888;">Hívj meg embereket az SLV szintek feloldásához!</p>
+            <button onclick="addInvite()" style="padding:5px 10px; background:#333; border:none; color:white; border-radius:5px;">+ Szimuláció</button>
         </div>
 
-        <div style="margin-top: 20px; font-size: 11px; color: #666; text-align: justify;">
-            <strong>SLV Rendszer:</strong><br>
-            - SLV1: 2 meghívott (Magasabb jutalék)<br>
-            - SLV2: 3 meghívott<br>
-            - SLV3: 5 meghívott<br>
-            - SLV4: 10 meghívott (VIP Státusz)
+        <div class="ref-stat" style="border-left: 3px solid var(--sky-blue);">
+            <div>L1 Csapat (16%)</div>
+            <div style="color: var(--sky-blue);">12.50 USDT</div>
+        </div>
+        <div class="ref-stat" style="border-left: 3px solid var(--deep-purple);">
+            <div>L2 Csapat (8%)</div>
+            <div style="color: var(--deep-purple);">5.20 USDT</div>
+        </div>
+        <div class="ref-stat" style="border-left: 3px solid var(--danger);">
+            <div>L3 Csapat (4%)</div>
+            <div style="color: var(--danger);">1.80 USDT</div>
         </div>
     </div>
 
     <div class="modal" id="workModal">
-        <i class="fas fa-cog fa-spin" style="font-size: 50px; color: var(--sky-blue); margin-bottom: 20px;"></i>
-        <h3 style="color: white;">Adatok Feldolgozása...</h3>
-        <p style="color: var(--text-muted); font-size: 12px;">Skyhigh Server connection...</p>
-        <div style="width: 200px; height: 5px; background: #333; margin-top: 15px; border-radius: 5px; overflow: hidden;">
-            <div id="loaderBar" style="width: 0%; height: 100%; background: var(--sky-blue); transition: width 2s;"></div>
+        <i class="fas fa-cog fa-spin" style="font-size: 50px; color: var(--sky-blue);"></i>
+        <h3 style="color:white; margin-top:20px;">Adatok Feldolgozása...</h3>
+        <div style="width:200px; height:5px; background:#333; margin-top:10px; border-radius:5px;">
+            <div id="loader" style="width:0%; height:100%; background:var(--sky-blue); transition:width 2s;"></div>
         </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><i class="fas fa-home"></i>Főoldal</div>
-        <div class="nav-item" onclick="switchTab('team', this)"><i class="fas fa-users"></i>Csapat</div>
-        <div class="nav-item"><i class="fas fa-gem"></i>VIP</div>
+        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-home"></i>Főoldal</div>
+        <div class="nav-item" onclick="nav('levels', this)"><i class="fas fa-layer-group"></i>Szintek</div>
+        <div class="nav-item" onclick="nav('team', this)"><i class="fas fa-users"></i>Csapat</div>
         <div class="nav-item"><i class="fas fa-user"></i>Profil</div>
     </div>
 
     <script>
-        // --- SKYHIGH LOGIC CORE ---
-
+        // --- LOGIC ---
         let state = {
             balance: 0.00,
-            dailyProfit: 0.00,
-            tasksDone: 0,
+            daily: 0.00,
+            tasks: 0,
             invites: 0,
-            level: 1, // 1..4
-            slvLevel: 0, // 0 = Sima, 1..4 = SLV
+            level: 1, // Alap LV1
+            slv: false // SLV aktiválva van-e
         };
 
-        const config = {
-            1: { maxTasks: 10, reqInvites: 2 },
-            2: { maxTasks: 20, reqInvites: 3 },
-            3: { maxTasks: 30, reqInvites: 5 },
-            4: { maxTasks: 50, reqInvites: 10 }
+        const levels = {
+            1: { cost: 200, profit: 4, slvProfit: 6, maxTask: 10, slvReq: 2 },
+            2: { cost: 680, profit: 18, slvProfit: 24, maxTask: 20, slvReq: 3 },
+            3: { cost: 1560, profit: 48, slvProfit: 65, maxTask: 30, slvReq: 5 },
+            4: { cost: 3200, profit: 112, slvProfit: 150, maxTask: 50, slvReq: 10 }
         };
 
-        // DOM Elements
-        const el = {
-            balance: document.getElementById('balance'),
+        const els = {
+            bal: document.getElementById('balance'),
             daily: document.getElementById('dailyProfit'),
-            taskCount: document.getElementById('taskCount'),
-            levelBadge: document.getElementById('levelBadge'),
+            tasks: document.getElementById('taskCount'),
+            maxT: document.getElementById('maxTask'),
+            badge: document.getElementById('headerBadge'),
+            inv: document.getElementById('inviteCount'),
             modal: document.getElementById('workModal'),
-            loader: document.getElementById('loaderBar'),
-            home: document.getElementById('page-home'),
-            team: document.getElementById('page-team'),
-            invites: document.getElementById('inviteCount')
+            loader: document.getElementById('loader')
         };
 
-        function updateUI() {
-            el.balance.innerText = state.balance.toFixed(2);
-            el.daily.innerText = state.dailyProfit.toFixed(2);
-            el.taskCount.innerText = state.tasksDone;
-            el.invites.innerText = state.invites + " Fő";
+        function ui() {
+            els.bal.innerText = state.balance.toFixed(2);
+            els.daily.innerText = state.daily.toFixed(2);
+            els.tasks.innerText = state.tasks;
+            els.inv.innerText = state.invites + " Fő";
+            els.maxT.innerText = levels[state.level].maxTask;
             
-            // Badge Logic (SLV vs LV)
-            let badgeText = state.slvLevel > 0 ? `SLV${state.level}` : `LV${state.level}`;
-            el.levelBadge.innerText = badgeText;
+            let prefix = state.slv ? "SLV" : "LV";
+            els.badge.innerText = prefix + state.level;
             
-            if(state.slvLevel > 0) {
-                el.levelBadge.style.background = "linear-gradient(135deg, #ffd700, #ff8c00)";
-                el.levelBadge.style.color = "black";
+            if(state.slv) {
+                els.badge.style.background = "linear-gradient(135deg, #ffd700, #ff8c00)";
+                els.badge.style.color = "black";
             }
         }
 
-        // TAB VÁLTÁS
-        window.switchTab = function(tabName, navEl) {
-            // Hide all
-            el.home.style.display = 'none';
-            el.team.style.display = 'none';
+        // NAVIGÁCIÓ
+        window.nav = function(page, el) {
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            el.classList.add('active');
             
-            // Reset Nav
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            navEl.classList.add('active');
-
-            if(tabName === 'home') el.home.style.display = 'block';
-            if(tabName === 'team') el.team.style.display = 'block';
+            document.getElementById('page-home').style.display = 'none';
+            document.getElementById('page-levels').style.display = 'none';
+            document.getElementById('page-team').style.display = 'none';
+            
+            document.getElementById('page-' + page).style.display = 'block';
         }
 
-        // MEGHÍVÁS SZIMULÁCIÓ (SLV LOGIKA)
+        // SZINT FELOLDÁS (VÁSÁRLÁS)
+        window.unlockLevel = function(lv, cost) {
+            if(state.balance < cost) {
+                alert(`HIBA: Nincs elég fedezet!\nJelenlegi egyenleg: ${state.balance.toFixed(2)} USDT\nSzükséges: ${cost} USDT\n\nKérlek töltsd fel az egyenlegedet!`);
+                return;
+            }
+            
+            if(confirm(`Biztosan feloldod a LEVEL ${lv} szintet ${cost} USDT-ért?`)) {
+                state.balance -= cost;
+                state.level = lv;
+                state.slv = false; // Új szintnél újra kell gyűjteni az SLV-t
+                alert(`SIKERES VÁSÁRLÁS!\nMostantól LEVEL ${lv} szinten vagy.\nNapi limit: ${levels[lv].maxTask} db.`);
+                ui();
+                window.nav('home', document.querySelectorAll('.nav-item')[0]);
+            }
+        }
+
+        // PÉNZ HOZZÁADÁS (TESZT GOMB)
+        window.addMoney = function() {
+            state.balance += 500;
+            alert("Rendszerüzenet: 500 USDT jóváírva (Teszt mód)");
+            ui();
+        }
+
+        // MEGHÍVÁS SZIMULÁCIÓ
         window.addInvite = function() {
             state.invites++;
+            let req = levels[state.level].slvReq;
             
-            // SLV Check
-            let req = config[state.level].reqInvites;
-            if(state.invites >= req && state.slvLevel < state.level) {
-                state.slvLevel = state.level;
-                alert(`GRATULÁLUNK! Feloldottad az SLV${state.level} státuszt!\nA tőkelekötésed aktív, jutalékod növekedett.`);
+            if(state.invites >= req && !state.slv) {
+                state.slv = true;
+                alert(`GRATULÁLUNK!\nElérted a ${req} meghívottat!\nFeloldottad az SLV${state.level} bónuszt!\nA bevételed megemelkedett.`);
             }
-            updateUI();
+            ui();
         }
 
-        // MUNKA (TASK)
-        window.startWork = function() {
-            let max = config[state.level].maxTasks;
-            if(state.tasksDone >= max) {
-                alert("Figyelem: Mára teljesítetted a kvótát! (Kötbér elkerülve)");
+        // MUNKA
+        window.startTask = function() {
+            let limit = levels[state.level].maxTask;
+            if(state.tasks >= limit) {
+                alert("Mára végeztél! Holnap folytathatod.");
                 return;
             }
 
-            // Start Animation
-            el.modal.style.display = 'flex';
-            el.loader.style.width = '0%';
-            setTimeout(() => { el.loader.style.width = '100%'; }, 50);
-
+            els.modal.style.display = 'flex';
+            els.loader.style.width = '0%';
+            setTimeout(() => els.loader.style.width = '100%', 50);
+            
             setTimeout(() => {
-                // Done
-                el.modal.style.display = 'none';
+                els.modal.style.display = 'none';
                 
-                // Jutalék kalkuláció
-                let reward = 0.50;
-                if(state.slvLevel > 0) reward = 0.80; // SLV bónusz
-
-                state.balance += reward;
-                state.dailyProfit += reward;
-                state.tasksDone++;
+                // Profit számítás
+                let l = levels[state.level];
+                let dailyTotal = state.slv ? l.slvProfit : l.profit;
+                let perTask = dailyTotal / l.maxTask;
                 
-                const apps = ["TikTok Optimization", "Amazon Ranking", "Facebook Ads Review", "Temu Click"];
-                const app = apps[Math.floor(Math.random() * apps.length)];
+                state.balance += perTask;
+                state.daily += perTask;
+                state.tasks++;
                 
-                alert(`Sikeres Skyhigh feladat!\nApp: ${app}\nJóváírva: +${reward.toFixed(2)} USDT`);
-                updateUI();
-            }, 2500);
+                alert(`Sikeres optimalizálás!\nJutalék: +${perTask.toFixed(2)} USDT`);
+                ui();
+            }, 2000);
         }
 
-        // Init
-        updateUI();
-
+        ui();
     </script>
 </body>
 </html>
