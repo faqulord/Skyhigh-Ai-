@@ -3,383 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh Tech</title>
+    <title>Skyhigh Tech Global</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- RESET & BASE --- */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            margin: 0; padding: 0;
-            background-color: #050a14;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            padding-bottom: 80px; /* Hely a menünek */
-            overflow-x: hidden;
-            /* Háttér effekt */
-            background-image: radial-gradient(circle at top center, #1a2c4d 0%, #050a14 70%);
-            min-height: 100vh;
+        /* --- CORE DESIGN SYSTEM (WTQ COPY) --- */
+        :root {
+            --bg-dark: #050a14;
+            --card-bg: #0d1b36;
+            --neon-blue: #00f2ff;
+            --neon-purple: #7000ff;
+            --neon-gold: #ffd700;
+            --neon-green: #00ff9d;
+            --neon-red: #ff0055;
+            --text-main: #ffffff;
+            --text-muted: #8899ac;
         }
 
-        /* --- HEADER --- */
-        .header {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(5, 10, 20, 0.95);
-            padding: 15px 20px;
-            display: flex; justify-content: space-between; align-items: center;
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Roboto', sans-serif;
+            padding-bottom: 90px;
+            background-image: linear-gradient(180deg, #02060e 0%, #0a152b 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- UTILS --- */
+        .glow-text { text-shadow: 0 0 10px currentColor; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .btn-press { transition: transform 0.1s; cursor: pointer; }
+        .btn-press:active { transform: scale(0.97); opacity: 0.8; }
+
+        /* --- HEADER & TICKER --- */
+        .top-ticker {
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--neon-blue);
+            font-size: 10px; padding: 8px;
+            white-space: nowrap; overflow: hidden;
             border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-            z-index: 1000;
+        }
+        .ticker-content { display: inline-block; animation: scroll 20s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        .header {
+            padding: 15px 20px;
+            background: rgba(5, 10, 20, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky; top: 0; z-index: 100;
             backdrop-filter: blur(10px);
         }
-        .logo {
-            font-size: 18px; font-weight: 900; letter-spacing: 0.5px;
-            background: linear-gradient(90deg, #fff, #00f2ff);
+        .brand {
+            font-size: 20px; font-weight: 900; letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, var(--neon-blue));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .user-badge {
-            background: linear-gradient(135deg, #7000ff, #ff0055);
-            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold;
-            box-shadow: 0 0 10px rgba(112, 0, 255, 0.5);
         }
 
         /* --- PAGES --- */
-        .page {
-            display: none; /* Alapból rejtve */
-            padding: 80px 20px 20px 20px; /* Header helye */
-            animation: fadeIn 0.3s ease-in-out;
-        }
+        .page { display: none; padding: 20px; animation: fadeUp 0.3s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- BALANCE CARD --- */
-        .card {
-            background: linear-gradient(160deg, #0d1b36, #050a14);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px; padding: 25px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: relative; margin-bottom: 30px;
+        /* --- HOME (LOBBY) --- */
+        .hero-card {
+            background: linear-gradient(135deg, #0d1b36, #000);
+            border-radius: 16px; padding: 25px; margin-bottom: 25px;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+            text-align: center;
         }
-        .balance-label { font-size: 12px; color: #8899ac; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-val { font-size: 42px; font-weight: 700; color: #fff; margin: 10px 0; text-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
-        .profit-info { display: flex; justify-content: space-between; font-size: 12px; color: #8899ac; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-        .profit-val { color: #00f2ff; font-weight: bold; }
+        .hero-title { color: var(--neon-blue); font-weight: bold; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
+        .enter-btn {
+            background: linear-gradient(90deg, var(--neon-blue), #0066ff);
+            color: #000; font-weight: 900; font-size: 16px;
+            padding: 15px 40px; border-radius: 30px; border: none;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            margin-top: 15px; display: inline-block;
+        }
 
-        /* --- TASK RADAR (ANIMÁCIÓ) --- */
-        .task-container {
-            display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;
+        .info-box {
+            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; margin-bottom: 15px;
+            border-left: 3px solid var(--neon-purple);
         }
-        .radar-wrap {
-            width: 160px; height: 160px; position: relative;
-            display: flex; justify-content: center; align-items: center;
+        .info-header { color: var(--neon-purple); font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .info-text { font-size: 12px; line-height: 1.6; color: #ccc; text-align: justify; }
+
+        /* --- LEVELS (WTQ STYLE) --- */
+        .lv-card {
+            background: #0d1b36; border-radius: 12px; margin-bottom: 15px;
+            display: flex; align-items: center; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05); position: relative;
         }
-        .radar-circle {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            border: 2px solid rgba(0, 242, 255, 0.1);
+        .lv-badge-side {
+            width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; flex-direction: column;
+            background: rgba(0,0,0,0.2); border-right: 1px solid rgba(255,255,255,0.05);
         }
-        .radar-pulse {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%);
-            transform: scale(0); opacity: 0;
-        }
-        .radar-active .radar-pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        .lv-shield { font-size: 30px; margin-bottom: 5px; filter: drop-shadow(0 0 5px currentColor); }
+        .lv-badge-text { font-weight: 900; font-size: 14px; }
         
-        .start-btn {
-            width: 130px; height: 130px; border-radius: 50%; border: none;
-            background: linear-gradient(135deg, #00f2ff, #0066ff);
-            color: #050a14; font-size: 20px; font-weight: 900; cursor: pointer;
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
-            position: relative; z-index: 2; transition: transform 0.2s;
-        }
-        .start-btn:active { transform: scale(0.95); }
-        .start-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; }
-
-        /* --- LEVELS (PAJZSOK) --- */
-        .level-card {
-            background: rgba(13, 27, 54, 0.8);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 15px; margin-bottom: 15px;
-            display: flex; align-items: center;
-        }
-        .lv-icon { font-size: 35px; margin-right: 15px; width: 50px; text-align: center; }
-        .lv-info { flex: 1; }
-        .lv-title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
-        .lv-sub { font-size: 12px; color: #8899ac; }
+        .lv-content { flex: 1; padding: 15px; }
+        .lv-row { font-size: 12px; margin-bottom: 4px; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .lv-val { color: #fff; font-weight: bold; }
         .lv-btn {
-            padding: 8px 15px; border-radius: 6px; border: none; font-size: 12px; font-weight: bold; cursor: pointer;
+            background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue);
+            padding: 5px 15px; border-radius: 20px; font-size: 11px; font-weight: bold;
+            margin-top: 5px; float: right;
         }
-        
-        /* Színek szintekhez */
-        .l1 { color: #00ff9d; } .btn-l1 { background: rgba(0, 255, 157, 0.2); color: #00ff9d; border: 1px solid #00ff9d; }
-        .l2 { color: #00f2ff; } .btn-l2 { background: rgba(0, 242, 255, 0.2); color: #00f2ff; border: 1px solid #00f2ff; }
-        .l3 { color: #ffd700; } .btn-l3 { background: rgba(255, 215, 0, 0.2); color: #ffd700; border: 1px solid #ffd700; }
-        .l4 { color: #ff0055; } .btn-l4 { background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; }
+        .active-lv .lv-btn { background: var(--neon-blue); color: #000; }
 
-        /* --- TEAM --- */
-        .team-stat {
-            background: #0d1b36; padding: 15px; border-radius: 8px; margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-left: 4px solid #333;
+        /* --- CAREER TABLE --- */
+        .career-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+        .career-table th { text-align: left; color: var(--neon-gold); padding: 8px; border-bottom: 1px solid #333; }
+        .career-table td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ccc; }
+        .pos-badge { background: #333; padding: 3px 6px; border-radius: 4px; color: #fff; font-weight: bold; }
+
+        /* --- WORKSPACE (TASK) --- */
+        .task-header { display: flex; gap: 10px; margin-bottom: 20px; }
+        .stat-box {
+            flex: 1; background: #0d1b36; padding: 15px; border-radius: 12px; text-align: center;
+            border: 1px solid rgba(0, 242, 255, 0.2);
         }
+        .stat-val { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .stat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+        .app-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px;
+        }
+        .grid-item {
+            background: rgba(255,255,255,0.05); border-radius: 10px; aspect-ratio: 1;
+            display: flex; justify-content: center; align-items: center;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .grid-item i { font-size: 24px; color: #555; }
+        .grid-item.active { border-color: var(--neon-blue); background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 10px var(--neon-blue); }
+        .grid-item.active i { color: #fff; filter: drop-shadow(0 0 5px #fff); }
+
+        .work-btn-container { text-align: center; position: relative; height: 100px; display: flex; justify-content: center; align-items: center; }
+        .main-work-btn {
+            width: 90%; max-width: 300px; padding: 15px; border-radius: 8px; border: none;
+            background: linear-gradient(90deg, #00f2ff, #0066ff); color: #fff;
+            font-size: 16px; font-weight: bold; letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+        .main-work-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; }
+
+        /* --- PROFILE (WTQ IMAGE BASED) --- */
+        .profile-header {
+            background: #0d1b36; padding: 20px; border-radius: 0 0 20px 20px; margin: -20px -20px 20px -20px;
+            position: relative; overflow: hidden;
+        }
+        .profile-user-row { display: flex; align-items: center; gap: 15px; position: relative; z-index: 2; }
+        .avatar-circle {
+            width: 60px; height: 60px; border-radius: 50%; background: #fff; color: var(--neon-blue);
+            font-size: 24px; display: flex; justify-content: center; align-items: center; font-weight: bold;
+            border: 3px solid var(--neon-blue);
+        }
+        .user-info h2 { margin: 0; font-size: 18px; color: white; display: flex; align-items: center; gap: 10px; }
+        .slv-tag { color: var(--neon-red); font-weight: 900; font-style: italic; font-size: 16px; }
+        .invite-code { font-size: 12px; color: #aaa; margin-top: 5px; }
+        .countdown-bar {
+            margin-top: 15px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px;
+            font-size: 11px; color: #ccc; display: flex; justify-content: space-between;
+        }
+
+        .balance-detail-card {
+            background: #0d1b36; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .main-bal-title { text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 5px; }
+        .main-bal-amount { text-align: center; font-size: 32px; font-weight: bold; color: #fff; margin-bottom: 20px; }
+        
+        .bal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
+        .bal-item div:first-child { color: #fff; font-weight: bold; font-size: 14px; margin-bottom: 3px; }
+        .bal-item div:last-child { color: var(--text-muted); font-size: 10px; }
+        
+        /* Színkódok a profil adatokhoz a kép alapján */
+        .c-blue { color: var(--neon-blue) !important; }
+        .c-green { color: var(--neon-green) !important; }
+
+        .action-row { display: flex; gap: 10px; margin-top: 20px; }
+        .act-btn {
+            flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; color: white;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .act-deposit { background: linear-gradient(90deg, #5533ff, #8855ff); }
+        .act-withdraw { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+
+        .menu-list { background: #0d1b36; border-radius: 12px; overflow: hidden; }
+        .menu-item {
+            padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; color: #fff; font-size: 14px; cursor: pointer;
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-icon { width: 30px; height: 30px; background: rgba(0, 242, 255, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 15px; color: var(--neon-blue); }
+        .menu-arrow { margin-left: auto; color: #555; }
 
         /* --- MODAL (POPUP) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 2000;
             display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
         }
         .modal-box {
-            background: #0d1b36; border: 2px solid #00f2ff;
-            border-radius: 20px; padding: 30px; text-align: center; width: 85%; max-width: 350px;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3);
+            background: linear-gradient(160deg, #0d1b36, #000);
+            border: 2px solid var(--neon-blue); border-radius: 16px; padding: 30px; text-align: center;
+            width: 85%; max-width: 320px; box-shadow: 0 0 50px rgba(0, 242, 255, 0.4);
             animation: popIn 0.3s;
         }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .modal-btn {
-            width: 100%; padding: 12px; border-radius: 8px; border: none;
-            background: linear-gradient(90deg, #00f2ff, #0066ff); color: white; font-weight: bold; margin-top: 20px;
-        }
 
-        /* --- BOTTOM NAV --- */
+        /* --- NAV BAR --- */
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: #050a14; border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; justify-content: space-around; padding: 12px 0;
-            z-index: 999;
+            background: #02060e; border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-around; padding: 12px 0; z-index: 999;
         }
-        .nav-item {
-            text-align: center; color: #5a6b8c; font-size: 10px; cursor: pointer; flex: 1;
-        }
+        .nav-item { text-align: center; color: #556; font-size: 10px; cursor: pointer; transition: 0.3s; flex: 1; }
         .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
-        .nav-item.active { color: #00f2ff; }
+        .nav-item.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="logo"><i class="fas fa-bolt"></i> SKYHIGH</div>
-        <div class="user-badge" id="headerBadge">LV1</div>
+    <div class="top-ticker">
+        <div class="ticker-content">
+            📢 Új kifizetés: User8834... sikeresen felvett 450 USDT-t. &nbsp;&nbsp;&nbsp; 📢 Gratulálunk User9921... elérte a Manager szintet! &nbsp;&nbsp;&nbsp; 📢 Aktív felhasználók: 14,203 fő. &nbsp;&nbsp;&nbsp; 📢 Skyhigh NASDAQ IPO 2026 Q3 terv elfogadva.
+        </div>
+    </div>
+
+    <div class="header flex-between">
+        <div class="brand"><i class="fas fa-satellite-dish"></i> SKYHIGH</div>
+        <div style="font-size: 11px; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 15px;">HU | EN</div>
     </div>
 
     <div id="page-home" class="page active">
-        <div class="card">
-            <div class="balance-label">Teljes Vagyon (USDT)</div>
-            <div class="balance-val" id="balanceDisplay">0.00</div>
-            <div class="profit-info">
-                <span>Mai profit:</span>
-                <span class="profit-val" id="dailyDisplay">0.00 USDT</span>
-            </div>
-            <div style="font-size: 10px; color: #ffd700; margin-top: 10px; background: rgba(255,215,0,0.1); padding: 5px; border-radius: 4px; display: inline-block;">
-                <i class="fas fa-lock"></i> Tőke lekötve: 365 Nap
+        <div class="hero-card">
+            <div class="hero-title">INTELLIGENT WORKSPACE</div>
+            <div style="font-size: 36px; font-weight: bold; color: #fff; margin: 10px 0;" id="lobbyBalance">0.00</div>
+            <div style="color: #888; font-size: 12px; margin-bottom: 20px;">USDT Egyenleg</div>
+            <button class="enter-btn btn-press" onclick="nav('work')">MUNKATERÜLET MEGNYITÁSA <i class="fas fa-arrow-right"></i></button>
+        </div>
+
+        <div class="info-box">
+            <div class="info-header"><i class="fab fa-google"></i> Google Partner Program</div>
+            <div class="info-text">
+                A Skyhigh Technology a globális megosztott gazdaság (Shared Economy) úttörője. Rendszerünk automatikusan optimalizálja az applikációk rangsorolását a Play Áruházban.
             </div>
         </div>
 
-        <div class="task-container">
-            <div class="radar-wrap" id="radarAnim">
-                <div class="radar-circle"></div>
-                <div class="radar-circle" style="width: 70%; height: 70%;"></div>
-                <div class="radar-pulse"></div>
-                <button class="start-btn" onclick="runTask()">START</button>
+        <div class="info-box" style="border-color: var(--neon-green);">
+            <div class="info-header" style="color: var(--neon-green);"><i class="fas fa-chart-line"></i> Tőzsdei Kilátások (2026)</div>
+            <div class="info-text">
+                A Skyhigh Technology 2026 Q3-ban tervezi a tőzsdei bevezetést (IPO) a NASDAQ-on. Minden aktív Menedzser szintű partnerünk részvénycsomagot (Stock Options) kap ajándékba.
             </div>
-            <div style="margin-top: 25px; color: #8899ac; font-size: 14px;">
-                Rendelések: <strong style="color:white"><span id="taskDone">0</span>/10</strong>
-            </div>
-        </div>
-
-        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; font-size: 12px; line-height: 1.6; color: #ccc;">
-            <strong style="color: #00f2ff;">GOOGLE PARTNER PROGRAM</strong><br>
-            A Skyhigh Technology a megosztott gazdaság (Shared Economy) úttörője. Rendszerünk automatikusan optimalizálja az applikációk rangsorolását a Play Áruházban. Minden elvégzett feladat után garantált jutalék jár.
         </div>
     </div>
 
     <div id="page-levels" class="page">
-        <h2 style="text-align: center; color: #00f2ff; margin-bottom: 20px;">VIP Szintek</h2>
+        <h2 class="glow-text" style="text-align:center; color: var(--neon-blue); margin-bottom: 25px;">VIP SZINTEK</h2>
 
-        <div class="level-card" style="border-left: 3px solid #00ff9d;">
-            <div class="lv-icon l1"><i class="fas fa-shield-alt"></i></div>
-            <div class="lv-info">
-                <div class="lv-title l1">LEVEL 1</div>
-                <div class="lv-sub">Kaució: 200 USDT</div>
-                <div class="lv-sub">Profit: 4-6 USDT / Nap</div>
+        <div class="lv-card active-lv">
+            <div class="lv-badge-side" style="color: var(--neon-green);">
+                <i class="fas fa-shield-alt lv-shield"></i>
+                <div class="lv-badge-text">LV1</div>
             </div>
-            <button class="lv-btn btn-l1" onclick="buyLevel(1, 200)">AKTÍV</button>
+            <div class="lv-content">
+                <div class="lv-row"><span>Kaució</span><span class="lv-val">200 USDT</span></div>
+                <div class="lv-row"><span>Napi Feladat</span><span class="lv-val">10 db</span></div>
+                <div class="lv-row"><span>Napi Profit</span><span class="lv-val" style="color:var(--neon-green)">4-6 USDT</span></div>
+                <button class="lv-btn">AKTÍV</button>
+            </div>
         </div>
 
-        <div class="level-card" style="border-left: 3px solid #00f2ff;">
-            <div class="lv-icon l2"><i class="fas fa-rocket"></i></div>
-            <div class="lv-info">
-                <div class="lv-title l2">LEVEL 2</div>
-                <div class="lv-sub">Kaució: 680 USDT</div>
-                <div class="lv-sub">Profit: 18-24 USDT / Nap</div>
+        <div class="lv-card">
+            <div class="lv-badge-side" style="color: var(--neon-blue);">
+                <i class="fas fa-rocket lv-shield"></i>
+                <div class="lv-badge-text">LV2</div>
             </div>
-            <button class="lv-btn btn-l2" onclick="buyLevel(2, 680)">FELOLDÁS</button>
-        </div>
-
-        <div class="level-card" style="border-left: 3px solid #ffd700;">
-            <div class="lv-icon l3"><i class="fas fa-crown"></i></div>
-            <div class="lv-info">
-                <div class="lv-title l3">LEVEL 3</div>
-                <div class="lv-sub">Kaució: 1560 USDT</div>
-                <div class="lv-sub">Profit: 48-65 USDT / Nap</div>
+            <div class="lv-content">
+                <div class="lv-row"><span>Kaució</span><span class="lv-val">680 USDT</span></div>
+                <div class="lv-row"><span>Napi Feladat</span><span class="lv-val">20 db</span></div>
+                <div class="lv-row"><span>Napi Profit</span><span class="lv-val" style="color:var(--neon-blue)">18-24 USDT</span></div>
+                <button class="lv-btn" onclick="buyLevel(2, 680)">FELOLDÁS</button>
             </div>
-            <button class="lv-btn btn-l3" onclick="buyLevel(3, 1560)">FELOLDÁS</button>
         </div>
-    </div>
-
-    <div id="page-team" class="page">
-        <h2 style="text-align: center; margin-bottom: 20px;">Csapat</h2>
         
-        <div style="text-align: center; margin-bottom: 30px; background: #0d1b36; padding: 20px; border-radius: 12px;">
-            <div style="font-size: 12px; color: #888;">Meghívottak száma</div>
-            <div style="font-size: 30px; font-weight: bold; color: white;" id="inviteDisplay">0 Fő</div>
-            <button onclick="addInvite()" style="margin-top: 10px; background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px;">+ Teszt Meghívás</button>
-        </div>
-
-        <div class="team-stat" style="border-color: #00f2ff;">
-            <div>L1 Közvetlen (16%)</div>
-            <div style="color: #00f2ff; font-weight: bold;">0.00 USDT</div>
-        </div>
-        <div class="team-stat" style="border-color: #7000ff;">
-            <div>L2 Közvetett (8%)</div>
-            <div style="color: #7000ff; font-weight: bold;">0.00 USDT</div>
-        </div>
-        <div class="team-stat" style="border-color: #ff0055;">
-            <div>L3 Mélységi (4%)</div>
-            <div style="color: #ff0055; font-weight: bold;">0.00 USDT</div>
+        <div class="lv-card">
+            <div class="lv-badge-side" style="color: var(--neon-gold);">
+                <i class="fas fa-crown lv-shield"></i>
+                <div class="lv-badge-text">LV3</div>
+            </div>
+            <div class="lv-content">
+                <div class="lv-row"><span>Kaució</span><span class="lv-val">1560 USDT</span></div>
+                <div class="lv-row"><span>Napi Feladat</span><span class="lv-val">30 db</span></div>
+                <div class="lv-row"><span>Napi Profit</span><span class="lv-val" style="color:var(--neon-gold)">48-65 USDT</span></div>
+                <button class="lv-btn" onclick="buyLevel(3, 1560)">FELOLDÁS</button>
+            </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="successModal">
-        <div class="modal-box">
-            <i class="fas fa-check-circle" style="font-size: 60px; color: #00f2ff; margin-bottom: 20px;"></i>
-            <h3 style="margin: 0; color: white;">SIKERES PÁROSÍTÁS!</h3>
-            <p style="color: #00f2ff; font-size: 18px; margin: 10px 0;" id="modalAppName">App: TikTok</p>
-            <h1 style="color: #00ff9d; margin: 20px 0;" id="modalReward">+0.50 USDT</h1>
-            <button class="modal-btn" onclick="closeModal()">RENDBEN</button>
+    <div id="page-work" class="page">
+        <div class="task-header">
+            <div class="stat-box">
+                <div class="stat-val" id="workBalance">0.00</div>
+                <div class="stat-lbl">Account Funds</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" style="color: var(--neon-green);" id="workComm">0.00</div>
+                <div class="stat-lbl">Commission</div>
+            </div>
+        </div>
+
+        <div class="app-grid" id="iconGrid">
+            </div>
+
+        <div class="work-btn-container">
+            <button class="main-work-btn btn-press" id="startBtn" onclick="startWork()">GET TO WORK</button>
+            <div style="position: absolute; bottom: -25px; color: #666; font-size: 12px;">
+                Task order quantities: <span id="taskDone" style="color:#fff">0</span>/10
+            </div>
         </div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="switchPage('home', this)">
-            <i class="fas fa-home"></i>Főoldal
-        </div>
-        <div class="nav-item" onclick="switchPage('levels', this)">
-            <i class="fas fa-layer-group"></i>Szintek
-        </div>
-        <div class="nav-item" onclick="switchPage('team', this)">
-            <i class="fas fa-users"></i>Csapat
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-user"></i>Profil
+    <div id="page-career" class="page">
+        <h2 style="color: var(--neon-gold); text-align: center; margin-bottom: 10px;">KARRIER PROGRAM</h2>
+        <p style="font-size: 12px; color: #ccc; text-align: center; margin-bottom: 20px;">
+            A Skyhigh-nál vezetőket nevelünk. Építs csapatot és szerezz fix havi fizetést!
+        </p>
+
+        <div style="background: #0d1b36; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,215,0,0.2);">
+            <table class="career-table">
+                <thead>
+                    <tr>
+                        <th>Pozíció</th>
+                        <th>Feltétel (Fő)</th>
+                        <th>Juttatás</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="pos-badge" style="color:#aaa">Junior</span></td>
+                        <td>20</td>
+                        <td>300 USDT</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pos-badge" style="color:#fff">Assistant</span></td>
+                        <td>50</td>
+                        <td>800 USDT</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pos-badge" style="color:var(--neon-blue)">Manager</span></td>
+                        <td>100</td>
+                        <td>2000 USDT</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pos-badge" style="color:var(--neon-gold)">Director</span></td>
+                        <td>200+</td>
+                        <td>5000 USDT + %</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <script>
-        // ADATOK
-        let user = {
-            balance: 0.00,
-            daily: 0.00,
-            tasks: 0,
-            invites: 0,
-            level: 1
-        };
+    <div id="page-profile" class="page">
+        <div class="profile-header">
+            <div class="profile-user-row">
+                <div class="avatar-circle">S</div>
+                <div class="user-info">
+                    <h2>363***9301 <span class="slv-tag">SLV4</span></h2>
+                    <div class="invite-code">Meghívó kód: 659**02 <i class="far fa-copy"></i></div>
+                </div>
+            </div>
+            <div class="countdown-bar">
+                <span><i class="fas fa-lock"></i> Tőke lekötve</span>
+                <span>Visszaszámlálás: 167 Nap 18 Óra</span>
+            </div>
+        </div>
 
-        const apps = ["TikTok", "Instagram", "Binance", "Temu", "Spotify", "Uber"];
-
-        // UI ELEMEK
-        const els = {
-            bal: document.getElementById('balanceDisplay'),
-            daily: document.getElementById('dailyDisplay'),
-            tasks: document.getElementById('taskDone'),
-            badge: document.getElementById('headerBadge'),
-            invites: document.getElementById('inviteDisplay'),
-            radar: document.getElementById('radarAnim'),
-            modal: document.getElementById('successModal')
-        };
-
-        // NAVIGÁCIÓ (JAVÍTVA!)
-        function switchPage(pageId, btnEl) {
-            // Minden gomb inaktív
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            // Klikkelt gomb aktív
-            btnEl.classList.add('active');
-
-            // Minden oldal elrejtése
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            // Kiválasztott oldal megjelenítése
-            document.getElementById('page-' + pageId).classList.add('active');
-        }
-
-        // FELADAT (TASK) LOGIKA
-        function runTask() {
-            if (user.tasks >= 10) {
-                alert("Mára végeztél a 10 feladattal!");
-                return;
-            }
-
-            // Animáció indítása
-            els.radar.classList.add('radar-active');
+        <div class="balance-detail-card">
+            <div class="main-bal-title">a mérlegem</div>
+            <div class="main-bal-amount" id="profileBalance">22.48 USDT</div>
             
-            // Késleltetés (Szimuláció)
-            setTimeout(() => {
-                // Animáció stop
-                els.radar.classList.remove('radar-active');
-                
-                // Matek
-                let reward = 0.50 + (user.level * 0.2); // Szinttől függő jutalék
-                user.balance += reward;
-                user.daily += reward;
-                user.tasks++;
-                
-                // Random App
-                let randApp = apps[Math.floor(Math.random() * apps.length)];
-
-                // UI Frissítés
-                els.bal.innerText = user.balance.toFixed(2);
-                els.daily.innerText = user.daily.toFixed(2) + " USDT";
-                els.tasks.innerText = user.tasks;
-
-                // Modal Megjelenítése
-                document.getElementById('modalAppName').innerText = "Optimalizálva: " + randApp;
-                document.getElementById('modalReward').innerText = "+" + reward.toFixed(2) + " USDT";
-                els.modal.style.display = 'flex';
-
-            }, 2500); // 2.5 mp várakozás
-        }
-
-        function closeModal() {
-            els.modal.style.display = 'none';
-        }
-
-        // SZINT VÁSÁRLÁS
-        function buyLevel(lv, cost) {
-            if (user.level >= lv) {
-                alert("Ez a szint már aktív!");
-                return;
-            }
-            if (user.balance < cost) {
-                alert("Nincs elég egyenleged! Töltsd fel a számládat.");
-                // Itt vinné a befizetésre
-                return;
-            }
-            // Vásárlás
-            user.balance -= cost;
-            user.level = lv;
-            els.bal.innerText = user.balance.toFixed(2);
-            els.badge.innerText = "LV" + lv;
-            alert("Sikeres szintlépés! Új szint: LV" + lv);
-        }
-
-        // MEGHÍVÁS TESZT
-        function addInvite() {
-            user.invites++;
-            els.invites.innerText = user.invites + " Fő";
-        }
-
-    </script>
-</body>
-</html>
+            <div class="bal-grid">
+                <div class=
