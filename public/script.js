@@ -1,39 +1,31 @@
-// STATE
-let user = {
-    balance: 0.00,
-    today: 0.00,
-    tasks: 0,
-    level: 1
-};
+// ADATOK
+let user = { balance: 0.00, today: 0.00, tasks: 0 };
+const apps = ["TikTok", "FB", "Insta", "X", "Temu", "Uber", "Amz", "Snap", "Line", "Chat"];
 
-// SZINTEK ADATOK (SLV INFÓVAL)
+// LEVELS ADATOK
 const levels = [
-    { id: 1, cost: 200, profit: "4-6", slv: "+20% ha 2 embert meghívsz" },
-    { id: 2, cost: 680, profit: "18-24", slv: "+25% ha 3 embert meghívsz" },
-    { id: 3, cost: 1560, profit: "48-65", slv: "+30% ha 5 embert meghívsz" },
-    { id: 4, cost: 3600, profit: "104", slv: "VIP szint" },
-    { id: 5, cost: 7600, profit: "200", slv: "Director szint" }
+    { id: 1, cost: 200, profit: "4-6 USDT / Nap", icon: "fa-shield-alt" },
+    { id: 2, cost: 680, profit: "18-24 USDT / Nap", icon: "fa-rocket" },
+    { id: 3, cost: 1560, profit: "48-65 USDT / Nap", icon: "fa-crown" }
 ];
 
-const apps = ["TikTok", "FB", "Insta", "Uber", "Temu", "Amz", "Spoti", "Snap", "Line", "X"];
-
-// INIT
 document.addEventListener("DOMContentLoaded", () => {
-    renderLevels();
+    initLevels();
     initRotator();
     updateUI();
 });
 
 function updateUI() {
-    // Main
+    // HOME
     document.getElementById('mainBal').innerText = user.balance.toFixed(2);
     document.getElementById('mainToday').innerText = user.today.toFixed(2);
-    // Work
-    document.getElementById('workDone').innerText = user.tasks + "/10";
-    document.getElementById('workComm').innerText = user.today.toFixed(2);
-    document.getElementById('workTotal').innerText = user.balance.toFixed(2);
-    // Profile
-    document.getElementById('profBigBal').innerText = user.balance.toFixed(2) + " USDT";
+    document.getElementById('homeTask').innerText = user.tasks;
+    // WORK
+    document.getElementById('wTask').innerText = user.tasks + "/10";
+    document.getElementById('wComm').innerText = user.today.toFixed(2);
+    document.getElementById('wTotal').innerText = user.balance.toFixed(2);
+    // PROFILE
+    document.getElementById('profBal').innerText = user.balance.toFixed(2) + " USDT";
     document.getElementById('pAvail').innerText = user.balance.toFixed(2) + " USDT";
     document.getElementById('pToday').innerText = user.today.toFixed(2) + " USDT";
 }
@@ -48,80 +40,73 @@ function nav(pageId, btn) {
     }
 }
 
-// --- LEVELS ---
-function renderLevels() {
-    const cont = document.getElementById('lvContainer');
-    const colors = ["#00ff9d", "#0099ff", "#ffd700", "#aa00ff", "#ff0055"];
-    
-    cont.innerHTML = levels.map((l, i) => `
-        <div class="lv-row">
-            <div class="lv-left">
-                <i class="fas fa-shield-alt lv-shield" style="color:${colors[i]}"></i>
-                <div style="font-weight:bold; color:${colors[i]}">LV${l.id}</div>
+function initLevels() {
+    const c = document.getElementById('lvContainer');
+    c.innerHTML = levels.map(l => `
+        <div class="lv-card">
+            <div class="lv-icon"><i class="fas ${l.icon}"></i></div>
+            <div class="lv-info">
+                <div class="lv-title">LEVEL ${l.id}</div>
+                <div class="lv-sub">Kaució: ${l.cost} USDT</div>
+                <div class="lv-sub">Profit: ${l.profit}</div>
             </div>
-            <div class="lv-right">
-                <div class="lv-line"><span>Betét:</span><span>${l.cost} USDT</span></div>
-                <div class="lv-line"><span>Profit:</span><span style="color:${colors[i]}">${l.profit}</span></div>
-                <div class="slv-info">SLV: ${l.slv}</div>
-                <button onclick="alert('Nincs elég pénz!')" style="float:right; margin-top:5px; background:transparent; border:1px solid ${colors[i]}; color:${colors[i]}; border-radius:10px; font-size:10px;">AKTIVÁLÁS</button>
-            </div>
+            <button class="lv-btn">AKTÍV</button>
         </div>
     `).join('');
 }
 
-// --- ROTATOR LOGIC (A KÖR) ---
+// ROTATOR (KÖR)
 function initRotator() {
-    const rot = document.getElementById('rotator');
+    const circle = document.getElementById('iconCircle');
+    const radius = 120; // Sugár
     const total = apps.length;
-    const radius = 130; // Kör sugara
 
-    // Ikonok elhelyezése körben
     apps.forEach((app, i) => {
         const el = document.createElement('div');
-        el.className = 'app-icon';
+        el.className = 'app-item';
         el.innerHTML = '<i class="fab fa-android"></i>'; // Placeholder icon
         
-        // Matek: Kör koordináták
         const angle = (i / total) * 2 * Math.PI;
-        const x = Math.cos(angle) * radius + 150; // 150 a fele a 300px containernek
+        // Középpont 150, 150 (300/2)
+        const x = Math.cos(angle) * radius + 150;
         const y = Math.sin(angle) * radius + 150;
         
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-        rot.appendChild(el);
+        el.style.left = (x - 20) + 'px'; // -20 a fél szélesség miatt
+        el.style.top = (y - 20) + 'px';
+        
+        circle.appendChild(el);
     });
 }
 
-function startRotation() {
-    if(user.tasks >= 10) { alert("Vége mára!"); return; }
+function runTask() {
+    if(user.tasks >= 10) { alert("Nincs több feladat!"); return; }
     
-    const rot = document.getElementById('rotator');
+    const circle = document.getElementById('iconCircle');
     const btn = document.getElementById('startBtn');
     
     btn.disabled = true;
     
-    // Pörgetés (CSS Transform)
-    const randomRot = 720 + Math.floor(Math.random() * 360);
-    rot.style.transform = `rotate(${randomRot}deg)`;
+    // Pörgetés
+    const rot = 720 + Math.floor(Math.random() * 360);
+    circle.style.transform = `rotate(${rot}deg)`;
     
     setTimeout(() => {
-        // Kész
-        rot.style.transform = `rotate(0deg)`; // Reset (vagy maradhatna is)
+        circle.style.transform = `rotate(0deg)`;
         
-        const reward = 0.50;
-        user.balance += reward;
-        user.today += reward;
+        const r = 0.50;
+        user.balance += r;
+        user.today += r;
         user.tasks++;
         updateUI();
         
-        document.getElementById('centerText').innerText = user.tasks + "/10";
-        document.getElementById('mApp').innerText = "App: " + apps[Math.floor(Math.random()*apps.length)];
-        document.getElementById('modalOverlay').style.display = 'flex';
+        document.getElementById('centerCount').innerText = user.tasks + "/10";
+        document.getElementById('mRew').innerText = "+" + r.toFixed(2) + " USDT";
+        document.getElementById('modal').style.display = 'flex';
         
         btn.disabled = false;
     }, 3000);
 }
 
 function closeModal() {
-    document.getElementById('modalOverlay').style.display = 'none';
+    document.getElementById('modal').style.display = 'none';
 }
