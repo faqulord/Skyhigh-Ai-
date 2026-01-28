@@ -3,386 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skyhigh Tech - Global</title>
+    <title>Skyhigh Tech</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- SKYHIGH 'WTQ STYLE' PRO DESIGN --- */
-        :root {
-            --bg-core: #010a13;
-            --neon-cyan: #00f7ff;
-            --neon-pink: #ff00e6;
-            --neon-gold: #ffd700;
-            --neon-green: #00ff2a;
-            --card-dark: rgba(13, 27, 56, 0.85);
-            --text-primary: #ffffff;
-            --text-secondary: #8a9ab5;
-        }
-
+        /* --- RESET & BASE --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background-color: var(--bg-core);
-            color: var(--text-primary);
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
-            margin: 0;
-            padding-bottom: 100px;
-            /* TECH HÁTTÉR MINTA */
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 247, 255, 0.1) 0%, transparent 60%),
-                linear-gradient(180deg, #010a13 0%, #051838 100%),
-                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300f7ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            min-height: 100vh;
+            margin: 0; padding: 0;
+            background-color: #050a14;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            padding-bottom: 80px; /* Hely a menünek */
             overflow-x: hidden;
+            /* Háttér effekt */
+            background-image: radial-gradient(circle at top center, #1a2c4d 0%, #050a14 70%);
+            min-height: 100vh;
         }
 
-        /* GLOW EFFECT */
-        .glow-text { text-shadow: 0 0 10px var(--neon-cyan); }
-        .glow-box { box-shadow: 0 0 15px rgba(0, 247, 255, 0.3), inset 0 0 15px rgba(0, 247, 255, 0.1); border: 1px solid var(--neon-cyan); }
-
-        /* HEADER */
+        /* --- HEADER --- */
         .header {
-            background: rgba(1, 10, 19, 0.95);
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(5, 10, 20, 0.95);
             padding: 15px 20px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--neon-cyan);
-            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+            z-index: 1000;
             backdrop-filter: blur(10px);
         }
-        .brand {
-            font-size: 20px; font-weight: 900; letter-spacing: 1px;
-            background: linear-gradient(to right, #fff, var(--neon-cyan));
+        .logo {
+            font-size: 18px; font-weight: 900; letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #fff, #00f2ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 5px var(--neon-cyan));
+        }
+        .user-badge {
+            background: linear-gradient(135deg, #7000ff, #ff0055);
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold;
+            box-shadow: 0 0 10px rgba(112, 0, 255, 0.5);
         }
 
-        /* SHIELD BADGES (PAJZSOK) */
-        .shield-badge {
-            display: inline-flex; align-items: center; padding: 5px 12px;
-            border-radius: 4px; font-weight: bold; font-size: 12px; color: #000;
-            clip-path: polygon(50% 0, 100% 15%, 100% 85%, 50% 100%, 0 85%, 0 15%);
-            text-transform: uppercase;
+        /* --- PAGES --- */
+        .page {
+            display: none; /* Alapból rejtve */
+            padding: 80px 20px 20px 20px; /* Header helye */
+            animation: fadeIn 0.3s ease-in-out;
         }
-        .s-l1 { background: linear-gradient(180deg, #aaffaa, var(--neon-green)); box-shadow: 0 0 10px var(--neon-green); }
-        .s-l2 { background: linear-gradient(180deg, #aaeeff, var(--neon-cyan)); box-shadow: 0 0 10px var(--neon-cyan); }
-        .s-l3 { background: linear-gradient(180deg, #ffffaa, var(--neon-gold)); box-shadow: 0 0 10px var(--neon-gold); }
-        .s-l4 { background: linear-gradient(180deg, #ffaaff, var(--neon-pink)); box-shadow: 0 0 10px var(--neon-pink); }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* APP SPINNER BANNER (PÖRGETŐ SÁV) */
-        .app-ticker-wrap {
-            background: rgba(0,0,0,0.5); padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden; white-space: nowrap; position: relative;
+        /* --- BALANCE CARD --- */
+        .card {
+            background: linear-gradient(160deg, #0d1b36, #050a14);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 25px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative; margin-bottom: 30px;
         }
-        .app-ticker { display: inline-block; animation: ticker 20s linear infinite; }
-        .app-item {
-            display: inline-flex; flex-direction: column; align-items: center;
-            margin: 0 15px; padding: 10px; background: rgba(255,255,255,0.05);
-            border-radius: 12px; width: 70px; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .app-icon { font-size: 30px; margin-bottom: 5px; }
-        .app-name { font-size: 10px; color: var(--text-secondary); }
-        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .balance-label { font-size: 12px; color: #8899ac; text-transform: uppercase; letter-spacing: 1px; }
+        .balance-val { font-size: 42px; font-weight: 700; color: #fff; margin: 10px 0; text-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
+        .profit-info { display: flex; justify-content: space-between; font-size: 12px; color: #8899ac; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+        .profit-val { color: #00f2ff; font-weight: bold; }
 
-        /* DASHBOARD & CARDS */
-        .main-container { padding: 20px; }
-        .tech-card {
-            background: var(--card-dark); border-radius: 16px; padding: 20px;
-            border: 1px solid rgba(0, 247, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            position: relative; overflow: hidden;
+        /* --- TASK RADAR (ANIMÁCIÓ) --- */
+        .task-container {
+            display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;
+        }
+        .radar-wrap {
+            width: 160px; height: 160px; position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .radar-circle {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            border: 2px solid rgba(0, 242, 255, 0.1);
+        }
+        .radar-pulse {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%);
+            transform: scale(0); opacity: 0;
+        }
+        .radar-active .radar-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        
+        .start-btn {
+            width: 130px; height: 130px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #00f2ff, #0066ff);
+            color: #050a14; font-size: 20px; font-weight: 900; cursor: pointer;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+            position: relative; z-index: 2; transition: transform 0.2s;
+        }
+        .start-btn:active { transform: scale(0.95); }
+        .start-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; }
+
+        /* --- LEVELS (PAJZSOK) --- */
+        .level-card {
+            background: rgba(13, 27, 54, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 15px; margin-bottom: 15px;
+            display: flex; align-items: center;
+        }
+        .lv-icon { font-size: 35px; margin-right: 15px; width: 50px; text-align: center; }
+        .lv-info { flex: 1; }
+        .lv-title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .lv-sub { font-size: 12px; color: #8899ac; }
+        .lv-btn {
+            padding: 8px 15px; border-radius: 6px; border: none; font-size: 12px; font-weight: bold; cursor: pointer;
+        }
+        
+        /* Színek szintekhez */
+        .l1 { color: #00ff9d; } .btn-l1 { background: rgba(0, 255, 157, 0.2); color: #00ff9d; border: 1px solid #00ff9d; }
+        .l2 { color: #00f2ff; } .btn-l2 { background: rgba(0, 242, 255, 0.2); color: #00f2ff; border: 1px solid #00f2ff; }
+        .l3 { color: #ffd700; } .btn-l3 { background: rgba(255, 215, 0, 0.2); color: #ffd700; border: 1px solid #ffd700; }
+        .l4 { color: #ff0055; } .btn-l4 { background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; }
+
+        /* --- TEAM --- */
+        .team-stat {
+            background: #0d1b36; padding: 15px; border-radius: 8px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 4px solid #333;
+        }
+
+        /* --- MODAL (POPUP) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
             backdrop-filter: blur(5px);
         }
-        /* Fénycsík effekt a kártyákon */
-        .tech-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(0, 247, 255, 0.1), transparent);
-            transform: rotate(45deg); animation: shine 6s infinite linear; pointer-events: none;
+        .modal-box {
+            background: #0d1b36; border: 2px solid #00f2ff;
+            border-radius: 20px; padding: 30px; text-align: center; width: 85%; max-width: 350px;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3);
+            animation: popIn 0.3s;
         }
-        @keyframes shine { 0% {top:-150%; left:-150%;} 100% {top:150%; left:150%;} }
-
-        .balance-title { font-size: 12px; color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 1.5px; }
-        .balance-amount { font-size: 48px; font-weight: 800; margin: 15px 0; text-shadow: 0 0 20px rgba(0, 247, 255, 0.5); }
-
-        /* WORK SECTION (START GOMB & CSÍK) */
-        .work-container { text-align: center; margin-top: 40px; }
-        .progress-track {
-            width: 90%; height: 12px; background: #051838; border-radius: 6px; margin: 0 auto 25px;
-            border: 1px solid var(--neon-cyan); overflow: hidden; box-shadow: inset 0 0 10px #000;
-        }
-        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink)); transition: width 0.3s; box-shadow: 0 0 15px var(--neon-cyan); }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        .start-btn-wrap { position: relative; width: 150px; height: 150px; margin: 0 auto; }
-        .start-btn {
-            width: 100%; height: 100%; border-radius: 50%; border: none;
-            background: linear-gradient(135deg, #00aaff, #00ffea);
-            color: #010a13; font-size: 24px; font-weight: 900; cursor: pointer;
-            box-shadow: 0 0 40px var(--neon-cyan), inset 0 0 20px rgba(255,255,255,0.5);
-            position: relative; z-index: 2; transition: all 0.2s;
-        }
-        .start-btn:active { transform: scale(0.95); box-shadow: 0 0 20px var(--neon-cyan); }
-        .pulse-ring {
-            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
-            border: 2px solid var(--neon-cyan); border-radius: 50%; animation: pulse 2s infinite; opacity: 0;
-        }
-        @keyframes pulse { 0% {transform: scale(0.8); opacity: 1;} 100% {transform: scale(1.5); opacity: 0;} }
-
-        /* PHILOSOPHY SECTION */
-        .philo-box {
-            margin-top: 40px; padding: 25px; background: rgba(0,0,0,0.3); border-left: 4px solid var(--neon-pink);
-        }
-        .philo-title { color: var(--neon-pink); font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; }
-        .philo-text { font-size: 12px; line-height: 1.6; color: #a0b0c0; text-align: justify; }
-
-        /* LEVELS CARDS (ÚJ PAJZSOS DESIGN) */
-        .lv-shield-card {
-            display: flex; align-items: center; background: var(--card-dark);
-            margin-bottom: 15px; padding: 20px; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden;
-        }
-        .shield-icon-large { font-size: 50px; margin-right: 20px; filter: drop-shadow(0 0 10px currentColor); }
-        .lv-details { flex: 1; }
-        .lv-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
-        .lv-cost { color: var(--text-secondary); font-size: 14px; }
-        .lv-profit { color: var(--neon-green); font-weight: bold; margin-top: 10px; }
-        .btn-unlock {
-            padding: 10px 20px; border: none; border-radius: 8px;
-            background: linear-gradient(90deg, var(--neon-cyan), #00aaff); color: #000;
-            font-weight: bold; cursor: pointer; box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+        .modal-btn {
+            width: 100%; padding: 12px; border-radius: 8px; border: none;
+            background: linear-gradient(90deg, #00f2ff, #0066ff); color: white; font-weight: bold; margin-top: 20px;
         }
 
-        /* CUSTOM MODAL (AZ ÚJ FELUGRÓ ABLAK) */
-        .custom-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(1, 10, 19, 0.9); z-index: 2000;
-            display: none; /* Alapból rejtve */
-            justify-content: center; align-items: center;
-            backdrop-filter: blur(10px);
+        /* --- BOTTOM NAV --- */
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #050a14; border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-around; padding: 12px 0;
+            z-index: 999;
         }
-        .custom-modal-box {
-            background: linear-gradient(160deg, #0d1b38, #010a13);
-            padding: 30px; border-radius: 20px; text-align: center;
-            width: 80%; max-width: 350px;
-            border: 2px solid var(--neon-cyan);
-            box-shadow: 0 0 50px rgba(0, 247, 255, 0.5);
-            transform: scale(0.8); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .nav-item {
+            text-align: center; color: #5a6b8c; font-size: 10px; cursor: pointer; flex: 1;
         }
-        .custom-modal-overlay.active { display: flex; }
-        .custom-modal-overlay.active .custom-modal-box { transform: scale(1); opacity: 1; }
-        
-        .modal-icon { font-size: 60px; color: var(--neon-green); margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--neon-green)); }
-        .modal-title { font-size: 22px; font-weight: bold; color: #fff; margin-bottom: 10px; }
-        .modal-app-name { color: var(--neon-cyan); font-size: 18px; margin-bottom: 20px; }
-        .modal-reward { font-size: 28px; font-weight: 900; color: var(--neon-green); margin-bottom: 25px; text-shadow: 0 0 10px var(--neon-green); }
-        .btn-modal-close {
-            width: 100%; padding: 15px; border-radius: 12px; border: none;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-            color: #fff; font-weight: bold; font-size: 16px; cursor: pointer;
-        }
-
-        /* NAV */
-        .nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(1, 10, 19, 0.95);
-            display: flex; justify-content: space-around; padding: 15px 0;
-            border-top: 1px solid var(--neon-cyan); z-index: 999; backdrop-filter: blur(10px);
-        }
-        .nav-item { color: var(--text-secondary); text-align: center; font-size: 10px; cursor: pointer; transition: 0.3s; }
-        .nav-item i { font-size: 22px; margin-bottom: 6px; display: block; }
-        .nav-item.active { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
-        .nav-item.active i { transform: translateY(-3px); }
+        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+        .nav-item.active { color: #00f2ff; }
 
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="brand"><i class="fas fa-microchip"></i> SKYHIGH TECH</div>
-        <div id="headerBadge" class="shield-badge s-l1">
-            <i class="fas fa-shield-alt"></i>&nbsp; LV1
+        <div class="logo"><i class="fas fa-bolt"></i> SKYHIGH</div>
+        <div class="user-badge" id="headerBadge">LV1</div>
+    </div>
+
+    <div id="page-home" class="page active">
+        <div class="card">
+            <div class="balance-label">Teljes Vagyon (USDT)</div>
+            <div class="balance-val" id="balanceDisplay">0.00</div>
+            <div class="profit-info">
+                <span>Mai profit:</span>
+                <span class="profit-val" id="dailyDisplay">0.00 USDT</span>
+            </div>
+            <div style="font-size: 10px; color: #ffd700; margin-top: 10px; background: rgba(255,215,0,0.1); padding: 5px; border-radius: 4px; display: inline-block;">
+                <i class="fas fa-lock"></i> Tőke lekötve: 365 Nap
+            </div>
+        </div>
+
+        <div class="task-container">
+            <div class="radar-wrap" id="radarAnim">
+                <div class="radar-circle"></div>
+                <div class="radar-circle" style="width: 70%; height: 70%;"></div>
+                <div class="radar-pulse"></div>
+                <button class="start-btn" onclick="runTask()">START</button>
+            </div>
+            <div style="margin-top: 25px; color: #8899ac; font-size: 14px;">
+                Rendelések: <strong style="color:white"><span id="taskDone">0</span>/10</strong>
+            </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; font-size: 12px; line-height: 1.6; color: #ccc;">
+            <strong style="color: #00f2ff;">GOOGLE PARTNER PROGRAM</strong><br>
+            A Skyhigh Technology a megosztott gazdaság (Shared Economy) úttörője. Rendszerünk automatikusan optimalizálja az applikációk rangsorolását a Play Áruházban. Minden elvégzett feladat után garantált jutalék jár.
         </div>
     </div>
 
-    <div class="app-ticker-wrap">
-        <div class="app-ticker" id="appTicker">
-            </div>
-    </div>
+    <div id="page-levels" class="page">
+        <h2 style="text-align: center; color: #00f2ff; margin-bottom: 20px;">VIP Szintek</h2>
 
-    <div id="page-home" class="main-container">
-        <div class="tech-card glow-box">
-            <div class="balance-title">Teljes Eszközérték (USDT)</div>
-            <div class="balance-amount" id="balance">0.00</div>
-            <div style="display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 13px;">
-                <div>Mai profit: <span style="color: var(--neon-green);" id="dailyProfit">0.00</span></div>
-                <div>Függőben: 0.00</div>
+        <div class="level-card" style="border-left: 3px solid #00ff9d;">
+            <div class="lv-icon l1"><i class="fas fa-shield-alt"></i></div>
+            <div class="lv-info">
+                <div class="lv-title l1">LEVEL 1</div>
+                <div class="lv-sub">Kaució: 200 USDT</div>
+                <div class="lv-sub">Profit: 4-6 USDT / Nap</div>
             </div>
+            <button class="lv-btn btn-l1" onclick="buyLevel(1, 200)">AKTÍV</button>
         </div>
 
-        <div class="work-container">
-            <div class="progress-track">
-                <div class="progress-fill" id="progressFill"></div>
+        <div class="level-card" style="border-left: 3px solid #00f2ff;">
+            <div class="lv-icon l2"><i class="fas fa-rocket"></i></div>
+            <div class="lv-info">
+                <div class="lv-title l2">LEVEL 2</div>
+                <div class="lv-sub">Kaució: 680 USDT</div>
+                <div class="lv-sub">Profit: 18-24 USDT / Nap</div>
             </div>
-            
-            <div class="start-btn-wrap">
-                <div class="pulse-ring"></div>
-                <div class="pulse-ring" style="animation-delay: 0.5s;"></div>
-                <button class="start-btn" onclick="startSlotMachine()">START</button>
-            </div>
-            <div style="margin-top: 25px; font-size: 14px; color: var(--neon-cyan);">
-                <i class="fas fa-satellite-dish fa-spin"></i>
-                Rendelések: <strong style="color:#fff; font-size:18px;"><span id="taskCount">0</span>/<span id="maxTask">10</span></strong>
-            </div>
+            <button class="lv-btn btn-l2" onclick="buyLevel(2, 680)">FELOLDÁS</button>
         </div>
 
-        <div class="philo-box">
-            <div class="philo-title"><i class="fab fa-google"></i> Google Ökoszisztéma Partner</div>
-            <p class="philo-text">
-                A Skyhigh Technology a globális <strong>Megosztott Gazdaság (Shared Economy)</strong> elvén működő, decentralizált alkalmazás-optimalizáló platform. Algoritmus alapú feladatkiosztási rendszerünk (Intelligent Dispatch) biztosítja, hogy partnereink (TikTok, Meta, Google Play) alkalmazásai organikus növekedést érjenek el a digitális piactereken. Csatlakozz a jövő munkahelyéhez!
-            </p>
+        <div class="level-card" style="border-left: 3px solid #ffd700;">
+            <div class="lv-icon l3"><i class="fas fa-crown"></i></div>
+            <div class="lv-info">
+                <div class="lv-title l3">LEVEL 3</div>
+                <div class="lv-sub">Kaució: 1560 USDT</div>
+                <div class="lv-sub">Profit: 48-65 USDT / Nap</div>
+            </div>
+            <button class="lv-btn btn-l3" onclick="buyLevel(3, 1560)">FELOLDÁS</button>
         </div>
     </div>
 
-    <div id="page-levels" class="main-container" style="display:none;">
-        <h2 style="text-align:center; margin-bottom: 30px;" class="glow-text">VIP SZINTEK</h2>
+    <div id="page-team" class="page">
+        <h2 style="text-align: center; margin-bottom: 20px;">Csapat</h2>
         
-        <div class="lv-shield-card glow-box" style="border-color: var(--neon-green);">
-            <i class="fas fa-shield-alt shield-icon-large" style="color: var(--neon-green);"></i>
-            <div class="lv-details">
-                <div class="lv-name" style="color: var(--neon-green);">LEVEL 1</div>
-                <div class="lv-cost">Kaució: 200 USDT</div>
-                <div class="lv-profit">Profit: 4.00 - 6.00 USDT / Nap</div>
-            </div>
-            <button class="btn-unlock" style="background: var(--neon-green);" onclick="unlockLevel(1, 200)">AKTÍV</button>
+        <div style="text-align: center; margin-bottom: 30px; background: #0d1b36; padding: 20px; border-radius: 12px;">
+            <div style="font-size: 12px; color: #888;">Meghívottak száma</div>
+            <div style="font-size: 30px; font-weight: bold; color: white;" id="inviteDisplay">0 Fő</div>
+            <button onclick="addInvite()" style="margin-top: 10px; background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px;">+ Teszt Meghívás</button>
         </div>
 
-        <div class="lv-shield-card" style="border-color: var(--neon-cyan);">
-            <i class="fas fa-shield-alt shield-icon-large" style="color: var(--neon-cyan);"></i>
-            <div class="lv-details">
-                <div class="lv-name" style="color: var(--neon-cyan);">LEVEL 2</div>
-                <div class="lv-cost">Kaució: 680 USDT</div>
-                <div class="lv-profit">Profit: 18.00 - 24.00 USDT / Nap</div>
-            </div>
-            <button class="btn-unlock" onclick="unlockLevel(2, 680)">FELOLDÁS</button>
+        <div class="team-stat" style="border-color: #00f2ff;">
+            <div>L1 Közvetlen (16%)</div>
+            <div style="color: #00f2ff; font-weight: bold;">0.00 USDT</div>
         </div>
-
-         <div class="lv-shield-card" style="border-color: var(--neon-gold);">
-            <i class="fas fa-star shield-icon-large" style="color: var(--neon-gold);"></i>
-            <div class="lv-details">
-                <div class="lv-name" style="color: var(--neon-gold);">LEVEL 3</div>
-                <div class="lv-cost">Kaució: 1560 USDT</div>
-                <div class="lv-profit">Profit: 48.00 - 65.00 USDT / Nap</div>
-            </div>
-            <button class="btn-unlock" style="background: var(--neon-gold);" onclick="unlockLevel(3, 1560)">FELOLDÁS</button>
+        <div class="team-stat" style="border-color: #7000ff;">
+            <div>L2 Közvetett (8%)</div>
+            <div style="color: #7000ff; font-weight: bold;">0.00 USDT</div>
         </div>
-
-         <div class="lv-shield-card" style="border-color: var(--neon-pink);">
-            <i class="fas fa-crown shield-icon-large" style="color: var(--neon-pink);"></i>
-            <div class="lv-details">
-                <div class="lv-name" style="color: var(--neon-pink);">LEVEL 4 (VIP)</div>
-                <div class="lv-cost">Kaució: 3200 USDT</div>
-                <div class="lv-profit">Profit: 112.00 - 150.00 USDT / Nap</div>
-            </div>
-            <button class="btn-unlock" style="background: var(--neon-pink);" onclick="unlockLevel(4, 3200)">FELOLDÁS</button>
+        <div class="team-stat" style="border-color: #ff0055;">
+            <div>L3 Mélységi (4%)</div>
+            <div style="color: #ff0055; font-weight: bold;">0.00 USDT</div>
         </div>
     </div>
 
-    <div class="custom-modal-overlay" id="successModal">
-        <div class="custom-modal-box">
-            <i class="fas fa-check-circle modal-icon"></i>
-            <div class="modal-title">SIKERES PÁROSÍTÁS!</div>
-            <div class="modal-app-name" id="modalAppName">
-                <i class="fab fa-tiktok"></i> TikTok Optimization
-            </div>
-            <div class="modal-reward" id="modalReward">+ 0.50 USDT</div>
-            <button class="btn-modal-close" onclick="closeModal()">BEZÁRÁS</button>
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-box">
+            <i class="fas fa-check-circle" style="font-size: 60px; color: #00f2ff; margin-bottom: 20px;"></i>
+            <h3 style="margin: 0; color: white;">SIKERES PÁROSÍTÁS!</h3>
+            <p style="color: #00f2ff; font-size: 18px; margin: 10px 0;" id="modalAppName">App: TikTok</p>
+            <h1 style="color: #00ff9d; margin: 20px 0;" id="modalReward">+0.50 USDT</h1>
+            <button class="modal-btn" onclick="closeModal()">RENDBEN</button>
         </div>
     </div>
 
-    <div class="nav">
-        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-home"></i>Főoldal</div>
-        <div class="nav-item" onclick="nav('levels', this)"><i class="fas fa-shield-alt"></i>Szintek</div>
-        <div class="nav-item"><i class="fas fa-users"></i>Csapat</div>
-        <div class="nav-item"><i class="fas fa-user-astronaut"></i>Profil</div>
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchPage('home', this)">
+            <i class="fas fa-home"></i>Főoldal
+        </div>
+        <div class="nav-item" onclick="switchPage('levels', this)">
+            <i class="fas fa-layer-group"></i>Szintek
+        </div>
+        <div class="nav-item" onclick="switchPage('team', this)">
+            <i class="fas fa-users"></i>Csapat
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user"></i>Profil
+        </div>
     </div>
 
     <script>
-        // --- LOGIKA ÉS ANIMÁCIÓK ---
-
-        // 1. Adatok
-        let state = { balance: 0.00, daily: 0.00, tasks: 0, level: 1, slv: false };
-        const levels = {
-            1: { max: 10, profit: 4, slvP: 6, color: '#00ff2a', class: 's-l1', icon: 'fa-shield-alt' },
-            2: { max: 20, profit: 18, slvP: 24, color: '#00f7ff', class: 's-l2', icon: 'fa-shield-alt' },
-            3: { max: 30, profit: 48, slvP: 65, color: '#ffd700', class: 's-l3', icon: 'fa-star' },
-            4: { max: 50, profit: 112, slvP: 150, color: '#ff00e6', class: 's-l4', icon: 'fa-crown' }
+        // ADATOK
+        let user = {
+            balance: 0.00,
+            daily: 0.00,
+            tasks: 0,
+            invites: 0,
+            level: 1
         };
-        const apps = [
-            {n: "TikTok Ads", i: "fab fa-tiktok", c: "#fe2c55"},
-            {n: "Binance Crypto", i: "fab fa-bitcoin", c: "#f3ba2f"},
-            {n: "Candy Crush Saga", i: "fas fa-candy-cane", c: "#ff00e6"},
-            {n: "Instagram Reels", i: "fab fa-instagram", c: "#c13584"},
-            {n: "Call of Duty Mobile", i: "fas fa-gamepad", c: "#ff9900"},
-            {n: "Spotify Premium", i: "fab fa-spotify", c: "#1db954"},
-            {n: "Temu Shopping", i: "fas fa-shopping-bag", c: "#ff5722"}
-        ];
 
-        // DOM elemek
-        const el = {
-            bal: document.getElementById('balance'),
-            daily: document.getElementById('dailyProfit'),
-            tasks: document.getElementById('taskCount'),
-            maxT: document.getElementById('maxTask'),
+        const apps = ["TikTok", "Instagram", "Binance", "Temu", "Spotify", "Uber"];
+
+        // UI ELEMEK
+        const els = {
+            bal: document.getElementById('balanceDisplay'),
+            daily: document.getElementById('dailyDisplay'),
+            tasks: document.getElementById('taskDone'),
             badge: document.getElementById('headerBadge'),
-            bar: document.getElementById('progressFill'),
-            ticker: document.getElementById('appTicker'),
-            modal: document.getElementById('successModal'),
-            mApp: document.getElementById('modalAppName'),
-            mRew: document.getElementById('modalReward'),
-            startBtn: document.querySelector('.start-btn')
+            invites: document.getElementById('inviteDisplay'),
+            radar: document.getElementById('radarAnim'),
+            modal: document.getElementById('successModal')
         };
 
-        // UI Frissítés
-        function ui() {
-            el.bal.innerText = state.balance.toFixed(2);
-            el.daily.innerText = state.daily.toFixed(2);
-            el.tasks.innerText = state.tasks;
-            
-            let lvData = levels[state.level];
-            el.maxT.innerText = lvData.max;
-            
-            // Pajzs frissítése
-            let prefix = state.slv ? "SLV" : "LV";
-            el.badge.className = `shield-badge ${lvData.class}`;
-            el.badge.innerHTML = `<i class="fas ${lvData.icon}"></i>&nbsp; ${prefix}${state.level}`;
+        // NAVIGÁCIÓ (JAVÍTVA!)
+        function switchPage(pageId, btnEl) {
+            // Minden gomb inaktív
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Klikkelt gomb aktív
+            btnEl.classList.add('active');
+
+            // Minden oldal elrejtése
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            // Kiválasztott oldal megjelenítése
+            document.getElementById('page-' + pageId).classList.add('active');
         }
 
-        // App Ticker feltöltése (Pörgető sáv)
-        function initTicker() {
-            let content = "";
-            // Duplázzuk az appokat, hogy végtelennek tűnjön a pörgés
-            [...apps, ...apps, ...apps].forEach(app => {
-                content += `
-                    <div class="app-item">
-                        <i class="${app.i} app-icon" style="color:${app.c}"></i>
-                        <div class="app-name">${app.n}</div>
-                    </div>
-                `;
-            });
-            el.ticker.innerHTML = content;
-        }
-
-        // --- A NAGY PÖRGETÉS ANIMÁCIÓ (SLOT MACHINE) ---
-        let isSpinning = false;
-
-        window.startSlotMachine = function() {
-            if(isSpinning) return;
-            if(state.tasks >= levels[state.level].max) {
-                 // Itt még simple alert van, de ezt ritkán látja
-                alert("Mára végeztél a feladatokkal!");
+        // FELADAT (TASK) LOGIKA
+        function runTask() {
+            if (user.tasks >= 10) {
+                alert("Mára végeztél a 10 feladattal!");
                 return;
             }
-            isSpinning = true;
-            el.startBtn.disabled = true;
-            el.startBtn.style.opacity = 0.5;
 
-            // 1. Progress Bar indítása
-            el.bar.style.width = "0%";
-            setTimeout(() => el.bar.style.width = "100%", 100);
+            // Animáció indítása
+            els.radar.classList.add('radar-active');
+            
+            // Késleltetés (Szimuláció)
+            setTimeout(() => {
+                // Animáció stop
+                els.radar.classList.remove('radar-active');
+                
+                // Matek
+                let reward = 0.50 + (user.level * 0.2); // Szinttől függő jutalék
+                user.balance += reward;
+                user.daily += reward;
+                user.tasks++;
+                
+                // Random App
+                let randApp = apps[Math.floor(Math.random() * apps.length)];
 
-            // 2. Ticker felgyorsítása (Slot machine effekt)
-            el
+                // UI Frissítés
+                els.bal.innerText = user.balance.toFixed(2);
+                els.daily.innerText = user.daily.toFixed(2) + " USDT";
+                els.tasks.innerText = user.tasks;
+
+                // Modal Megjelenítése
+                document.getElementById('modalAppName').innerText = "Optimalizálva: " + randApp;
+                document.getElementById('modalReward').innerText = "+" + reward.toFixed(2) + " USDT";
+                els.modal.style.display = 'flex';
+
+            }, 2500); // 2.5 mp várakozás
+        }
+
+        function closeModal() {
+            els.modal.style.display = 'none';
+        }
+
+        // SZINT VÁSÁRLÁS
+        function buyLevel(lv, cost) {
+            if (user.level >= lv) {
+                alert("Ez a szint már aktív!");
+                return;
+            }
+            if (user.balance < cost) {
+                alert("Nincs elég egyenleged! Töltsd fel a számládat.");
+                // Itt vinné a befizetésre
+                return;
+            }
+            // Vásárlás
+            user.balance -= cost;
+            user.level = lv;
+            els.bal.innerText = user.balance.toFixed(2);
+            els.badge.innerText = "LV" + lv;
+            alert("Sikeres szintlépés! Új szint: LV" + lv);
+        }
+
+        // MEGHÍVÁS TESZT
+        function addInvite() {
+            user.invites++;
+            els.invites.innerText = user.invites + " Fő";
+        }
+
+    </script>
+</body>
+</html>
