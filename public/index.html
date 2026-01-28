@@ -2,268 +2,428 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K ETQ - Global Promotion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ETQ Electronic Technology</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ALAP DESIGN (WTQ STÍLUS) */
+        /* --- PROFI DESIGN ALAPOK (WTQ STÍLUS) --- */
+        :root {
+            --primary-blue: #0066ff;
+            --neon-cyan: #00e5ff;
+            --neon-purple: #bb00ff;
+            --dark-bg: #050a14;
+            --card-bg: #0a1528;
+            --text-light: #e6eefa;
+        }
         body {
-            background-color: #000814; /* Sötétkék alap */
-            color: white;
-            font-family: 'Arial', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
             padding: 0;
-            background-image: linear-gradient(180deg, #001f3f 0%, #000814 100%);
+            /* Finom sötét gradiens háttér */
+            background-image: radial-gradient(circle at top, #0a1535 0%, var(--dark-bg) 60%);
             min-height: 100vh;
+            padding-bottom: 70px; /* Hely az alsó menünek */
         }
+        * { box-sizing: border-box; }
 
         /* HEADER */
         .header {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #4d4dff;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 20px;
+            background: rgba(10, 21, 40, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
         }
-        .logo {
-            font-size: 24px;
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+        .user-level-badge {
+            background: linear-gradient(135deg, var(--primary-blue), var(--neon-purple));
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px #00d4ff;
-        }
-        .lang-icon {
-            font-size: 20px;
+            box-shadow: 0 0 10px rgba(187, 0, 255, 0.3);
         }
 
-        /* BALANCE KÁRTYA (A kék doboz a képen) */
-        .balance-card {
-            background: linear-gradient(135deg, #003366 0%, #001a33 100%);
-            margin: 20px;
+        /* MAIN CONTAINER */
+        .container {
             padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #0059b3;
-            box-shadow: 0 0 20px rgba(0, 89, 179, 0.3);
+        }
+
+        /* BALANCE KÁRTYA (Profi kinézet) */
+        .balance-card {
+            background: linear-gradient(135deg, #0d2347 0%, #0a1528 100%);
+            border-radius: 20px;
+            padding: 25px;
             text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Neon fény effekt a háttérben */
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .balance-title {
+            font-size: 14px;
+            color: #8daec4;
+            margin-bottom: 10px;
         }
         .balance-amount {
-            font-size: 32px;
-            font-weight: bold;
+            font-size: 36px;
+            font-weight: 800;
             color: #fff;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
         }
-        .balance-label {
-            color: #8daec4;
-            font-size: 14px;
-            margin-top: 5px;
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
         }
-
-        /* TASK GOMB (A nagy gomb) */
-        .task-section {
-            text-align: center;
-            margin: 20px;
-        }
-        .start-btn {
-            background: linear-gradient(90deg, #00d4ff 0%, #0059b3 100%);
+        .btn-action {
+            flex: 1;
+            padding: 12px;
             border: none;
-            padding: 15px 50px;
-            font-size: 18px;
-            color: white;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 0 15px #00d4ff;
-            width: 80%;
-            font-weight: bold;
-            transition: transform 0.2s;
-        }
-        .start-btn:active {
-            transform: scale(0.95);
-        }
-        .progress-container {
-            width: 80%;
-            height: 10px;
-            background-color: #001a33;
-            margin: 10px auto;
-            border-radius: 5px;
-            display: none; /* Alapból rejtve */
-        }
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: #00d4ff;
-            border-radius: 5px;
-            transition: width 0.1s;
-        }
-
-        /* VIP SZINTEK (A lista a képről) */
-        .vip-list {
-            padding: 10px 20px;
-        }
-        .vip-card {
-            background: linear-gradient(90deg, #0d0d2b 0%, #1a1a40 100%);
             border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 5px solid;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-deposit { background: linear-gradient(90deg, var(--neon-purple), var(--primary-blue)); color: white; }
+        .btn-withdraw { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+        /* TASK SECTION (A munka területe) */
+        .task-container {
+            margin-top: 30px;
+        }
+        .task-status-bar {
             display: flex;
             justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #8daec4;
+        }
+        .task-status-bar span strong { color: var(--neon-cyan); }
+
+        /* GRAB BUTTON - A FŐ GOMB */
+        .grab-button-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
             align-items: center;
         }
+        .grab-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--primary-blue));
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .grab-btn:active { transform: scale(0.95); box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+        .grab-btn:disabled { opacity: 0.7; cursor: not-allowed; }
         
-        /* Színek a szintekhez */
-        .lv1 { border-color: #00ff00; }
-        .lv2 { border-color: #00d4ff; }
-        .lv3 { border-color: #ffa500; }
-        .lv4 { border-color: #b10dc9; } /* Lila - ahogy kérted */
+        /* Pulzáló animáció a gomb körül */
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--neon-cyan);
+            animation: pulse 2s infinite;
+            opacity: 0;
+        }
+        .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
 
-        .vip-info h3 { margin: 0; font-size: 18px; }
-        .vip-info p { margin: 5px 0 0; font-size: 12px; color: #aaa; }
-        .vip-price { font-weight: bold; color: #fff; }
+        /* FOLYAMATBAN LÉVŐ MUNKA ANIMÁCIÓ */
+        .processing-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 10, 20, 0.9);
+            z-index: 200;
+            display: none; /* Alapból rejtve */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .app-icon-placeholder {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+        .loader-bar {
+            width: 60%;
+            height: 8px;
+            background: #0a1528;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .loader-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            transition: width 3s ease-in-out;
+        }
 
-        /* FOOTER MENÜ */
+        /* SIKERES POPUP */
+        .success-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(135deg, #0d2347 0%, #0a1528 100%);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.3);
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        .success-modal.active { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: all; }
+        .success-icon { font-size: 50px; color: var(--neon-cyan); margin-bottom: 15px; }
+        .reward-text { font-size: 24px; font-weight: bold; color: #00ff00; margin: 10px 0; }
+        .app-name-text { color: #8daec4; margin-bottom: 20px; }
+
+        /* BOTTOM NAVIGATION (Profi menü) */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: #000814;
+            background: rgba(10, 21, 40, 0.95);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
-            padding: 15px 0;
-            border-top: 1px solid #333;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
         }
         .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             color: #888;
-            font-size: 12px;
-            text-align: center;
+            text-decoration: none;
+            font-size: 11px;
+            gap: 5px;
+            transition: color 0.3s;
         }
-        .nav-item.active { color: #00d4ff; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: var(--neon-cyan); }
+        .nav-item.active i { text-shadow: 0 0 10px var(--neon-cyan); }
 
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">K ETQ</div>
-        <div class="lang-icon">🌐 HU</div>
+        <div class="logo-text">ETQ TECHNOLOGY</div>
+        <div class="user-level-badge"><i class="fas fa-crown"></i> LV1 Tag</div>
     </div>
 
-    <div class="balance-card">
-        <div class="balance-amount" id="userBalance">0.00 USDT</div>
-        <div class="balance-label">Rendelkezésre álló egyenleg</div>
-        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
-            <button style="background: #b10dc9; border:none; color:white; padding:5px 15px; border-radius:5px;">Letét</button>
-            <button style="background: #0059b3; border:none; color:white; padding:5px 15px; border-radius:5px;">Kivonás</button>
+    <div class="container">
+        <div class="balance-card">
+            <div class="balance-title">Teljes Vagyon (USDT)</div>
+            <div class="balance-amount" id="balanceDisplay">0.00</div>
+            <div style="color: #00ff00; font-size: 12px; margin-top: 5px;">+ Tegnapi profit: 0.00</div>
+            <div class="action-buttons">
+                <button class="btn-action btn-deposit"><i class="fas fa-wallet"></i> Befizetés</button>
+                <button class="btn-action btn-withdraw"><i class="fas fa-hand-holding-usd"></i> Kifizetés</button>
+            </div>
+        </div>
+
+        <div class="task-container">
+            <div class="task-status-bar">
+                <span>Mai rendelések: <strong id="taskCountDisplay">0</strong>/10</span>
+                <span>Jutalék ráta: <strong>2.0%</strong></span>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px; color: #8daec4; font-size: 13px;">
+                <i class="fab fa-google-play" style="color: var(--neon-cyan);"></i> Google Play Store Optimalizálás
+            </div>
+
+            <div class="grab-button-container">
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring"></div>
+                <button class="grab-btn" id="startTaskBtn" onclick="startOptimization()">
+                    <i class="fas fa-rocket" style="font-size: 40px; margin-bottom: 10px; display: block;"></i>
+                    START
+                </button>
+            </div>
+            <p style="text-align: center; color: #556; font-size: 12px; margin-top: 20px;">
+                Kattints a gombra a rendszer intelligens párosításához.
+            </p>
         </div>
     </div>
 
-    <div class="task-section">
-        <h3>Napi feladatok: <span id="taskCount">0</span>/10</h3>
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="app-icon-placeholder" id="randomAppIcon">📱</div>
+        <h3 id="randomAppName" style="color: white;">App Keresése...</h3>
+        <p style="color: var(--neon-cyan); font-size: 12px;">Adatok szinkronizálása a Google szerverekkel...</p>
+        <div class="loader-bar">
+            <div class="loader-fill" id="loaderFill"></div>
         </div>
-        <button class="start-btn" onclick="startTask()">GET TO WORK</button>
-        <p id="statusMsg" style="color: #00d4ff; font-size: 12px; min-height: 20px;"></p>
     </div>
 
-    <div class="vip-list">
-        <div class="vip-card lv1">
-            <div class="vip-info">
-                <h3 style="color:#00ff00;">Level 1</h3>
-                <p>Napi 10 rendelés | Jutalék: 2%</p>
-            </div>
-            <div class="vip-price">200 USDT</div>
-        </div>
-
-        <div class="vip-card lv2">
-            <div class="vip-info">
-                <h3 style="color:#00d4ff;">Level 2</h3>
-                <p>Napi 20 rendelés | Jutalék: 2.5%</p>
-            </div>
-            <div class="vip-price">680 USDT</div>
-        </div>
-
-        <div class="vip-card lv3">
-            <div class="vip-info">
-                <h3 style="color:#ffa500;">Level 3</h3>
-                <p>Napi 30 rendelés | Jutalék: 3%</p>
-            </div>
-            <div class="vip-price">1560 USDT</div>
-        </div>
-
-        <div class="vip-card lv4">
-            <div class="vip-info">
-                <h3 style="color:#b10dc9;">Level 4 (VIP)</h3>
-                <p>Napi 50 rendelés | Jutalék: 3.5%</p>
-            </div>
-            <div class="vip-price">3200 USDT</div>
-        </div>
+    <div class="success-modal" id="successModal">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <h2 style="color: white; margin: 0;">Optimalizálás Kész!</h2>
+        <p class="app-name-text" id="successAppName">App: TikTok</p>
+        <div class="reward-text">+ 0.50 USDT</div>
+        <p style="color: #aaa; font-size: 12px;">A jutalék jóváírva az egyenlegeden.</p>
+        <button class="btn-action btn-deposit" style="width: 100%; margin-top: 20px;" onclick="closeModal()">Tovább</button>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item">🏠<br>Főoldal</div>
-        <div class="nav-item active">⚡<br>Munka</div>
-        <div class="nav-item">👥<br>Csapat</div>
-        <div class="nav-item">👤<br>Profil</div>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Főoldal</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-tasks"></i>
+            <span>Feladat</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-gem"></i>
+            <span>VIP</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
     </div>
 
     <script>
-        // Ez a Javascript végzi az "A Opciót" (Szimuláció)
-        let balance = 0.00;
-        let tasksDone = 0;
-        let userLevel = 1; // Alapból LV1 a demóban
+        // --- PROFI SZIMULÁCIÓS LOGIKA (A OPCIÓ) ---
 
-        function startTask() {
-            if (tasksDone >= 10) {
-                alert("Mára végeztél a feladatokkal!");
+        // 1. Adatok (Állapot)
+        let state = {
+            balance: 0.00,
+            tasksDone: 0,
+            maxTasks: 10,
+            level: 1,
+            commissionRate: 0.02 // 2%
+        };
+
+        // 2. Random App Lista (Hogy valóságosnak tűnjön)
+        const fakeApps = [
+            { name: "TikTok - Videos", icon: '<i class="fab fa-tiktok" style="color: #fe2c55;"></i>', price: 45.00 },
+            { name: "Binance: BTC, Crypto", icon: '<i class="fab fa-bitcoin" style="color: #f3ba2f;"></i>', price: 120.00 },
+            { name: "Spotify Music", icon: '<i class="fab fa-spotify" style="color: #1db954;"></i>', price: 30.00 },
+            { name: "Instagram", icon: '<i class="fab fa-instagram" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>', price: 60.00 },
+            { name: "Call of Duty Mobile", icon: '<i class="fas fa-gamepad" style="color: #ff9900;"></i>', price: 85.50 }
+        ];
+
+        // UI Elemek
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const taskCountDisplay = document.getElementById('taskCountDisplay');
+        const startBtn = document.getElementById('startTaskBtn');
+        const overlay = document.getElementById('processingOverlay');
+        const loaderFill = document.getElementById('loaderFill');
+        const modal = document.getElementById('successModal');
+        
+        const randomAppIcon = document.getElementById('randomAppIcon');
+        const randomAppName = document.getElementById('randomAppName');
+        const successAppName = document.getElementById('successAppName');
+        const rewardText = document.querySelector('.reward-text');
+
+        // FŐ FÜGGVÉNY - A GOMB NYOMÁSAKOR FUT LE
+        function startOptimization() {
+            // Ellenőrzés
+            if (state.tasksDone >= state.maxTasks) {
+                alert("Mára elérted a szinted (LV1) maximum rendelési számát!");
                 return;
             }
 
-            const btn = document.querySelector('.start-btn');
-            const status = document.getElementById('statusMsg');
-            const bar = document.getElementById('progressBar');
-            const container = document.getElementById('progressContainer');
+            // 1. UI felkészítése az animációra
+            startBtn.disabled = true;
+            overlay.style.display = 'flex';
+            loaderFill.style.width = '0%';
+            
+            // 2. Random App kiválasztása
+            const currentApp = fakeApps[Math.floor(Math.random() * fakeApps.length)];
+            randomAppIcon.innerHTML = currentApp.icon;
+            randomAppName.innerText = "Optimalizálás: " + currentApp.name;
 
-            // UI Animáció indítása
-            btn.disabled = true;
-            btn.style.opacity = "0.5";
-            container.style.display = "block";
-            status.innerText = "Applikációk rangsorolása folyamatban... (Google API)";
+            // 3. Animáció indítása (3 másodperc)
+            setTimeout(() => { loaderFill.style.width = '100%'; }, 100);
 
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
-                    completeTaskBackend(); // Ha kész a csík, hívjuk a szervert
-                } else {
-                    width++;
-                    bar.style.width = width + '%';
-                }
-            }, 30); // Gyorsaság
+            // 4. Amikor kész az animáció (Szimulált backend válasz)
+            setTimeout(() => {
+                finishTask(currentApp);
+            }, 3500); // 3.5mp múlva kész
         }
 
-        function completeTaskBackend() {
-            // Itt kommunikálunk a server.js-el
-            fetch('/api/complete-task', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ level: userLevel })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // UI Frissítése
-                balance += data.reward;
-                tasksDone++;
-                
-                document.getElementById('userBalance').innerText = balance.toFixed(2) + " USDT";
-                document.getElementById('taskCount').innerText = tasksDone;
-                document.getElementById('statusMsg').innerText = data.message + " +" + data.reward + " USDT";
-                
-                // Reset
-                document.querySelector('.start-btn').disabled = false;
-                document.querySelector('.start-btn').style.opacity = "1";
-                document.getElementById('progressContainer').style.display = "none";
-            });
+        function finishTask(app) {
+            // Matek: Termék ára * jutalék ráta (pl. $50 * 0.02 = $1.00)
+            // A demó kedvéért most fix 0.50 USDT-t adunk, hogy látványos legyen
+            const reward = 0.50; 
+
+            // Állapot frissítése
+            state.balance += reward;
+            state.tasksDone++;
+
+            // UI Frissítése
+            balanceDisplay.innerText = state.balance.toFixed(2);
+            taskCountDisplay.innerText = state.tasksDone;
+            
+            // Modal beállítása és megjelenítése
+            successAppName.innerText = `App: ${app.name} (Érték: $${app.price})`;
+            rewardText.innerText = `+ ${reward.toFixed(2)} USDT`;
+            
+            overlay.style.display = 'none'; // Overlay eltüntetése
+            modal.classList.add('active'); // Popup megjelenítése
         }
+
+        // Modal bezárása
+        function closeModal() {
+            modal.classList.remove('active');
+            startBtn.disabled = false; // Gomb újra aktív
+        }
+
     </script>
 </body>
 </html>
