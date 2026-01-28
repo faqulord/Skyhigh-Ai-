@@ -6,27 +6,25 @@
     <title>ETQ Electronic Technology</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- PROFI DESIGN ALAPOK (WTQ STÍLUS) --- */
+        /* --- WTQ STÍLUSÚ DESIGN (PIXEL PERFECT) --- */
         :root {
-            --primary-blue: #0066ff;
-            --neon-cyan: #00e5ff;
-            --neon-purple: #bb00ff;
-            --dark-bg: #050a14;
-            --card-bg: #0a1528;
-            --text-light: #e6eefa;
+            --bg-dark: #000814;
+            --card-blue: #0b1e3b;
+            --accent-cyan: #00eaff;
+            --accent-purple: #9d00ff;
+            --text-gray: #8f9bb3;
+            --gold: #ffc107;
         }
+
         body {
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            /* Finom sötét gradiens háttér */
-            background-image: radial-gradient(circle at top, #0a1535 0%, var(--dark-bg) 60%);
+            padding-bottom: 80px;
+            background-image: linear-gradient(180deg, #00122e 0%, #000814 100%);
             min-height: 100vh;
-            padding-bottom: 70px; /* Hely az alsó menünek */
         }
-        * { box-sizing: border-box; }
 
         /* HEADER */
         .header {
@@ -34,394 +32,349 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-            background: rgba(10, 21, 40, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(11, 30, 59, 0.9);
+            backdrop-filter: blur(5px);
             position: sticky;
             top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            z-index: 50;
+            border-bottom: 1px solid rgba(0, 234, 255, 0.1);
         }
-        .logo-text {
-            font-size: 18px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #fff, var(--neon-cyan));
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            font-style: italic;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 0.5px;
         }
-        .user-level-badge {
-            background: linear-gradient(135deg, var(--primary-blue), var(--neon-purple));
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+        .slv-badge {
+            background: linear-gradient(90deg, var(--accent-purple), #ff0055);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: bold;
-            box-shadow: 0 0 10px rgba(187, 0, 255, 0.3);
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--accent-purple);
         }
 
-        /* MAIN CONTAINER */
-        .container {
+        /* BALANCE SECTION */
+        .balance-container {
             padding: 20px;
         }
-
-        /* BALANCE KÁRTYA (Profi kinézet) */
         .balance-card {
-            background: linear-gradient(135deg, #0d2347 0%, #0a1528 100%);
-            border-radius: 20px;
+            background: linear-gradient(135deg, #0f2b50 0%, #051021 100%);
+            border-radius: 15px;
             padding: 25px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.2);
-            border: 1px solid rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
         }
-        /* Neon fény effekt a háttérben */
-        .balance-card::before {
+        .balance-card::after {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 229, 255, 0.1) 0%, transparent 60%);
-            pointer-events: none;
+            top: 0; right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(157,0,255,0.2) 0%, transparent 70%);
         }
-        .balance-title {
-            font-size: 14px;
-            color: #8daec4;
-            margin-bottom: 10px;
-        }
-        .balance-amount {
-            font-size: 36px;
-            font-weight: 800;
-            color: #fff;
-            text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
-        }
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        .btn-action {
+        .balance-title { color: var(--text-gray); font-size: 13px; letter-spacing: 1px; }
+        .balance-amount { font-size: 42px; font-weight: 700; margin: 10px 0; text-shadow: 0 0 10px rgba(0,234,255,0.3); }
+        
+        .btn-row { display: flex; gap: 15px; margin-top: 20px; }
+        .btn {
             flex: 1;
             padding: 12px;
+            border-radius: 8px;
             border: none;
-            border-radius: 12px;
-            font-weight: 600;
+            color: white;
+            font-weight: bold;
             font-size: 14px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
-        .btn-deposit { background: linear-gradient(90deg, var(--neon-purple), var(--primary-blue)); color: white; }
-        .btn-withdraw { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-depo { background: linear-gradient(90deg, #00c6ff, #0072ff); }
+        .btn-with { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
 
-        /* TASK SECTION (A munka területe) */
-        .task-container {
-            margin-top: 30px;
-        }
-        .task-status-bar {
+        /* SLV STATUS BAR (REFERRAL LOGIC) */
+        .status-bar {
+            background: rgba(11, 30, 59, 0.6);
+            margin: 0 20px;
+            padding: 15px;
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #8daec4;
+            align-items: center;
+            border-left: 3px solid var(--accent-purple);
         }
-        .task-status-bar span strong { color: var(--neon-cyan); }
+        .invite-info { font-size: 12px; color: var(--text-gray); }
+        .invite-count { color: var(--accent-cyan); font-weight: bold; font-size: 14px; }
 
-        /* GRAB BUTTON - A FŐ GOMB */
-        .grab-button-container {
+        /* TASK SECTION */
+        .task-section {
+            margin-top: 30px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .grab-btn-wrapper {
             position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
+            width: 160px;
+            height: 160px;
+            margin: 20px auto;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         .grab-btn {
-            width: 180px;
-            height: 180px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--primary-blue));
+            background: linear-gradient(135deg, var(--accent-cyan), #0055ff);
+            border: 4px solid rgba(255,255,255,0.1);
             color: white;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
-            position: relative;
+            box-shadow: 0 0 40px rgba(0, 234, 255, 0.3);
             z-index: 2;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .grab-btn:active { transform: scale(0.95); box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
-        .grab-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-        
-        /* Pulzáló animáció a gomb körül */
-        .pulse-ring {
+        .grab-btn:active { transform: scale(0.95); }
+        .ripple {
             position: absolute;
-            width: 100%;
-            height: 100%;
             border-radius: 50%;
-            border: 2px solid var(--neon-cyan);
-            animation: pulse 2s infinite;
-            opacity: 0;
+            border: 1px solid var(--accent-cyan);
+            width: 100%; height: 100%;
+            animation: ripple 2s infinite;
         }
-        .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
-        @keyframes pulse {
-            0% { transform: scale(0.9); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-
-        /* FOLYAMATBAN LÉVŐ MUNKA ANIMÁCIÓ */
-        .processing-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(5, 10, 20, 0.9);
-            z-index: 200;
-            display: none; /* Alapból rejtve */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        .app-icon-placeholder {
-            font-size: 60px;
-            margin-bottom: 20px;
-            animation: bounce 1s infinite alternate;
-        }
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
-        .loader-bar {
-            width: 60%;
-            height: 8px;
-            background: #0a1528;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 20px;
-        }
-        .loader-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
-            transition: width 3s ease-in-out;
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
         }
 
-        /* SIKERES POPUP */
-        .success-modal {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: linear-gradient(135deg, #0d2347 0%, #0a1528 100%);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            border: 2px solid var(--neon-cyan);
-            box-shadow: 0 0 50px rgba(0, 229, 255, 0.3);
-            z-index: 300;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s;
+        /* COMPANY INFO (A Kért Szövegek) */
+        .company-info {
+            padding: 30px 20px;
+            background: #050f1f;
+            margin-top: 30px;
+            border-top: 1px solid #1a2f4d;
         }
-        .success-modal.active { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: all; }
-        .success-icon { font-size: 50px; color: var(--neon-cyan); margin-bottom: 15px; }
-        .reward-text { font-size: 24px; font-weight: bold; color: #00ff00; margin: 10px 0; }
-        .app-name-text { color: #8daec4; margin-bottom: 20px; }
+        .info-title {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--gold);
+            padding-left: 10px;
+        }
+        .info-text {
+            color: var(--text-gray);
+            font-size: 12px;
+            line-height: 1.6;
+            text-align: justify;
+        }
 
-        /* BOTTOM NAVIGATION (Profi menü) */
-        .bottom-nav {
+        /* BOTTOM NAV */
+        .nav {
             position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(10, 21, 40, 0.95);
-            backdrop-filter: blur(10px);
+            bottom: 0; width: 100%;
+            background: #0b1e3b;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #888;
+            text-align: center;
+            color: #5a6b8c;
+            font-size: 10px;
             text-decoration: none;
-            font-size: 11px;
-            gap: 5px;
-            transition: color 0.3s;
         }
-        .nav-item i { font-size: 20px; }
-        .nav-item.active { color: var(--neon-cyan); }
-        .nav-item.active i { text-shadow: 0 0 10px var(--neon-cyan); }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
+        .nav-item.active { color: var(--accent-cyan); }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .app-loader { width: 80%; text-align: center; }
+        .loading-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-top: 20px; overflow: hidden; }
+        .loading-fill { width: 0%; height: 100%; background: var(--accent-cyan); transition: width 2s; }
 
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo-text">ETQ TECHNOLOGY</div>
-        <div class="user-level-badge"><i class="fas fa-crown"></i> LV1 Tag</div>
+        <div class="logo">ETQ TECHNOLOGY</div>
+        <div class="slv-badge" id="levelBadge">LV1</div>
     </div>
 
-    <div class="container">
+    <div class="balance-container">
         <div class="balance-card">
-            <div class="balance-title">Teljes Vagyon (USDT)</div>
-            <div class="balance-amount" id="balanceDisplay">0.00</div>
-            <div style="color: #00ff00; font-size: 12px; margin-top: 5px;">+ Tegnapi profit: 0.00</div>
-            <div class="action-buttons">
-                <button class="btn-action btn-deposit"><i class="fas fa-wallet"></i> Befizetés</button>
-                <button class="btn-action btn-withdraw"><i class="fas fa-hand-holding-usd"></i> Kifizetés</button>
+            <div class="balance-title">TELJES EGYENLEG (USDT)</div>
+            <div class="balance-amount" id="balance">0.00</div>
+            <div style="font-size: 12px; color: var(--accent-cyan);">Mai bevétel: <span id="todayProfit">0.00</span></div>
+            <div class="btn-row">
+                <button class="btn btn-depo">BEFIZETÉS</button>
+                <button class="btn btn-with">KIFIZETÉS</button>
             </div>
-        </div>
-
-        <div class="task-container">
-            <div class="task-status-bar">
-                <span>Mai rendelések: <strong id="taskCountDisplay">0</strong>/10</span>
-                <span>Jutalék ráta: <strong>2.0%</strong></span>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 20px; color: #8daec4; font-size: 13px;">
-                <i class="fab fa-google-play" style="color: var(--neon-cyan);"></i> Google Play Store Optimalizálás
-            </div>
-
-            <div class="grab-button-container">
-                <div class="pulse-ring"></div>
-                <div class="pulse-ring"></div>
-                <button class="grab-btn" id="startTaskBtn" onclick="startOptimization()">
-                    <i class="fas fa-rocket" style="font-size: 40px; margin-bottom: 10px; display: block;"></i>
-                    START
-                </button>
-            </div>
-            <p style="text-align: center; color: #556; font-size: 12px; margin-top: 20px;">
-                Kattints a gombra a rendszer intelligens párosításához.
-            </p>
         </div>
     </div>
 
-    <div class="processing-overlay" id="processingOverlay">
-        <div class="app-icon-placeholder" id="randomAppIcon">📱</div>
-        <h3 id="randomAppName" style="color: white;">App Keresése...</h3>
-        <p style="color: var(--neon-cyan); font-size: 12px;">Adatok szinkronizálása a Google szerverekkel...</p>
-        <div class="loader-bar">
-            <div class="loader-fill" id="loaderFill"></div>
+    <div class="status-bar">
+        <div class="invite-info">
+            <div>Jelenlegi szint: <strong style="color:white;" id="currentLevelName">LV1</strong></div>
+            <div style="font-size:10px; margin-top:3px;">SLV Feloldása: <span id="neededInvites">2</span> meghívott kell</div>
+        </div>
+        <div style="text-align: right;">
+            <div class="invite-count" id="inviteCount">0 Fő</div>
+            <button onclick="simulateInvite()" style="font-size:9px; background:transparent; border:1px solid #555; color:#aaa; cursor:pointer;">+ Simulálás</button>
         </div>
     </div>
 
-    <div class="success-modal" id="successModal">
-        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-        <h2 style="color: white; margin: 0;">Optimalizálás Kész!</h2>
-        <p class="app-name-text" id="successAppName">App: TikTok</p>
-        <div class="reward-text">+ 0.50 USDT</div>
-        <p style="color: #aaa; font-size: 12px;">A jutalék jóváírva az egyenlegeden.</p>
-        <button class="btn-action btn-deposit" style="width: 100%; margin-top: 20px;" onclick="closeModal()">Tovább</button>
+    <div class="task-section">
+        <div style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">
+            Intelligens Google API Optimalizálás...
+        </div>
+        <div class="grab-btn-wrapper">
+            <div class="ripple"></div>
+            <button class="grab-btn" onclick="doTask()">START<br>TASK</button>
+        </div>
+        <div style="color: var(--text-gray); font-size: 12px; margin-top: 10px;">
+            Mai feladatok: <span style="color:white;" id="tasksDone">0</span>/10
+        </div>
     </div>
 
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active">
-            <i class="fas fa-home"></i>
-            <span>Főoldal</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-tasks"></i>
-            <span>Feladat</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-gem"></i>
-            <span>VIP</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-user"></i>
-            <span>Profil</span>
-        </a>
+    <div class="company-info">
+        <div class="info-title">Az ETQ Filozófiája</div>
+        <p class="info-text">
+            Az ETQ Electronic Technology Co., Ltd.-t 2019-ben alapították Coloradóban. Vezető globális alkalmazás-promóciós vállalatként elkötelezettek vagyunk a Google ökoszisztéma erősítése mellett.
+        </p>
+        <br>
+        <div class="info-title">Stratégiai Partnerek</div>
+        <p class="info-text">
+            Közvetlen kapcsolatban állunk olyan óriásokkal, mint a TikTok, Facebook és a Snapchat. Rendszerünk intelligens elosztási megoldással ("Intelligent Distribution Solution") biztosítja, hogy minden partnerünk applikációja a megfelelő célközönséghez jusson el, miközben felhasználóink stabil, átlátható USDT alapú jövedelemhez jutnak.
+        </p>
+    </div>
+
+    <div class="modal" id="taskModal">
+        <i class="fab fa-android" style="font-size: 50px; color: #a4c639; margin-bottom: 20px;"></i>
+        <h3 style="color: white;">Applikáció Optimalizálása...</h3>
+        <p style="color: #888; font-size: 12px;">Data syncing with Play Store...</p>
+        <div class="app-loader">
+            <div class="loading-bar"><div class="loading-fill" id="fillBar"></div></div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="#" class="nav-item active"><i class="fas fa-home"></i>Főoldal</a>
+        <a href="#" class="nav-item"><i class="fas fa-bolt"></i>Munka</a>
+        <a href="#" class="nav-item"><i class="fas fa-users"></i>Csapat</a>
+        <a href="#" class="nav-item"><i class="fas fa-user-circle"></i>Profil</a>
     </div>
 
     <script>
-        // --- PROFI SZIMULÁCIÓS LOGIKA (A OPCIÓ) ---
+        // --- LOGIKA ---
 
-        // 1. Adatok (Állapot)
-        let state = {
+        let user = {
             balance: 0.00,
+            level: 1, // 1, 2, 3, 4
+            isSLV: false, // Ez az új SLV status
+            invites: 0,
             tasksDone: 0,
-            maxTasks: 10,
-            level: 1,
-            commissionRate: 0.02 // 2%
+            maxTasks: 10
         };
 
-        // 2. Random App Lista (Hogy valóságosnak tűnjön)
-        const fakeApps = [
-            { name: "TikTok - Videos", icon: '<i class="fab fa-tiktok" style="color: #fe2c55;"></i>', price: 45.00 },
-            { name: "Binance: BTC, Crypto", icon: '<i class="fab fa-bitcoin" style="color: #f3ba2f;"></i>', price: 120.00 },
-            { name: "Spotify Music", icon: '<i class="fab fa-spotify" style="color: #1db954;"></i>', price: 30.00 },
-            { name: "Instagram", icon: '<i class="fab fa-instagram" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>', price: 60.00 },
-            { name: "Call of Duty Mobile", icon: '<i class="fas fa-gamepad" style="color: #ff9900;"></i>', price: 85.50 }
-        ];
+        const levelRequirements = {
+            1: { tasks: 10, invitesNeeded: 2, commission: 0.50 },
+            2: { tasks: 20, invitesNeeded: 3, commission: 1.20 },
+            3: { tasks: 30, invitesNeeded: 5, commission: 2.50 }
+        };
 
-        // UI Elemek
-        const balanceDisplay = document.getElementById('balanceDisplay');
-        const taskCountDisplay = document.getElementById('taskCountDisplay');
-        const startBtn = document.getElementById('startTaskBtn');
-        const overlay = document.getElementById('processingOverlay');
-        const loaderFill = document.getElementById('loaderFill');
-        const modal = document.getElementById('successModal');
-        
-        const randomAppIcon = document.getElementById('randomAppIcon');
-        const randomAppName = document.getElementById('randomAppName');
-        const successAppName = document.getElementById('successAppName');
-        const rewardText = document.querySelector('.reward-text');
+        // DOM elemek
+        const els = {
+            balance: document.getElementById('balance'),
+            todayProfit: document.getElementById('todayProfit'),
+            levelBadge: document.getElementById('levelBadge'),
+            inviteCount: document.getElementById('inviteCount'),
+            tasksDone: document.getElementById('tasksDone'),
+            currentLevelName: document.getElementById('currentLevelName'),
+            modal: document.getElementById('taskModal'),
+            fillBar: document.getElementById('fillBar')
+        };
 
-        // FŐ FÜGGVÉNY - A GOMB NYOMÁSAKOR FUT LE
-        function startOptimization() {
-            // Ellenőrzés
-            if (state.tasksDone >= state.maxTasks) {
-                alert("Mára elérted a szinted (LV1) maximum rendelési számát!");
+        // Frissítés
+        function updateUI() {
+            els.balance.innerText = user.balance.toFixed(2);
+            els.inviteCount.innerText = user.invites + " Fő";
+            els.tasksDone.innerText = user.tasksDone;
+            
+            // SLV Logic megjelenítése
+            let prefix = user.isSLV ? "SLV" : "LV";
+            els.levelBadge.innerText = prefix + user.level;
+            els.currentLevelName.innerText = prefix + user.level;
+            
+            // Ha SLV vagy, akkor más a szín
+            if(user.isSLV) {
+                els.levelBadge.style.background = "linear-gradient(90deg, #ffd700, #ff8c00)"; // Gold
+                els.levelBadge.style.color = "black";
+            }
+        }
+
+        // 1. MEGHÍVÁS SZIMULÁLÁSA (SLV LOGIKA)
+        function simulateInvite() {
+            user.invites++;
+            
+            // Ellenőrizzük, feloldotta-e az SLV szintet?
+            let req = levelRequirements[user.level];
+            if (req && user.invites >= req.invitesNeeded && !user.isSLV) {
+                user.isSLV = true;
+                alert(`GRATULÁLUNK! Feloldottad az SLV${user.level} szintet! Magasabb jutalék aktiválva.`);
+            }
+            updateUI();
+        }
+
+        // 2. MUNKA (TASK)
+        function doTask() {
+            if(user.tasksDone >= user.maxTasks) {
+                alert("Mára végeztél a feladatokkal!");
                 return;
             }
 
-            // 1. UI felkészítése az animációra
-            startBtn.disabled = true;
-            overlay.style.display = 'flex';
-            loaderFill.style.width = '0%';
+            // Modal indítása
+            els.modal.style.display = "flex";
+            els.fillBar.style.width = "0%";
             
-            // 2. Random App kiválasztása
-            const currentApp = fakeApps[Math.floor(Math.random() * fakeApps.length)];
-            randomAppIcon.innerHTML = currentApp.icon;
-            randomAppName.innerText = "Optimalizálás: " + currentApp.name;
+            setTimeout(() => { els.fillBar.style.width = "100%"; }, 100);
 
-            // 3. Animáció indítása (3 másodperc)
-            setTimeout(() => { loaderFill.style.width = '100%'; }, 100);
-
-            // 4. Amikor kész az animáció (Szimulált backend válasz)
             setTimeout(() => {
-                finishTask(currentApp);
-            }, 3500); // 3.5mp múlva kész
-        }
+                // Kész
+                els.modal.style.display = "none";
+                
+                // Jutalék számítás (SLV többet kap)
+                let baseComm = levelRequirements[user.level].commission;
+                if(user.isSLV) baseComm *= 1.5; // +50% ha SLV vagy
 
-        function finishTask(app) {
-            // Matek: Termék ára * jutalék ráta (pl. $50 * 0.02 = $1.00)
-            // A demó kedvéért most fix 0.50 USDT-t adunk, hogy látványos legyen
-            const reward = 0.50; 
-
-            // Állapot frissítése
-            state.balance += reward;
-            state.tasksDone++;
-
-            // UI Frissítése
-            balanceDisplay.innerText = state.balance.toFixed(2);
-            taskCountDisplay.innerText = state.tasksDone;
-            
-            // Modal beállítása és megjelenítése
-            successAppName.innerText = `App: ${app.name} (Érték: $${app.price})`;
-            rewardText.innerText = `+ ${reward.toFixed(2)} USDT`;
-            
-            overlay.style.display = 'none'; // Overlay eltüntetése
-            modal.classList.add('active'); // Popup megjelenítése
-        }
-
-        // Modal bezárása
-        function closeModal() {
-            modal.classList.remove('active');
-            startBtn.disabled = false; // Gomb újra aktív
+                user.balance += baseComm;
+                let currentProfit = parseFloat(els.todayProfit.innerText);
+                els.todayProfit.innerText = (currentProfit + baseComm).toFixed(2);
+                
+                user.tasksDone++;
+                updateUI();
+                
+                // Random App név kiírása
+                const apps = ["TikTok", "Uber", "Facebook", "Temu", "Amazon"];
+                const randomApp = apps[Math.floor(Math.random() * apps.length)];
+                alert(`Sikeres optimalizálás: ${randomApp}\nJutalék: ${baseComm.toFixed(2)} USDT`);
+                
+            }, 2500);
         }
 
     </script>
